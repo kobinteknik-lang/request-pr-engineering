@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FORM REQUEST PR ENGINEERING</title>
+<style>
+<style>
+    /* Reset & Base */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+    /* Body dengan Background Gambar */
+    body { 
+        display: flex; justify-content: center; align-items: center; 
+        min-height: 100vh; padding: 20px; color: #334155;
+        background-image: url('https://static.vecteezy.com/system/resources/previews/003/386/349/large_2x/machine-gears-background-free-photo.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+    
+    /* Container Card dengan Efek Transparansi */
+    .container { 
+        width: 100%; max-width: 500px; 
+        background: rgba(255, 255, 255, 0.9) !important; /* Putih transparan */
+        backdrop-filter: blur(5px); /* Efek blur */
+        padding: 30px; border-radius: 16px; 
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    h2 { text-align: center; color: #0f172a; margin-bottom: 8px; font-size: 22px; }
+    .subtitle { text-align: center; color: #64748b; font-size: 13px; margin-bottom: 25px; }
+
+    /* Form Elements */
+    .form-group { margin-bottom: 18px; position: relative; }
+    label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #475569; }
+    
+    input, textarea, select { 
+        width: 100%; padding: 12px; border-radius: 8px; 
+        border: 1px solid #cbd5e1; background: #f8fafc; 
+        font-size: 14px; transition: all 0.2s;
+    }
+    input:focus, textarea:focus, select:focus { 
+        background: #fff; border-color: #2563eb; 
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); outline: none; 
+    }
+    input[readonly] { background: #e2e8f0; color: #475569; cursor: not-allowed; }
+
+    /* Button */
+    .btn { 
+        width: 100%; padding: 12px; background: #2563eb; color: #fff; 
+        border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+        transition: background 0.2s; margin-top: 10px;
+    }
+    .btn:hover { background: #1d4ed8; }
+    .btn:disabled { background: #94a3b8; }
+
+    /* Autocomplete */
+    .suggestions-box { 
+        position: absolute; width: 100%; background: #fff; 
+        border: 1px solid #cbd5e1; border-top: none; 
+        max-height: 200px; overflow-y: auto; display: none; 
+        z-index: 999; border-radius: 0 0 8px 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    .suggestion-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
+    .suggestion-item:hover { background: #eff6ff; }
+    .suggestion-name { font-weight: 500; font-size: 14px; }
+    .suggestion-code { font-size: 11px; color: #64748b; }
+	.footer {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+    color: white; /* Warna teks putih agar kontras dengan background gear */
+    font-size: 12px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Efek bayangan agar teks tetap terbaca */
+    pointer-events: none; /* Agar tidak mengganggu klik di area bawah */
+}
+
+/* Pastikan body punya posisi relative agar footer bisa mengikuti bawah */
+body {
+    position: relative;
+    min-height: 100vh;
+}
+/* 1. Pengaturan Dasar agar tidak overflow */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body { 
+        min-height: 100vh;
+        display: flex; 
+        flex-direction: column; /* Membantu posisi footer */
+        justify-content: center; 
+        align-items: center; 
+        padding: 15px; /* Memberi jarak di layar HP */
+        background: url('https://static.vecteezy.com/system/resources/previews/003/386/349/large_2x/machine-gears-background-free-photo.jpg') no-repeat center center fixed;
+        background-size: cover;
+    }
+
+    /* 2. Container yang fleksibel */
+    .container { 
+        width: 100%; 
+        max-width: 500px; /* Lebar maksimal di desktop */
+        background: rgba(255, 255, 255, 0.9) !important; 
+        backdrop-filter: blur(8px);
+        padding: 25px; 
+        border-radius: 16px; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        margin: auto; /* Memastikan posisi di tengah */
+    }
+
+    /* 3. Input agar tidak meluap di layar kecil */
+    input, textarea, select { 
+        width: 100%; 
+        max-width: 100%; /* Memastikan tidak keluar dari container */
+        padding: 12px; 
+        font-size: 16px; /* Ukuran 16px mencegah auto-zoom di iOS saat klik input */
+        border-radius: 8px; 
+        border: 1px solid #cbd5e1;
+    }
+
+    /* 4. Footer responsif */
+    .footer {
+        padding: 15px;
+        text-align: center;
+        color: white;
+        font-size: 11px;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        width: 100%;
+    }
+
+    /* Media query untuk layar yang sangat kecil (HP) */
+    @media (max-width: 480px) {
+        .container {
+            padding: 20px;
+            border-radius: 12px;
+        }
+        h2 { font-size: 18px; }
+        .btn { padding: 15px; } /* Tombol lebih mudah ditekan dengan jempol */
+    }
+</style>
+</head>
+
+<body>
+<div id="pageLoader" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; display:flex; justify-content:center; align-items:center; flex-direction:column;">
+    <div style="border:5px solid #f3f3f3; border-top:5px solid #2563eb; border-radius:50%; width:50px; height:50px; animation:spin 1s linear infinite;"></div>
+    <p style="margin-top:15px; font-weight:bold; color:#2563eb;">Memuat Database...</p>
+</div>
+
+<style>
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
+<footer class="footer">
+    &copy; 2026 Departemen Engineering - Sistem PR Internal
+</footer>
+<div class="container">
+    <h2>FORM REQUEST PR ENGINEERING</h2>
+    <div class="subtitle">Sistem Internal Permintaan Barang & Sparepart</div>
+
+    <form id="prForm">
+        <div class="form-group">
+            <label>Nama Karyawan</label>
+            <input type="text" name="nama" required>
+        </div>
+        <div class="form-group">
+            <label>Grup / Nonshift</label>
+            <select name="grup" required>
+                <option value="" disabled selected>-- Pilih --</option>
+                <option>Group A</option> <option>Group B</option> <option>Group C</option> 
+                <option>Group D</option> <option>Nonshift</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Departemen</label>
+            <input type="text" name="departemen" value="Engineering" readonly>
+        </div>
+        <div class="form-group">
+            <label>Nama Barang / Sparepart</label>
+            <input type="text" id="barangInput" name="barang" autocomplete="off" required>
+            <div id="suggestions" class="suggestions-box"></div>
+        </div>
+        <div class="form-group">
+            <label>Kode Barang</label>
+            <input type="text" id="kodeInput" name="kode">
+        </div>
+        <div class="form-group">
+            <label>Jumlah Barang</label>
+            <input type="number" name="jumlah" min="1" step="1" required>
+        </div>
+        <div class="form-group">
+            <label>Keterangan Kebutuhan</label>
+            <textarea name="keterangan" required></textarea>
+        </div>
+        <div class="form-group">
+            <label>Untuk Mesin</label>
+            <input type="text" name="mesin" required>
+        </div>
+        <button type="submit" class="btn" id="submitBtn">Kirim Request PR</button>
+    </form>
+</div>
+
+<script>
+    const barangInput = document.getElementById('barangInput');
+    const kodeInput = document.getElementById('kodeInput');
+    const suggestionsBox = document.getElementById('suggestions');
+    const form = document.getElementById('prForm');
+    const scriptURL = "https://script.google.com/macros/s/AKfycbxek8os1feQ0zocHA1e-Y-2wVKAMs8zj54gT5c88KUjsreKV3b1HHcRdLZsMKNWC25B/exec";
+
+    let databaseBarang = [];
+
+   // 1. LOAD DATA
+window.onload = async () => {
+    const loader = document.getElementById('pageLoader');
+    try {
+        const res = await fetch(scriptURL + "?action=getBarang");
+        databaseBarang = await res.json();
+    } catch (error) {
+        console.error("Gagal memuat database:", error);
+    } finally {
+        // Sembunyikan loader setelah data berhasil diambil (atau gagal)
+        loader.style.display = 'none';
+    }
+};
+
+    // 2. LOGIKA SEARCH & RESET (Klik untuk ganti)
+    barangInput.addEventListener('click', function() {
+        this.value = ''; // Reset input saat diklik
+        kodeInput.value = '';
+        suggestionsBox.style.display = 'none';
+    });
+
+    barangInput.addEventListener('input', function() {
+        const val = this.value.toLowerCase().trim();
+        if(val.length < 1) { suggestionsBox.style.display = 'none'; return; }
+
+        const results = databaseBarang.filter(item => 
+            item.nama.toLowerCase().includes(val) || item.kode.toLowerCase().includes(val)
+        );
+        renderSuggestions(results, val);
+    });
+
+    function renderSuggestions(results, keyword) {
+        suggestionsBox.innerHTML = '';
+        if(results.length === 0) { suggestionsBox.style.display = 'none'; return; }
+        
+        results.slice(0, 10).forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'suggestion-item';
+            div.innerHTML = `<div class="suggestion-name">${item.nama}</div><div class="suggestion-code">${item.kode}</div>`;
+            div.onclick = () => {
+                barangInput.value = item.nama;
+                kodeInput.value = item.kode;
+                suggestionsBox.style.display = 'none';
+            };
+            suggestionsBox.appendChild(div);
+        });
+        suggestionsBox.style.display = 'block';
+    }
+
+    // 3. SUBMIT FORM
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true; btn.innerText = 'Mengirim...';
+
+        fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+            .then(() => { alert('Data berhasil dikirim!'); form.reset(); })
+            .catch(() => alert('Gagal mengirim data.'))
+            .finally(() => { btn.disabled = false; btn.innerText = 'Kirim Request PR'; });
+    });
+
+    // Close click outside
+    document.addEventListener('click', e => {
+        if(!barangInput.contains(e.target) && !suggestionsBox.contains(e.target)) suggestionsBox.style.display = 'none';
+    });
+</script>
+</body>
+</html>
