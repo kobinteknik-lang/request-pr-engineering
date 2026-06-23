@@ -463,50 +463,62 @@ barangInput.addEventListener('keydown', function (e) {
     // Submit
     form.addEventListener('submit', async function (e) {
 
-        e.preventDefault();
+    e.preventDefault();
 
-        if (!kodeInput.value.trim()) {
-            alert("Harap pilih barang dari daftar.");
-            return;
-        }
+    if (!kodeInput.value.trim()) {
+        alert("Harap pilih barang dari daftar.");
+        return;
+    }
 
-        submitBtn.disabled = true;
+    submitBtn.disabled = true;
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = "Mengirim...";
 
-        const originalText = submitBtn.textContent;
-        submitBtn.textContent = "Mengirim...";
+    try {
+
+        const response = await fetch(scriptURL, {
+            method: 'POST',
+            body: new FormData(form)
+        });
+
+        // 🔥 UBAH: jangan langsung json, baca dulu text
+        const text = await response.text();
+        console.log("RAW RESPONSE:", text);
+
+        let result;
 
         try {
-
-            const response = await fetch(scriptURL, {
-                method: 'POST',
-                body: new FormData(form)
-            });
-
-            const result = await response.json();
-
-            if (!result.success) {
-                throw new Error(result.message || "Gagal menyimpan data");
-            }
-
-            alert("Data berhasil dikirim.");
-
-            form.reset();
-            kodeInput.value = '';
-            suggestionsBox.innerHTML = '';
-            suggestionsBox.style.display = 'none';
-
-        } catch (error) {
-
-            console.error(error);
-            alert(error.message || "Terjadi kesalahan saat mengirim data.");
-
-        } finally {
-
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
+            result = JSON.parse(text);
+        } catch (err) {
+            throw new Error("Server tidak mengirim JSON yang valid");
         }
-    });
 
+        if (!response.ok) {
+            throw new Error("Server error HTTP: " + response.status);
+        }
+
+       if (result.result !== "success") {
+    throw new Error("Gagal menyimpan data");
+}
+
+        alert("Data berhasil dikirim.");
+
+        form.reset();
+        kodeInput.value = '';
+        suggestionsBox.innerHTML = '';
+        suggestionsBox.style.display = 'none';
+
+    } catch (error) {
+
+        console.error("SUBMIT ERROR:", error);
+        alert(error.message || "Terjadi kesalahan saat mengirim data.");
+
+    } finally {
+
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    }
+});
     // Tutup suggestion saat klik luar
     document.addEventListener('click', (e) => {
 
