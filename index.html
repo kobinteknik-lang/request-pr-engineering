@@ -304,49 +304,64 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderSuggestions(results, keyword) {
         suggestionsBox.innerHTML = '';
 
-        if (!results.length) {
-            suggestionsBox.style.display = 'none';
-            return;
-        }
-
-        // Pecah keyword menjadi komponen kata untuk highlight regex yang akurat
         const terms = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').trim().split(/\s+/);
         const regex = new RegExp(`(${terms.join('|')})`, 'gi');
 
-        // Tampilkan informasi jumlah data
-        const totalResult = results.length;
-        const infoDiv = document.createElement('div');
-        infoDiv.style.cssText = "padding: 8px 12px; font-size: 11px; color: #94a3b8; border-bottom: 1px solid #f1f5f9; background: #f8fafc; font-weight: 500;";
-        infoDiv.textContent = `${totalResult} data ditemukan`;
-        suggestionsBox.appendChild(infoDiv);
+        // 1. Tampilkan info jumlah data jika ada hasil
+        if (results.length > 0) {
+            const totalResult = results.length;
+            const infoDiv = document.createElement('div');
+            infoDiv.style.cssText = "padding: 8px 12px; font-size: 11px; color: #94a3b8; border-bottom: 1px solid #f1f5f9; background: #f8fafc; font-weight: 500;";
+            infoDiv.textContent = `${totalResult} data ditemukan`;
+            suggestionsBox.appendChild(infoDiv);
 
-        // Batasi hasil tampil maksimal 100 data demi performa DOM
-        results.slice(0, 100).forEach((item, index) => {
-            const nama = item.nama || '';
-            const kode = item.kode || '';
+            // Tampilkan maksimal 100 data
+            results.slice(0, 100).forEach((item, index) => {
+                const nama = item.nama || '';
+                const kode = item.kode || '';
 
-            // Lakukan highlight pada kata yang cocok
-            const highlightedNama = nama.replace(regex, '<mark>$1</mark>');
-            const highlightedKode = kode.replace(regex, '<mark>$1</mark>');
+                const highlightedNama = nama.replace(regex, '<mark>$1</mark>');
+                const highlightedKode = kode.replace(regex, '<mark>$1</mark>');
 
-            const div = document.createElement('div');
-            div.className = 'suggestion-item';
-            div.innerHTML = `
-                <div class="suggestion-name">${highlightedNama}</div>
-                <div class="suggestion-code">${highlightedKode}</div>
-            `;
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.innerHTML = `
+                    <div class="suggestion-name">${highlightedNama}</div>
+                    <div class="suggestion-code">${highlightedKode}</div>
+                `;
 
-            // Aksi saat item dipilih/diklik
-            div.addEventListener('click', () => {
-                barangInput.value = nama;
-                kodeInput.value = kode;
-                suggestionsBox.style.display = 'none';
-                selectedIndex = -1;
+                div.addEventListener('click', () => {
+                    barangInput.value = nama;
+                    kodeInput.value = kode;
+                    kodeInput.readOnly = true; // Kunci kembali jika pilih dari db
+                    suggestionsBox.style.display = 'none';
+                    selectedIndex = -1;
+                });
+
+                suggestionsBox.appendChild(div);
             });
+        }
 
-            suggestionsBox.appendChild(div);
+        // 2. TAMBAHKAN PILIHAN BARANG BARU (Selalu muncul di paling bawah / jika data tidak ditemukan)
+        const newBarangDiv = document.createElement('div');
+        newBarangDiv.className = 'suggestion-item';
+        newBarangDiv.style.cssText = "background: #fffbeb; border-top: 1px dashed #fcd34d;"; // Warna kekuningan sebagai penanda
+        newBarangDiv.innerHTML = `
+            <div class="suggestion-name" style="color: #b45309;">✨ Gunakan "${keyword}" sebagai Barang Baru</div>
+            <div class="suggestion-code" style="color: #d97706;">Klik untuk mengisi manual kode barang</div>
+        `;
+
+        newBarangDiv.addEventListener('click', () => {
+            barangInput.value = keyword;
+            kodeInput.value = ''; // Kosongkan agar diisi manual
+            kodeInput.placeholder = "Isi kode manual / ketik 'BARANG BARU'";
+            kodeInput.readOnly = false; // Buka proteksi readonly agar bisa diketik
+            kodeInput.focus();
+            suggestionsBox.style.display = 'none';
+            selectedIndex = -1;
         });
 
+        suggestionsBox.appendChild(newBarangDiv);
         suggestionsBox.style.display = 'block';
     }
 
@@ -380,14 +395,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Handle Form Submit
+   // Handle Form Submit
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
 
-        // Validasi agar pengguna wajib memilih dari autocomplete
+        // UBAH: Jika kode barang kosong karena user memilih/mengetik barang baru, 
+        // otomatis isi dengan "BARANG BARU" agar tidak diblokir oleh validasi.
         if (!kodeInput.value.trim()) {
-            alert("Harap pilih barang yang valid dari daftar yang tersedia.");
-            return;
+            kodeInput.value = "BARANG BARU";
         }
 
         submitBtn.disabled = true;
@@ -423,6 +438,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Reset Form & State setelah sukses
             form.reset();
             kodeInput.value = '';
+            kodeInput.placeholder = ''; // Bersihkan placeholder manual jika ada
+            kodeInput.readOnly = true;  // TAMBAHAN: Kunci kembali input kode barang menjadi readonly
             suggestionsBox.innerHTML = '';
             suggestionsBox.style.display = 'none';
 
