@@ -1,227 +1,186 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FORM REQUEST PR ENGINEERING</title>
-<style>
-.suggestion-item {
-    padding: 10px;
-    cursor: pointer;
-    border-bottom: 1px solid #eee;
-}
-
-.suggestion-item:hover,
-.suggestion-item.active {
-    background: #e8f0fe;
-}
-
-.suggestion-name {
-    font-weight: 600;
-}
-
-.suggestion-code {
-    font-size: 12px;
-    color: #666;
-}
-
-mark {
-    background: #ffe082;
-    padding: 0 2px;
-}
-<style>
-    /* Reset & Base */
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-
-    /* Body dengan Background Gambar */
-    body { 
-        display: flex; justify-content: center; align-items: center; 
-        min-height: 100vh; padding: 20px; color: #334155;
-        background-image: url('https://static.vecteezy.com/system/resources/previews/003/386/349/large_2x/machine-gears-background-free-photo.jpg');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-    }
-    
-    /* Container Card dengan Efek Transparansi */
-    .container { 
-        width: 100%; max-width: 500px; 
-        background: rgba(255, 255, 255, 0.9) !important; /* Putih transparan */
-        backdrop-filter: blur(5px); /* Efek blur */
-        padding: 30px; border-radius: 16px; 
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    }
-    
-    h2 { text-align: center; color: #0f172a; margin-bottom: 8px; font-size: 22px; }
-    .subtitle { text-align: center; color: #64748b; font-size: 13px; margin-bottom: 25px; }
-
-    /* Form Elements */
-    .form-group { margin-bottom: 18px; position: relative; }
-    label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #475569; }
-    
-    input, textarea, select { 
-        width: 100%; padding: 12px; border-radius: 8px; 
-        border: 1px solid #cbd5e1; background: #f8fafc; 
-        font-size: 14px; transition: all 0.2s;
-    }
-    input:focus, textarea:focus, select:focus { 
-        background: #fff; border-color: #2563eb; 
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); outline: none; 
-    }
-    input[readonly] { background: #e2e8f0; color: #475569; cursor: not-allowed; }
-
-    /* Button */
-    .btn { 
-        width: 100%; padding: 12px; background: #2563eb; color: #fff; 
-        border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
-        transition: background 0.2s; margin-top: 10px;
-    }
-    .btn:hover { background: #1d4ed8; }
-    .btn:disabled { background: #94a3b8; }
-
-    /* Autocomplete */
-    .suggestions-box { 
-        position: absolute; width: 100%; background: #fff; 
-        border: 1px solid #cbd5e1; border-top: none; 
-        max-height: 200px; overflow-y: auto; display: none; 
-        z-index: 999; border-radius: 0 0 8px 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    }
-    .suggestion-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
-    .suggestion-item:hover { background: #eff6ff; }
-    .suggestion-name { font-weight: 500; font-size: 14px; }
-    .suggestion-code { font-size: 11px; color: #64748b; }
-	.footer {
-    position: absolute;
-    bottom: 20px;
-    width: 100%;
-    text-align: center;
-    color: white; /* Warna teks putih agar kontras dengan background gear */
-    font-size: 12px;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Efek bayangan agar teks tetap terbaca */
-    pointer-events: none; /* Agar tidak mengganggu klik di area bawah */
-}
-
-/* Pastikan body punya posisi relative agar footer bisa mengikuti bawah */
-body {
-    position: relative;
-    min-height: 100vh;
-}
-/* 1. Pengaturan Dasar agar tidak overflow */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
-    body { 
-        min-height: 100vh;
-        display: flex; 
-        flex-direction: column; /* Membantu posisi footer */
-        justify-content: center; 
-        align-items: center; 
-        padding: 15px; /* Memberi jarak di layar HP */
-        background: url('https://static.vecteezy.com/system/resources/previews/003/386/349/large_2x/machine-gears-background-free-photo.jpg') no-repeat center center fixed;
-        background-size: cover;
-    }
-
-    /* 2. Container yang fleksibel */
-    .container { 
-        width: 100%; 
-        max-width: 500px; /* Lebar maksimal di desktop */
-        background: rgba(255, 255, 255, 0.9) !important; 
-        backdrop-filter: blur(8px);
-        padding: 25px; 
-        border-radius: 16px; 
-        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        margin: auto; /* Memastikan posisi di tengah */
-    }
-
-    /* 3. Input agar tidak meluap di layar kecil */
-    input, textarea, select { 
-        width: 100%; 
-        max-width: 100%; /* Memastikan tidak keluar dari container */
-        padding: 12px; 
-        font-size: 16px; /* Ukuran 16px mencegah auto-zoom di iOS saat klik input */
-        border-radius: 8px; 
-        border: 1px solid #cbd5e1;
-    }
-
-    /* 4. Footer responsif */
-    .footer {
-        padding: 15px;
-        text-align: center;
-        color: white;
-        font-size: 11px;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        width: 100%;
-    }
-
-    /* Media query untuk layar yang sangat kecil (HP) */
-    @media (max-width: 480px) {
-        .container {
-            padding: 20px;
-            border-radius: 12px;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FORM REQUEST PR ENGINEERING</title>
+    <style>
+        /* Reset & Base */
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
         }
-        h2 { font-size: 18px; }
-        .btn { padding: 15px; } /* Tombol lebih mudah ditekan dengan jempol */
-    }
-</style>
+
+        /* Body dengan Background Gambar & Flexbox Layout */
+        body { 
+            display: flex; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 20px; 
+            color: #334155;
+            background: url('https://static.vecteezy.com/system/resources/previews/003/386/349/large_2x/machine-gears-background-free-photo.jpg') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+        }
+        
+        /* Container Card dengan Efek Transparansi (Responsif) */
+        .container { 
+            width: 100%; 
+            max-width: 500px; 
+            background: rgba(255, 255, 255, 0.9) !important; 
+            backdrop-filter: blur(8px); 
+            padding: 30px; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            margin: auto;
+        }
+        
+        h2 { text-align: center; color: #0f172a; margin-bottom: 8px; font-size: 22px; }
+        .subtitle { text-align: center; color: #64748b; font-size: 13px; margin-bottom: 25px; }
+
+        /* Form Elements */
+        .form-group { margin-bottom: 18px; position: relative; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #475569; }
+        
+        input, textarea, select { 
+            width: 100%; 
+            max-width: 100%;
+            padding: 12px; 
+            border-radius: 8px; 
+            border: 1px solid #cbd5e1; 
+            background: #f8fafc; 
+            font-size: 16px; /* Mencegah auto-zoom di iOS */
+            transition: all 0.2s;
+        }
+        input:focus, textarea:focus, select:focus { 
+            background: #fff; 
+            border-color: #2563eb; 
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); 
+            outline: none; 
+        }
+        input[readonly] { background: #e2e8f0; color: #475569; cursor: not-allowed; }
+
+        /* Button */
+        .btn { 
+            width: 100%; 
+            padding: 12px; 
+            background: #2563eb; 
+            color: #fff; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            cursor: pointer;
+            transition: background 0.2s; 
+            margin-top: 10px;
+        }
+        .btn:hover { background: #1d4ed8; }
+        .btn:disabled { background: #94a3b8; }
+
+        /* Autocomplete / Suggestions Box */
+        .suggestions-box { 
+            position: absolute; 
+            width: 100%; 
+            background: #fff; 
+            border: 1px solid #cbd5e1; 
+            border-top: none; 
+            max-height: 200px; 
+            overflow-y: auto; 
+            display: none; 
+            z-index: 999; 
+            border-radius: 0 0 8px 8px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .suggestion-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
+        .suggestion-item:hover, .suggestion-item.active { background: #eff6ff; }
+        .suggestion-name { font-weight: 600; font-size: 14px; }
+        .suggestion-code { font-size: 11px; color: #64748b; }
+        mark { background: #ffe082; padding: 0 2px; }
+
+        /* Footer responsif */
+        .footer {
+            padding: 15px;
+            text-align: center;
+            color: white;
+            font-size: 11px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        /* Loading Spinner Animation */
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Media query untuk HP */
+        @media (max-width: 480px) {
+            .container { padding: 20px; border-radius: 12px; }
+            h2 { font-size: 18px; }
+            .btn { padding: 15px; } 
+        }
+    </style>
 </head>
 
 <body>
-<div id="pageLoader" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; display:flex; justify-content:center; align-items:center; flex-direction:column;">
-    <div style="border:5px solid #f3f3f3; border-top:5px solid #2563eb; border-radius:50%; width:50px; height:50px; animation:spin 1s linear infinite;"></div>
-    <p style="margin-top:15px; font-weight:bold; color:#2563eb;">Memuat Database...</p>
-</div>
+    <div id="pageLoader" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; display:flex; justify-content:center; align-items:center; flex-direction:column;">
+        <div style="border:5px solid #f3f3f3; border-top:5px solid #2563eb; border-radius:50%; width:50px; height:50px; animation:spin 1s linear infinite;"></div>
+        <p style="margin-top:15px; font-weight:bold; color:#2563eb;">Memuat Database...</p>
+    </div>
 
-<style>
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-</style>
-<footer class="footer">
-    &copy; 2026 Departemen Engineering - Sistem PR Internal
-</footer>
-<div class="container">
-    <h2>FORM REQUEST PR ENGINEERING</h2>
-    <div class="subtitle">Sistem Internal Permintaan Barang & Sparepart</div>
+    <div class="container">
+        <h2>FORM REQUEST PR ENGINEERING</h2>
+        <div class="subtitle">Sistem Internal Permintaan Barang & Sparepart</div>
 
-    <form id="prForm">
-        <div class="form-group">
-            <label>Nama Karyawan</label>
-            <input type="text" name="nama" required>
-        </div>
-        <div class="form-group">
-            <label>Grup / Nonshift</label>
-            <select name="grup" required>
-                <option value="" disabled selected>-- Pilih --</option>
-                <option>Group A</option> <option>Group B</option> <option>Group C</option> 
-                <option>Group D</option> <option>Nonshift</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Departemen</label>
-            <input type="text" name="departemen" value="Engineering" readonly>
-        </div>
-        <div class="form-group">
-            <label>Nama Barang / Sparepart</label>
-            <input type="text" id="barangInput" name="barang" autocomplete="off" required>
-            <div id="suggestions" class="suggestions-box"></div>
-        </div>
-        <div class="form-group">
-            <label>Kode Barang</label>
-            <input type="text" id="kodeInput" name="kode">
-        </div>
-        <div class="form-group">
-            <label>Jumlah Barang</label>
-            <input type="number" name="jumlah" min="1" step="1" required>
-        </div>
-        <div class="form-group">
-            <label>Keterangan Kebutuhan</label>
-            <textarea name="keterangan" required></textarea>
-        </div>
-        <div class="form-group">
-            <label>Untuk Mesin</label>
-            <input type="text" name="mesin" required>
-        </div>
-        <button type="submit" class="btn" id="submitBtn">Kirim Request PR</button>
-    </form>
-</div>
+        <form id="prForm">
+            <div class="form-group">
+                <label>Nama Karyawan</label>
+                <input type="text" name="nama" required>
+            </div>
+            <div class="form-group">
+                <label>Grup / Nonshift</label>
+                <select name="grup" required>
+                    <option value="" disabled selected>-- Pilih --</option>
+                    <option>Group A</option> 
+                    <option>Group B</option> 
+                    <option>Group C</option> 
+                    <option>Group D</option> 
+                    <option>Nonshift</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Departemen</label>
+                <input type="text" name="departemen" value="Engineering" readonly>
+            </div>
+            <div class="form-group">
+                <label>Nama Barang / Sparepart</label>
+                <input type="text" id="barangInput" name="barang" autocomplete="off" required>
+                <div id="suggestions" class="suggestions-box"></div>
+            </div>
+            <div class="form-group">
+                <label>Kode Barang</label>
+                <input type="text" id="kodeInput" name="kode">
+            </div>
+            <div class="form-group">
+                <label>Jumlah Barang</label>
+                <input type="number" name="jumlah" min="1" step="1" required>
+            </div>
+            <div class="form-group">
+                <label>Keterangan Kebutuhan</label>
+                <textarea name="keterangan" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Untuk Mesin</label>
+                <input type="text" name="mesin" required>
+            </div>
+            <button type="submit" class="btn" id="submitBtn">Kirim Request PR</button>
+        </form>
+    </div>
+
+    <footer class="footer">
+        &copy; 2026 Departemen Engineering - Sistem PR Internal
+    </footer>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -268,264 +227,217 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Gagal memuat database:", error);
 
             if (loader) {
-                loader.innerHTML = "Gagal memuat data. Silakan refresh halaman.";
+                loader.innerHTML = "<p style='color:red; font-weight:bold;'>Gagal memuat data. Silakan refresh halaman.</p>";
             }
         } finally {
-            if (loader) {
+            if (loader && databaseBarang.length > 0) {
                 loader.style.display = "none";
             }
         }
     }
 
     loadBarang();
-
-    // Search
+	// Search & Autocomplete Logic
     let selectedIndex = -1;
-let searchTimer;
+    let searchTimer;
 
-// Escape regex
-function escapeRegex(text) {
-    return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
+    // Search dengan ranking
+    function searchBarang(keyword) {
+        const terms = keyword
+            .toLowerCase()
+            .trim()
+            .split(/\s+/);
 
-// Search dengan ranking
-function searchBarang(keyword) {
+        return databaseBarang
+            .map(item => {
+                const nama = (item.nama || '').toLowerCase();
+                const kode = (item.kode || '').toLowerCase();
+                const fullText = `${nama} ${kode}`;
 
-    const terms = keyword
-        .toLowerCase()
-        .trim()
-        .split(/\s+/);
+                const matchAllWords = terms.every(term => fullText.includes(term));
+                if (!matchAllWords) return null;
 
-    return databaseBarang
-        .map(item => {
+                let score = 0;
 
-            const nama = (item.nama || '').toLowerCase();
-            const kode = (item.kode || '').toLowerCase();
+                // Prioritas kode
+                if (kode.startsWith(keyword)) score += 100;
+                else if (kode.includes(keyword)) score += 50;
 
-            const fullText = `${nama} ${kode}`;
+                // Prioritas nama
+                if (nama.startsWith(keyword)) score += 30;
+                else if (nama.includes(keyword)) score += 10;
 
-            const matchAllWords =
-                terms.every(term => fullText.includes(term));
+                // Bonus setiap kata cocok
+                terms.forEach(term => {
+                    if (kode.includes(term)) score += 20;
+                    if (nama.includes(term)) score += 10;
+                });
 
-            if (!matchAllWords) return null;
+                return { item, score };
+            })
+            .filter(Boolean)
+            .sort((a, b) => b.score - a.score)
+            .map(x => x.item);
+    }
 
-            let score = 0;
+    // Input search event
+    barangInput.addEventListener('input', function () {
+        clearTimeout(searchTimer);
+        const keyword = this.value.trim();
 
-            // Prioritas kode
-            if (kode.startsWith(keyword)) score += 100;
-            else if (kode.includes(keyword)) score += 50;
+        // Reset input kode ketika user mengetik ulang nama barang
+        kodeInput.value = '';
+        selectedIndex = -1;
 
-            // Prioritas nama
-            if (nama.startsWith(keyword)) score += 30;
-            else if (nama.includes(keyword)) score += 10;
+        if (!keyword) {
+            suggestionsBox.style.display = 'none';
+            return;
+        }
 
-            // Bonus setiap kata cocok
-            terms.forEach(term => {
-                if (kode.includes(term)) score += 20;
-                if (nama.includes(term)) score += 10;
+        searchTimer = setTimeout(() => {
+            const results = searchBarang(keyword);
+            renderSuggestions(results, keyword);
+        }, 250);
+    });
+
+    // Render hasil ke UI
+    function renderSuggestions(results, keyword) {
+        suggestionsBox.innerHTML = '';
+
+        if (!results.length) {
+            suggestionsBox.style.display = 'none';
+            return;
+        }
+
+        // Pecah keyword menjadi komponen kata untuk highlight regex yang akurat
+        const terms = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').trim().split(/\s+/);
+        const regex = new RegExp(`(${terms.join('|')})`, 'gi');
+
+        // Tampilkan informasi jumlah data
+        const totalResult = results.length;
+        const infoDiv = document.createElement('div');
+        infoDiv.style.cssText = "padding: 8px 12px; font-size: 11px; color: #94a3b8; border-bottom: 1px solid #f1f5f9; background: #f8fafc; font-weight: 500;";
+        infoDiv.textContent = `${totalResult} data ditemukan`;
+        suggestionsBox.appendChild(infoDiv);
+
+        // Batasi hasil tampil maksimal 100 data demi performa DOM
+        results.slice(0, 100).forEach((item, index) => {
+            const nama = item.nama || '';
+            const kode = item.kode || '';
+
+            // Lakukan highlight pada kata yang cocok
+            const highlightedNama = nama.replace(regex, '<mark>$1</mark>');
+            const highlightedKode = kode.replace(regex, '<mark>$1</mark>');
+
+            const div = document.createElement('div');
+            div.className = 'suggestion-item';
+            div.innerHTML = `
+                <div class="suggestion-name">${highlightedNama}</div>
+                <div class="suggestion-code">${highlightedKode}</div>
+            `;
+
+            // Aksi saat item dipilih/diklik
+            div.addEventListener('click', () => {
+                barangInput.value = nama;
+                kodeInput.value = kode;
+                suggestionsBox.style.display = 'none';
+                selectedIndex = -1;
             });
 
-            return {
-                item,
-                score
-            };
-
-        })
-        .filter(Boolean)
-        .sort((a, b) => b.score - a.score)
-        .map(x => x.item);
-}
-
-// Input search
-barangInput.addEventListener('input', function () {
-
-    clearTimeout(searchTimer);
-
-    const keyword = this.value.trim();
-
-    // User mengetik ulang
-    kodeInput.value = '';
-    selectedIndex = -1;
-
-    if (!keyword) {
-        suggestionsBox.style.display = 'none';
-        return;
-    }
-
-    searchTimer = setTimeout(() => {
-
-        const results = searchBarang(keyword);
-
-        renderSuggestions(results, keyword);
-
-    }, 250);
-});
-
-// Render hasil
-function renderSuggestions(results, keyword) {
-
-    suggestionsBox.innerHTML = '';
-
-    if (!results.length) {
-        suggestionsBox.style.display = 'none';
-        return;
-    }
-
-    const regex =
-        new RegExp(`(${escapeRegex(keyword)})`, 'gi');
-	const totalResult = results.length;
-
-	suggestionsBox.innerHTML = `
-    <div class="result-info">
-        ${totalResult} data ditemukan
-    </div>
-	`;
-    results.slice(0, 101).forEach((item, index) => {
-
-        const nama = item.nama || '';
-        const kode = item.kode || '';
-
-        const highlightedNama =
-            nama.replace(regex, '<mark>$1</mark>');
-
-        const highlightedKode =
-            kode.replace(regex, '<mark>$1</mark>');
-
-        const div = document.createElement('div');
-
-        div.className = 'suggestion-item';
-
-        div.innerHTML = `
-            <div class="suggestion-name">
-                ${highlightedNama}
-            </div>
-
-            <div class="suggestion-code">
-                ${highlightedKode}
-            </div>
-        `;
-
-        div.addEventListener('click', () => {
-
-            barangInput.value = nama;
-            kodeInput.value = kode;
-
-            suggestionsBox.style.display = 'none';
-            selectedIndex = -1;
+            suggestionsBox.appendChild(div);
         });
 
-        suggestionsBox.appendChild(div);
-    });
-
-    suggestionsBox.style.display = 'block';
-}
-barangInput.addEventListener('keydown', function (e) {
-
-    const items =
-        suggestionsBox.querySelectorAll('.suggestion-item');
-
-    if (!items.length) return;
-
-    if (e.key === 'ArrowDown') {
-
-        e.preventDefault();
-
-        selectedIndex =
-            Math.min(selectedIndex + 1, items.length - 1);
+        suggestionsBox.style.display = 'block';
     }
 
-    else if (e.key === 'ArrowUp') {
+    // Navigasi via Keyboard (Up, Down, Enter)
+    barangInput.addEventListener('keydown', function (e) {
+        const items = suggestionsBox.querySelectorAll('.suggestion-item');
+        if (!items.length) return;
 
-        e.preventDefault();
-
-        selectedIndex =
-            Math.max(selectedIndex - 1, 0);
-    }
-
-    else if (e.key === 'Enter') {
-
-        if (selectedIndex >= 0) {
-
+        if (e.key === 'ArrowDown') {
             e.preventDefault();
-
-            items[selectedIndex].click();
+            selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+        } 
+        else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedIndex = Math.max(selectedIndex - 1, 0);
+        } 
+        else if (e.key === 'Enter') {
+            if (selectedIndex >= 0) {
+                e.preventDefault();
+                items[selectedIndex].click();
+            }
         }
-    }
 
-    items.forEach((item, index) => {
-
-        item.classList.toggle(
-            'active',
-            index === selectedIndex
-        );
-    });
-});
-    // Submit
-    form.addEventListener('submit', async function (e) {
-
-    e.preventDefault();
-
-    if (!kodeInput.value.trim()) {
-        alert("Harap pilih barang dari daftar.");
-        return;
-    }
-
-    submitBtn.disabled = true;
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = "Mengirim...";
-
-    try {
-
-        const response = await fetch(scriptURL, {
-            method: 'POST',
-            body: new FormData(form)
+        // Terapkan kelas active & pastikan otomatis ter-scroll ke area pandang
+        items.forEach((item, index) => {
+            const isActive = index === selectedIndex;
+            item.classList.toggle('active', isActive);
+            if (isActive) {
+                item.scrollIntoView({ block: 'nearest' });
+            }
         });
+    });
 
-        // 🔥 UBAH: jangan langsung json, baca dulu text
-        const text = await response.text();
-        console.log("RAW RESPONSE:", text);
+    // Handle Form Submit
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
 
-        let result;
+        // Validasi agar pengguna wajib memilih dari autocomplete
+        if (!kodeInput.value.trim()) {
+            alert("Harap pilih barang yang valid dari daftar yang tersedia.");
+            return;
+        }
+
+        submitBtn.disabled = true;
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = "Mengirim...";
 
         try {
-            result = JSON.parse(text);
-        } catch (err) {
-            throw new Error("Server tidak mengirim JSON yang valid");
+            const response = await fetch(scriptURL, {
+                method: 'POST',
+                body: new FormData(form)
+            });
+
+            const text = await response.text();
+            console.log("RAW RESPONSE:", text);
+
+            let result;
+            try {
+                result = JSON.parse(text);
+            } catch (err) {
+                throw new Error("Server tidak mengirim format JSON yang valid.");
+            }
+
+            if (!response.ok) {
+                throw new Error("Server error HTTP: " + response.status);
+            }
+
+            if (result.result !== "success") {
+                throw new Error(result.message || "Gagal menyimpan data ke sistem.");
+            }
+
+            alert("Data Request PR berhasil dikirim.");
+            
+            // Reset Form & State setelah sukses
+            form.reset();
+            kodeInput.value = '';
+            suggestionsBox.innerHTML = '';
+            suggestionsBox.style.display = 'none';
+
+        } catch (error) {
+            console.error("SUBMIT ERROR:", error);
+            alert(error.message || "Terjadi kesalahan saat mengirim data.");
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
         }
+    });
 
-        if (!response.ok) {
-            throw new Error("Server error HTTP: " + response.status);
-        }
-
-       if (result.result !== "success") {
-    throw new Error("Gagal menyimpan data");
-}
-
-        alert("Data berhasil dikirim.");
-
-        form.reset();
-        kodeInput.value = '';
-        suggestionsBox.innerHTML = '';
-        suggestionsBox.style.display = 'none';
-
-    } catch (error) {
-
-        console.error("SUBMIT ERROR:", error);
-        alert(error.message || "Terjadi kesalahan saat mengirim data.");
-
-    } finally {
-
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
-    }
-});
-    // Tutup suggestion saat klik luar
+    // Tutup suggestion box saat klik di luar area input / box
     document.addEventListener('click', (e) => {
-
-        if (
-            !barangInput.contains(e.target) &&
-            !suggestionsBox.contains(e.target)
-        ) {
+        if (!barangInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
             suggestionsBox.style.display = 'none';
         }
     });
