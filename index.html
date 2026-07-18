@@ -136,6 +136,52 @@
         .btn-delete { background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
         .btn-delete:hover { background: #dc2626; }
 
+        /* CUSTOM ALERT NOTIFICATION MODAL STYLING */
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .custom-modal {
+            background: #ffffff;
+            width: 90%;
+            max-width: 400px;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .modal-icon {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 24px; margin: 0 auto 16px auto;
+        }
+        .modal-icon.success { background: #dcfce7; color: #16a34a; }
+        .modal-icon.error { background: #fee2e2; color: #dc2626; }
+        .modal-icon.warning { background: #fef3c7; color: #d97706; }
+        .modal-title { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+        .modal-message { font-size: 14px; color: #64748b; line-height: 1.5; margin-bottom: 20px; }
+        .modal-btn {
+            width: 100%; padding: 10px; border: none; border-radius: 8px;
+            font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        .modal-btn.success { background: #16a34a; color: white; }
+        .modal-btn.success:hover { background: #15803d; }
+        .modal-btn.error { background: #dc2626; color: white; }
+        .modal-btn.error:hover { background: #b91c1c; }
+        .modal-btn.warning { background: #d97706; color: white; }
+        .modal-btn.warning:hover { background: #b45309; }
+
         /* Footer responsif */
         .footer {
             padding: 15px;
@@ -164,6 +210,16 @@
     <div id="pageLoader">
         <div class="spinner"></div>
         <p class="loader-text">Memuat Database...</p>
+    </div>
+
+    <!-- Custom Alert Modal Structure -->
+    <div id="customAlertModal" class="custom-modal-overlay">
+        <div class="custom-modal">
+            <div id="modalIcon" class="modal-icon">✔</div>
+            <div id="modalTitle" class="modal-title">Notifikasi</div>
+            <div id="modalMessage" class="modal-message">Pesan notifikasi di sini.</div>
+            <button id="modalCloseBtn" class="modal-btn">Oke</button>
+        </div>
     </div>
 
     <div class="container">
@@ -276,14 +332,48 @@
         const emptyRow = document.getElementById('emptyRow');
         const loader = document.getElementById('pageLoader');
 
+        // Elemen Modal Alert Custom
+        const alertModal = document.getElementById('customAlertModal');
+        const modalIcon = document.getElementById('modalIcon');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+
         const scriptURL = "https://script.google.com/macros/s/AKfycbxek8os1feQ0zocHA1e-Y-2wVKAMs8zj54gT5c88KUjsreKV3b1HHcRdLZsMKNWC25B/exec";
 
         let databaseBarang = [];
-        let listBarangRequest = []; // Menampung data multi-barang
+        let listBarangRequest = []; 
         let selectedIndex = -1;
         let searchTimer;
 
-        // Validasi elemen HTML wajib
+        // FUNGSI UNTUK MENAMPILKAN CUSTOM ALERT MODAL
+        function showAlert(type, title, message) {
+            modalIcon.className = `modal-icon ${type}`;
+            modalCloseBtn.className = `modal-btn ${type}`;
+            
+            if (type === 'success') modalIcon.innerHTML = '✔';
+            else if (type === 'error') modalIcon.innerHTML = '✖';
+            else if (type === 'warning') modalIcon.innerHTML = '⚠';
+
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+
+            alertModal.style.display = 'flex';
+            setTimeout(() => {
+                alertModal.style.opacity = '1';
+                alertModal.querySelector('.custom-modal').style.transform = 'scale(1)';
+            }, 10);
+        }
+
+        // FUNGSI UNTUK MENUTUP MODAL
+        modalCloseBtn.addEventListener('click', () => {
+            alertModal.style.opacity = '0';
+            alertModal.querySelector('.custom-modal').style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                alertModal.style.display = 'none';
+            }, 300);
+        });
+
         if (!barangInput || !kodeInput || !suggestionsBox || !form || !submitBtn || !addBarangBtn) {
             console.error("Elemen HTML tidak ditemukan.");
             return;
@@ -303,8 +393,6 @@
                 const data = await res.json();
                 if (Array.isArray(data)) {
                     databaseBarang = data;
-                } else {
-                    console.error("Format data tidak valid:", data);
                 }
             } catch (error) {
                 console.error("Gagal memuat database:", error);
@@ -404,7 +492,6 @@
                 });
             }
 
-            // Opsi barang baru dinamis
             const newBarangDiv = document.createElement('div');
             newBarangDiv.className = 'suggestion-item';
             newBarangDiv.style.cssText = "background: #fffbeb; border-top: 1px dashed #fcd34d;"; 
@@ -416,7 +503,7 @@
             newBarangDiv.addEventListener('click', () => {
                 barangInput.value = keyword;
                 kodeInput.value = ''; 
-                kodeInput.placeholder = "Isi kode manual / biarkan kosong jika tidak tahu";
+                kodeInput.placeholder = "Isi kode manual / ketik 'BARANG BARU'";
                 kodeInput.readOnly = false;
                 kodeInput.focus();
                 suggestionsBox.style.display = 'none';
@@ -452,7 +539,7 @@
             });
         });
 
-        // LOGIKA TAMBAH BARANG KE TABEL (KERANJANG)
+        // TAMBAH BARANG KE TABEL
         addBarangBtn.addEventListener('click', () => {
             const namaBarang = barangInput.value.trim();
             let kodeBarang = kodeInput.value.trim();
@@ -461,18 +548,15 @@
             const mesin = mesinInput.value.trim();
 
             if (!namaBarang || !jumlah || !keterangan || !mesin) {
-                alert("Mohon lengkapi seluruh detail data barang terlebih dahulu!");
+                showAlert('warning', 'Data Belum Lengkap', 'Mohon lengkapi seluruh detail data barang terlebih dahulu!');
                 return;
             }
 
             if (!kodeBarang) kodeBarang = "BARANG BARU";
 
-            // Tambahkan objek barang baru ke array list
             listBarangRequest.push({ namaBarang, kodeBarang, jumlah, keterangan, mesin });
-            
             renderTable();
 
-            // Reset input barang temporer
             barangInput.value = '';
             kodeInput.value = '';
             kodeInput.placeholder = 'Otomatis terisi';
@@ -482,7 +566,6 @@
             mesinInput.value = '';
         });
 
-        // Fungsi Render Baris Tabel
         function renderTable() {
             barangTableBody.innerHTML = '';
             
@@ -492,7 +575,7 @@
                 return;
             }
 
-            submitBtn.disabled = false; // Aktifkan submit button jika min 1 barang ada
+            submitBtn.disabled = false;
 
             listBarangRequest.forEach((item, index) => {
                 const tr = document.createElement('tr');
@@ -509,7 +592,6 @@
             });
         }
 
-        // Ekspos fungsi hapus ke ranah window global agar terpanggil via HTML atribut
         window.hapusBarang = function(index) {
             listBarangRequest.splice(index, 1);
             renderTable();
@@ -520,7 +602,7 @@
             e.preventDefault();
 
             if (listBarangRequest.length === 0) {
-                alert("Daftar barang belanja masih kosong!");
+                showAlert('warning', 'Daftar Kosong', 'Daftar barang belanja masih kosong!');
                 return;
             }
 
@@ -528,7 +610,6 @@
             const originalText = submitBtn.textContent;
             submitBtn.textContent = "Mengirim...";
 
-            // Memaketkan struktur data JSON array
             const payload = {
                 nama: document.getElementById('namaInput').value.trim(),
                 grup: document.getElementById('grupSelect').value,
@@ -537,10 +618,9 @@
             };
 
             try {
-                // Mengirim payload sebagai JSON string stringified
                 const response = await fetch(scriptURL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' }, // Gunakan text/plain untuk bypass CORS preflight Apps Script
+                    headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify(payload)
                 });
 
@@ -556,23 +636,22 @@
                     throw new Error(result.message || "Gagal menyimpan data.");
                 }
 
-                alert("Semua data Request PR berhasil dikirim.");
+                // TAMPILKAN CUSTOM MODAL SUKSES
+                showAlert('success', 'Berhasil Dikirim', 'Semua data Request PR Anda telah sukses tersimpan ke sistem!');
                 
-                // Bersihkan total form dan array
                 listBarangRequest = [];
                 renderTable();
                 form.reset();
 
             } catch (error) {
                 console.error("SUBMIT ERROR:", error);
-                alert(error.message || "Terjadi masalah teknis saat pengiriman.");
+                showAlert('error', 'Gagal Mengirim', error.message || 'Terjadi masalah teknis saat pengiriman.');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
             }
         });
 
-        // Event menutup pop-up suggestion box luar area
         document.addEventListener('click', (e) => {
             if (!barangInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
                 suggestionsBox.style.display = 'none';
