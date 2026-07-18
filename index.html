@@ -30,7 +30,7 @@
         /* Container Card dengan Efek Transparansi (Responsif) */
         .container { 
             width: 100%; 
-            max-width: 500px; 
+            max-width: 550px; 
             background: rgba(255, 255, 255, 0.9) !important; 
             backdrop-filter: blur(8px); 
             padding: 30px; 
@@ -78,7 +78,7 @@
             margin-top: 10px;
         }
         .btn:hover { background: #1d4ed8; }
-        .btn:disabled { background: #94a3b8; }
+        .btn:disabled { background: #94a3b8; cursor: not-allowed; }
 
         /* Autocomplete / Suggestions Box */
         .suggestions-box { 
@@ -94,11 +94,47 @@
             border-radius: 0 0 8px 8px; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        .suggestion-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
+        .suggestion-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; text-align: left; }
         .suggestion-item:hover, .suggestion-item.active { background: #eff6ff; }
         .suggestion-name { font-weight: 600; font-size: 14px; }
         .suggestion-code { font-size: 11px; color: #64748b; }
         mark { background: #ffe082; padding: 0 2px; }
+
+        /* Page Loader Styling */
+        #pageLoader {
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(255,255,255,0.9); 
+            z-index: 9999; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            flex-direction: column;
+        }
+        .spinner {
+            border: 5px solid #f3f3f3; 
+            border-top: 5px solid #2563eb; 
+            border-radius: 50%; 
+            width: 50px; 
+            height: 50px; 
+            animation: spin 1s linear infinite;
+        }
+        .loader-text {
+            margin-top: 15px; 
+            font-weight: bold; 
+            color: #2563eb;
+        }
+
+        /* Styling Tabel Daftar Barang */
+        .table-responsive { width: 100%; overflow-x: auto; margin-top: 5px; border-radius: 8px; border: 1px solid #cbd5e1; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; }
+        th, td { padding: 10px; border: 1px solid #cbd5e1; text-align: left; }
+        th { background: #f1f5f9; color: #475569; font-weight: 600; }
+        .btn-delete { background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
+        .btn-delete:hover { background: #dc2626; }
 
         /* Footer responsif */
         .footer {
@@ -124,9 +160,10 @@
 </head>
 
 <body>
-    <div id="pageLoader" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; display:flex; justify-content:center; align-items:center; flex-direction:column;">
-        <div style="border:5px solid #f3f3f3; border-top:5px solid #2563eb; border-radius:50%; width:50px; height:50px; animation:spin 1s linear infinite;"></div>
-        <p style="margin-top:15px; font-weight:bold; color:#2563eb;">Memuat Database...</p>
+    <!-- Page Loader -->
+    <div id="pageLoader">
+        <div class="spinner"></div>
+        <p class="loader-text">Memuat Database...</p>
     </div>
 
     <div class="container">
@@ -134,47 +171,87 @@
         <div class="subtitle">Sistem Internal Permintaan Barang & Sparepart</div>
 
         <form id="prForm">
+            <!-- Data Identitas Pemohon -->
             <div class="form-group">
-                <label>Nama Karyawan</label>
-                <input type="text" name="nama" required>
+                <label for="namaInput">Nama Karyawan</label>
+                <input type="text" id="namaInput" name="nama" required>
             </div>
+            
             <div class="form-group">
-                <label>Grup / Nonshift</label>
-                <select name="grup" required>
+                <label for="grupSelect">Grup / Nonshift</label>
+                <select id="grupSelect" name="grup" required>
                     <option value="" disabled selected>-- Pilih --</option>
-                    <option>Group A</option> 
-                    <option>Group B</option> 
-                    <option>Group C</option> 
-                    <option>Group D</option> 
-                    <option>Nonshift</option>
+                    <option value="Group A">Group A</option> 
+                    <option value="Group B">Group B</option> 
+                    <option value="Group C">Group C</option> 
+                    <option value="Group D">Group D</option> 
+                    <option value="Nonshift">Nonshift</option>
                 </select>
             </div>
+            
             <div class="form-group">
-                <label>Departemen</label>
-                <input type="text" name="departemen" value="Engineering" readonly>
+                <label for="deptInput">Departemen</label>
+                <input type="text" id="deptInput" name="departemen" value="Engineering" readonly>
             </div>
+            
+            <hr style="border: 1px dashed #cbd5e1; margin: 25px 0;">
+
+            <!-- AREA INPUT BARANG (SEMENTARA) -->
+            <div style="background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                <strong style="font-size: 14px; display:block; margin-bottom: 12px; color: #1e293b;">📍 Input Detail Barang:</strong>
+                
+                <div class="form-group">
+                    <label for="barangInput">Nama Barang / Sparepart</label>
+                    <input type="text" id="barangInput" autocomplete="off">
+                    <div id="suggestions" class="suggestions-box"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="kodeInput">Kode Barang</label>
+                    <input type="text" id="kodeInput" readonly placeholder="Otomatis terisi">
+                </div>
+                
+                <div class="form-group">
+                    <label for="jumlahInput">Jumlah Barang</label>
+                    <input type="number" id="jumlahInput" min="1" step="1" oninput="this.value = !!this.value && Math.abs(this.value) >= 1 ? Math.floor(Math.abs(this.value)) : null">
+                </div>
+                
+                <div class="form-group">
+                    <label for="keteranganInput">Keterangan Kebutuhan</label>
+                    <textarea id="keteranganInput" rows="2"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="mesinInput">Untuk Mesin</label>
+                    <input type="text" id="mesinInput">
+                </div>
+                
+                <button type="button" id="addBarangBtn" class="btn" style="background: #059669; margin-top: 5px;">➕ Tambah ke Daftar</button>
+            </div>
+
+            <!-- TABEL KERANJANG DAFTAR BARANG -->
             <div class="form-group">
-                <label>Nama Barang / Sparepart</label>
-                <input type="text" id="barangInput" name="barang" autocomplete="off" required>
-                <div id="suggestions" class="suggestions-box"></div>
+                <label>Daftar Permintaan Barang Saat Ini:</label>
+                <div class="table-responsive">
+                    <table id="barangTable">
+                        <thead>
+                            <tr>
+                                <th>Barang</th>
+                                <th>Kode</th>
+                                <th>Qty</th>
+                                <th>Mesin</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="emptyRow"><td colspan="5" style="text-align: center; padding: 15px; color: #94a3b8;">Belum ada barang di dalam daftar.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Kode Barang</label>
-                <input type="text" id="kodeInput" name="kode">
-            </div>
-            <div class="form-group">
-                <label>Jumlah Barang</label>
-                <input type="number" name="jumlah" min="1" step="1" required>
-            </div>
-            <div class="form-group">
-                <label>Keterangan Kebutuhan</label>
-                <textarea name="keterangan" required></textarea>
-            </div>
-            <div class="form-group">
-                <label>Untuk Mesin</label>
-                <input type="text" name="mesin" required>
-            </div>
-            <button type="submit" class="btn" id="submitBtn">Kirim Request PR</button>
+            
+            <!-- BUTTON SUBMIT UTAMA -->
+            <button type="submit" class="btn" id="submitBtn" disabled>Kirim Request PR</button>
         </form>
     </div>
 
@@ -182,284 +259,326 @@
         &copy; 2026 Departemen Engineering - Sistem PR Internal
     </footer>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const barangInput = document.getElementById('barangInput');
+        const kodeInput = document.getElementById('kodeInput');
+        const jumlahInput = document.getElementById('jumlahInput');
+        const keteranganInput = document.getElementById('keteranganInput');
+        const mesinInput = document.getElementById('mesinInput');
+        
+        const suggestionsBox = document.getElementById('suggestions');
+        const form = document.getElementById('prForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const addBarangBtn = document.getElementById('addBarangBtn');
+        const barangTableBody = document.querySelector('#barangTable tbody');
+        const emptyRow = document.getElementById('emptyRow');
+        const loader = document.getElementById('pageLoader');
 
-    const barangInput = document.getElementById('barangInput');
-    const kodeInput = document.getElementById('kodeInput');
-    const suggestionsBox = document.getElementById('suggestions');
-    const form = document.getElementById('prForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const loader = document.getElementById('pageLoader');
+        const scriptURL = "https://script.google.com/macros/s/AKfycbxek8os1feQ0zocHA1e-Y-2wVKAMs8zj54gT5c88KUjsreKV3b1HHcRdLZsMKNWC25B/exec";
 
-    const scriptURL = "https://script.google.com/macros/s/AKfycbxek8os1feQ0zocHA1e-Y-2wVKAMs8zj54gT5c88KUjsreKV3b1HHcRdLZsMKNWC25B/exec";
+        let databaseBarang = [];
+        let listBarangRequest = []; // Menampung data multi-barang
+        let selectedIndex = -1;
+        let searchTimer;
 
-    let databaseBarang = [];
-
-    if (!barangInput || !kodeInput || !suggestionsBox || !form || !submitBtn) {
-        console.error("Elemen HTML tidak ditemukan.");
-        return;
-    }
-
-    // Escape karakter regex
-    function escapeRegex(text) {
-        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
-
-    // Load database
-    async function loadBarang() {
-        try {
-            const res = await fetch(`${scriptURL}?action=getBarang`);
-
-            if (!res.ok) {
-                throw new Error(`HTTP ${res.status}`);
-            }
-
-            const data = await res.json();
-
-            if (Array.isArray(data)) {
-                databaseBarang = data;
-            } else {
-                console.error("Format data tidak valid:", data);
-            }
-
-        } catch (error) {
-            console.error("Gagal memuat database:", error);
-
-            if (loader) {
-                loader.innerHTML = "<p style='color:red; font-weight:bold;'>Gagal memuat data. Silakan refresh halaman.</p>";
-            }
-        } finally {
-            if (loader && databaseBarang.length > 0) {
-                loader.style.display = "none";
-            }
-        }
-    }
-
-    loadBarang();
-	// Search & Autocomplete Logic
-    let selectedIndex = -1;
-    let searchTimer;
-
-    // Search dengan ranking
-    function searchBarang(keyword) {
-        const terms = keyword
-            .toLowerCase()
-            .trim()
-            .split(/\s+/);
-
-        return databaseBarang
-            .map(item => {
-                const nama = (item.nama || '').toLowerCase();
-                const kode = (item.kode || '').toLowerCase();
-                const fullText = `${nama} ${kode}`;
-
-                const matchAllWords = terms.every(term => fullText.includes(term));
-                if (!matchAllWords) return null;
-
-                let score = 0;
-
-                // Prioritas kode
-                if (kode.startsWith(keyword)) score += 100;
-                else if (kode.includes(keyword)) score += 50;
-
-                // Prioritas nama
-                if (nama.startsWith(keyword)) score += 30;
-                else if (nama.includes(keyword)) score += 10;
-
-                // Bonus setiap kata cocok
-                terms.forEach(term => {
-                    if (kode.includes(term)) score += 20;
-                    if (nama.includes(term)) score += 10;
-                });
-
-                return { item, score };
-            })
-            .filter(Boolean)
-            .sort((a, b) => b.score - a.score)
-            .map(x => x.item);
-    }
-
-    // Input search event
-    barangInput.addEventListener('input', function () {
-        clearTimeout(searchTimer);
-        const keyword = this.value.trim();
-
-        // Reset input kode ketika user mengetik ulang nama barang
-        kodeInput.value = '';
-        selectedIndex = -1;
-
-        if (!keyword) {
-            suggestionsBox.style.display = 'none';
+        // Validasi elemen HTML wajib
+        if (!barangInput || !kodeInput || !suggestionsBox || !form || !submitBtn || !addBarangBtn) {
+            console.error("Elemen HTML tidak ditemukan.");
             return;
         }
 
-        searchTimer = setTimeout(() => {
-            const results = searchBarang(keyword);
-            renderSuggestions(results, keyword);
-        }, 250);
-    });
+        function escapeRegex(text) {
+            return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
 
-    // Render hasil ke UI
-    function renderSuggestions(results, keyword) {
-        suggestionsBox.innerHTML = '';
+        // Load database barang dari Google Apps Script
+        async function loadBarang() {
+            try {
+                if (loader) loader.style.display = "flex"; 
+                const res = await fetch(`${scriptURL}?action=getBarang`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                
+                const data = await res.json();
+                if (Array.isArray(data)) {
+                    databaseBarang = data;
+                } else {
+                    console.error("Format data tidak valid:", data);
+                }
+            } catch (error) {
+                console.error("Gagal memuat database:", error);
+                if (loader) {
+                    loader.innerHTML = "<p style='color:red; font-weight:bold; text-align:center; padding:10px;'>Gagal memuat data. Silakan refresh halaman.</p>";
+                }
+            } finally {
+                if (loader && databaseBarang.length > 0) {
+                    loader.style.display = "none";
+                }
+            }
+        }
 
-        const terms = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').trim().split(/\s+/);
-        const regex = new RegExp(`(${terms.join('|')})`, 'gi');
+        loadBarang();
 
-        // 1. Tampilkan info jumlah data jika ada hasil
-        if (results.length > 0) {
-            const totalResult = results.length;
-            const infoDiv = document.createElement('div');
-            infoDiv.style.cssText = "padding: 8px 12px; font-size: 11px; color: #94a3b8; border-bottom: 1px solid #f1f5f9; background: #f8fafc; font-weight: 500;";
-            infoDiv.textContent = `${totalResult} data ditemukan`;
-            suggestionsBox.appendChild(infoDiv);
+        // Algoritma Search Autocomplete
+        function searchBarang(keyword) {
+            const terms = keyword.toLowerCase().trim().split(/\s+/);
+            return databaseBarang
+                .map(item => {
+                    const nama = (item.nama || '').toLowerCase();
+                    const kode = (item.kode || '').toLowerCase();
+                    const fullText = `${nama} ${kode}`;
 
-            // Tampilkan maksimal 100 data
-            results.slice(0, 100).forEach((item, index) => {
-                const nama = item.nama || '';
-                const kode = item.kode || '';
+                    const matchAllWords = terms.every(term => fullText.includes(term));
+                    if (!matchAllWords) return null;
 
-                const highlightedNama = nama.replace(regex, '<mark>$1</mark>');
-                const highlightedKode = kode.replace(regex, '<mark>$1</mark>');
+                    let score = 0;
+                    if (kode.startsWith(keyword)) score += 100;
+                    else if (kode.includes(keyword)) score += 50;
 
-                const div = document.createElement('div');
-                div.className = 'suggestion-item';
-                div.innerHTML = `
-                    <div class="suggestion-name">${highlightedNama}</div>
-                    <div class="suggestion-code">${highlightedKode}</div>
+                    if (nama.startsWith(keyword)) score += 30;
+                    else if (nama.includes(keyword)) score += 10;
+
+                    terms.forEach(term => {
+                        if (kode.includes(term)) score += 20;
+                        if (nama.includes(term)) score += 10;
+                    });
+
+                    return { item, score };
+                })
+                .filter(Boolean)
+                .sort((a, b) => b.score - a.score)
+                .map(x => x.item);
+        }
+
+        barangInput.addEventListener('input', function () {
+            clearTimeout(searchTimer);
+            const keyword = this.value.trim();
+            kodeInput.value = '';
+            selectedIndex = -1;
+
+            if (!keyword) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+
+            searchTimer = setTimeout(() => {
+                const results = searchBarang(keyword);
+                renderSuggestions(results, keyword);
+            }, 250);
+        });
+
+        function renderSuggestions(results, keyword) {
+            suggestionsBox.innerHTML = '';
+            const escapedKeyword = escapeRegex(keyword.trim());
+            const terms = escapedKeyword.split(/\s+/);
+            const regex = new RegExp(`(${terms.join('|')})`, 'gi');
+
+            if (results.length > 0) {
+                const infoDiv = document.createElement('div');
+                infoDiv.style.cssText = "padding: 8px 12px; font-size: 11px; color: #94a3b8; border-bottom: 1px solid #f1f5f9; background: #f8fafc; font-weight: 500;";
+                infoDiv.textContent = `${results.length} data ditemukan`;
+                suggestionsBox.appendChild(infoDiv);
+
+                results.slice(0, 100).forEach((item) => {
+                    const nama = item.nama || '';
+                    const kode = item.kode || '';
+                    const highlightedNama = nama.replace(regex, '<mark>$1</mark>');
+                    const highlightedKode = kode.replace(regex, '<mark>$1</mark>');
+
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item';
+                    div.innerHTML = `
+                        <div class="suggestion-name">${highlightedNama}</div>
+                        <div class="suggestion-code">${highlightedKode}</div>
+                    `;
+
+                    div.addEventListener('click', () => {
+                        barangInput.value = nama;
+                        kodeInput.value = kode;
+                        kodeInput.readOnly = true;
+                        suggestionsBox.style.display = 'none';
+                        selectedIndex = -1;
+                    });
+                    suggestionsBox.appendChild(div);
+                });
+            }
+
+            // Opsi barang baru dinamis
+            const newBarangDiv = document.createElement('div');
+            newBarangDiv.className = 'suggestion-item';
+            newBarangDiv.style.cssText = "background: #fffbeb; border-top: 1px dashed #fcd34d;"; 
+            newBarangDiv.innerHTML = `
+                <div class="suggestion-name" style="color: #b45309;">✨ Gunakan "${keyword}" sebagai Barang Baru</div>
+                <div class="suggestion-code" style="color: #d97706;">Klik untuk mengisi manual kode barang</div>
+            `;
+
+            newBarangDiv.addEventListener('click', () => {
+                barangInput.value = keyword;
+                kodeInput.value = ''; 
+                kodeInput.placeholder = "Isi kode manual / biarkan kosong jika tidak tahu";
+                kodeInput.readOnly = false;
+                kodeInput.focus();
+                suggestionsBox.style.display = 'none';
+                selectedIndex = -1;
+            });
+
+            suggestionsBox.appendChild(newBarangDiv);
+            suggestionsBox.style.display = 'block';
+        }
+
+        // Navigasi Keyboard Dropdown
+        barangInput.addEventListener('keydown', function (e) {
+            const items = suggestionsBox.querySelectorAll('.suggestion-item');
+            if (!items.length) return;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedIndex = Math.max(selectedIndex - 1, 0);
+            } else if (e.key === 'Enter') {
+                if (selectedIndex >= 0) {
+                    e.preventDefault();
+                    items[selectedIndex].click();
+                }
+            }
+
+            items.forEach((item, index) => {
+                const isActive = index === selectedIndex;
+                item.classList.toggle('active', isActive);
+                if (isActive) item.scrollIntoView({ block: 'nearest' });
+            });
+        });
+
+        // LOGIKA TAMBAH BARANG KE TABEL (KERANJANG)
+        addBarangBtn.addEventListener('click', () => {
+            const namaBarang = barangInput.value.trim();
+            let kodeBarang = kodeInput.value.trim();
+            const jumlah = jumlahInput.value.trim();
+            const keterangan = keteranganInput.value.trim();
+            const mesin = mesinInput.value.trim();
+
+            if (!namaBarang || !jumlah || !keterangan || !mesin) {
+                alert("Mohon lengkapi seluruh detail data barang terlebih dahulu!");
+                return;
+            }
+
+            if (!kodeBarang) kodeBarang = "BARANG BARU";
+
+            // Tambahkan objek barang baru ke array list
+            listBarangRequest.push({ namaBarang, kodeBarang, jumlah, keterangan, mesin });
+            
+            renderTable();
+
+            // Reset input barang temporer
+            barangInput.value = '';
+            kodeInput.value = '';
+            kodeInput.placeholder = 'Otomatis terisi';
+            kodeInput.readOnly = true;
+            jumlahInput.value = '';
+            keteranganInput.value = '';
+            mesinInput.value = '';
+        });
+
+        // Fungsi Render Baris Tabel
+        function renderTable() {
+            barangTableBody.innerHTML = '';
+            
+            if (listBarangRequest.length === 0) {
+                barangTableBody.appendChild(emptyRow);
+                submitBtn.disabled = true;
+                return;
+            }
+
+            submitBtn.disabled = false; // Aktifkan submit button jika min 1 barang ada
+
+            listBarangRequest.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.namaBarang}</td>
+                    <td>${item.kodeBarang}</td>
+                    <td>${item.jumlah}</td>
+                    <td>${item.mesin}</td>
+                    <td style="text-align:center;">
+                        <button type="button" class="btn-delete" onclick="hapusBarang(${index})">❌</button>
+                    </td>
                 `;
+                barangTableBody.appendChild(tr);
+            });
+        }
 
-                div.addEventListener('click', () => {
-                    barangInput.value = nama;
-                    kodeInput.value = kode;
-                    kodeInput.readOnly = true; // Kunci kembali jika pilih dari db
-                    suggestionsBox.style.display = 'none';
-                    selectedIndex = -1;
+        // Ekspos fungsi hapus ke ranah window global agar terpanggil via HTML atribut
+        window.hapusBarang = function(index) {
+            listBarangRequest.splice(index, 1);
+            renderTable();
+        };
+
+        // SUBMIT FORM KE GOOGLE SHEETS BACKEND
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            if (listBarangRequest.length === 0) {
+                alert("Daftar barang belanja masih kosong!");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = "Mengirim...";
+
+            // Memaketkan struktur data JSON array
+            const payload = {
+                nama: document.getElementById('namaInput').value.trim(),
+                grup: document.getElementById('grupSelect').value,
+                departemen: document.getElementById('deptInput').value,
+                items: listBarangRequest
+            };
+
+            try {
+                // Mengirim payload sebagai JSON string stringified
+                const response = await fetch(scriptURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' }, // Gunakan text/plain untuk bypass CORS preflight Apps Script
+                    body: JSON.stringify(payload)
                 });
 
-                suggestionsBox.appendChild(div);
-            });
-        }
+                const text = await response.text();
+                let result;
+                try {
+                    result = JSON.parse(text);
+                } catch (err) {
+                    throw new Error("Respon server tidak valid.");
+                }
 
-        // 2. TAMBAHKAN PILIHAN BARANG BARU (Selalu muncul di paling bawah / jika data tidak ditemukan)
-        const newBarangDiv = document.createElement('div');
-        newBarangDiv.className = 'suggestion-item';
-        newBarangDiv.style.cssText = "background: #fffbeb; border-top: 1px dashed #fcd34d;"; // Warna kekuningan sebagai penanda
-        newBarangDiv.innerHTML = `
-            <div class="suggestion-name" style="color: #b45309;">✨ Gunakan "${keyword}" sebagai Barang Baru</div>
-            <div class="suggestion-code" style="color: #d97706;">Klik untuk mengisi manual kode barang</div>
-        `;
+                if (result.result !== "success") {
+                    throw new Error(result.message || "Gagal menyimpan data.");
+                }
 
-        newBarangDiv.addEventListener('click', () => {
-            barangInput.value = keyword;
-            kodeInput.value = ''; // Kosongkan agar diisi manual
-            kodeInput.placeholder = "Isi kode manual / ketik 'BARANG BARU'";
-            kodeInput.readOnly = false; // Buka proteksi readonly agar bisa diketik
-            kodeInput.focus();
-            suggestionsBox.style.display = 'none';
-            selectedIndex = -1;
+                alert("Semua data Request PR berhasil dikirim.");
+                
+                // Bersihkan total form dan array
+                listBarangRequest = [];
+                renderTable();
+                form.reset();
+
+            } catch (error) {
+                console.error("SUBMIT ERROR:", error);
+                alert(error.message || "Terjadi masalah teknis saat pengiriman.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
         });
 
-        suggestionsBox.appendChild(newBarangDiv);
-        suggestionsBox.style.display = 'block';
-    }
-
-    // Navigasi via Keyboard (Up, Down, Enter)
-    barangInput.addEventListener('keydown', function (e) {
-        const items = suggestionsBox.querySelectorAll('.suggestion-item');
-        if (!items.length) return;
-
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
-        } 
-        else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            selectedIndex = Math.max(selectedIndex - 1, 0);
-        } 
-        else if (e.key === 'Enter') {
-            if (selectedIndex >= 0) {
-                e.preventDefault();
-                items[selectedIndex].click();
-            }
-        }
-
-        // Terapkan kelas active & pastikan otomatis ter-scroll ke area pandang
-        items.forEach((item, index) => {
-            const isActive = index === selectedIndex;
-            item.classList.toggle('active', isActive);
-            if (isActive) {
-                item.scrollIntoView({ block: 'nearest' });
+        // Event menutup pop-up suggestion box luar area
+        document.addEventListener('click', (e) => {
+            if (!barangInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                suggestionsBox.style.display = 'none';
             }
         });
     });
-
-   // Handle Form Submit
-    form.addEventListener('submit', async function (e) {
-        e.preventDefault();
-
-        // UBAH: Jika kode barang kosong karena user memilih/mengetik barang baru, 
-        // otomatis isi dengan "BARANG BARU" agar tidak diblokir oleh validasi.
-        if (!kodeInput.value.trim()) {
-            kodeInput.value = "BARANG BARU";
-        }
-
-        submitBtn.disabled = true;
-        const originalText = submitBtn.textContent;
-        submitBtn.textContent = "Mengirim...";
-
-        try {
-            const response = await fetch(scriptURL, {
-                method: 'POST',
-                body: new FormData(form)
-            });
-
-            const text = await response.text();
-            console.log("RAW RESPONSE:", text);
-
-            let result;
-            try {
-                result = JSON.parse(text);
-            } catch (err) {
-                throw new Error("Server tidak mengirim format JSON yang valid.");
-            }
-
-            if (!response.ok) {
-                throw new Error("Server error HTTP: " + response.status);
-            }
-
-            if (result.result !== "success") {
-                throw new Error(result.message || "Gagal menyimpan data ke sistem.");
-            }
-
-            alert("Data Request PR berhasil dikirim.");
-            
-            // Reset Form & State setelah sukses
-            form.reset();
-            kodeInput.value = '';
-            kodeInput.placeholder = ''; // Bersihkan placeholder manual jika ada
-            kodeInput.readOnly = true;  // TAMBAHAN: Kunci kembali input kode barang menjadi readonly
-            suggestionsBox.innerHTML = '';
-            suggestionsBox.style.display = 'none';
-
-        } catch (error) {
-            console.error("SUBMIT ERROR:", error);
-            alert(error.message || "Terjadi kesalahan saat mengirim data.");
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
-        }
-    });
-
-    // Tutup suggestion box saat klik di luar area input / box
-    document.addEventListener('click', (e) => {
-        if (!barangInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
-            suggestionsBox.style.display = 'none';
-        }
-    });
-
-});
-</script>
+    </script>
 </body>
 </html>
