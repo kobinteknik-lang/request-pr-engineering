@@ -133,7 +133,13 @@
         table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; }
         th, td { padding: 10px; border: 1px solid #cbd5e1; text-align: left; }
         th { background: #f1f5f9; color: #475569; font-weight: 600; }
-        .btn-delete { background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
+        
+        /* Action Buttons */
+        .action-btns { display: flex; gap: 4px; justify-content: center; }
+        .btn-action { border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; color: white; font-size: 12px; }
+        .btn-edit { background: #f59e0b; }
+        .btn-edit:hover { background: #d97706; }
+        .btn-delete { background: #ef4444; }
         .btn-delete:hover { background: #dc2626; }
 
         /* CUSTOM ALERT NOTIFICATION MODAL STYLING */
@@ -252,9 +258,9 @@
             
             <hr style="border: 1px dashed #cbd5e1; margin: 25px 0;">
 
-            <!-- AREA INPUT BARANG (SEMENTARA) -->
+            <!-- AREA INPUT BARANG -->
             <div style="background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-                <strong style="font-size: 14px; display:block; margin-bottom: 12px; color: #1e293b;">📍 Input Detail Barang:</strong>
+                <strong style="font-size: 14px; display:block; margin-bottom: 12px; color: #1e293b;" id="inputAreaTitle">📍 Input Detail Barang:</strong>
                 
                 <div class="form-group">
                     <label for="barangInput">Nama Barang / Sparepart</label>
@@ -282,12 +288,15 @@
                     <input type="text" id="mesinInput">
                 </div>
                 
-                <button type="button" id="addBarangBtn" class="btn" style="background: #059669; margin-top: 5px;">➕ Tambah ke Daftar</button>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" id="addBarangBtn" class="btn" style="background: #059669; margin-top: 5px;">➕ Tambah ke Daftar</button>
+                    <button type="button" id="cancelEditBtn" class="btn" style="background: #64748b; margin-top: 5px; display: none;">Batal</button>
+                </div>
             </div>
 
             <!-- TABEL KERANJANG DAFTAR BARANG -->
             <div class="form-group">
-                <label>Daftar Permintaan Barang Saat Ini:</label>
+                <label>Daftar Permintaan Barang Saat Ini: <span id="itemCount" style="color:#2563eb; font-weight:bold;">(0/15)</span></label>
                 <div class="table-responsive">
                     <table id="barangTable">
                         <thead>
@@ -323,11 +332,16 @@
         const jumlahInput = document.getElementById('jumlahInput');
         const keteranganInput = document.getElementById('keteranganInput');
         const mesinInput = document.getElementById('mesinInput');
+        const namaInput = document.getElementById('namaInput');
+        const grupSelect = document.getElementById('grupSelect');
         
         const suggestionsBox = document.getElementById('suggestions');
         const form = document.getElementById('prForm');
         const submitBtn = document.getElementById('submitBtn');
         const addBarangBtn = document.getElementById('addBarangBtn');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const inputAreaTitle = document.getElementById('inputAreaTitle');
+        const itemCount = document.getElementById('itemCount');
         const barangTableBody = document.querySelector('#barangTable tbody');
         const emptyRow = document.getElementById('emptyRow');
         const loader = document.getElementById('pageLoader');
@@ -344,7 +358,9 @@
         let databaseBarang = [];
         let listBarangRequest = []; 
         let selectedIndex = -1;
+        let editingIndex = -1; // Indeks barang yang sedang di-edit
         let searchTimer;
+        const MAX_ITEMS = 15; // Limitasi jumlah barang (Opsi 5)
 
         // FUNGSI UNTUK MENAMPILKAN CUSTOM ALERT MODAL
         function showAlert(type, title, message) {
@@ -365,19 +381,48 @@
             }, 10);
         }
 
-        // FUNGSI UNTUK MENUTUP MODAL
-        modalCloseBtn.addEventListener('click', () => {
+        // FUNGSI UNTUK MENUTUP MODAL (OPSI 5: Tentukan Event Esc & Overlay)
+        function closeModal() {
             alertModal.style.opacity = '0';
             alertModal.querySelector('.custom-modal').style.transform = 'scale(0.9)';
-            setTimeout(() => {
-                alertModal.style.display = 'none';
-            }, 300);
+            setTimeout(() => { alertModal.style.display = 'none'; }, 300);
+        }
+
+        modalCloseBtn.addEventListener('click', closeModal);
+        alertModal.addEventListener('click', (e) => { if (e.target === alertModal) closeModal(); });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && alertModal.style.display === 'flex') closeModal();
         });
 
-        if (!barangInput || !kodeInput || !suggestionsBox || !form || !submitBtn || !addBarangBtn) {
-            console.error("Elemen HTML tidak ditemukan.");
-            return;
+        // OPSI 4: AUTO-SAVE LOCALSTORAGE (Simpan dan Muat Draft)
+        function saveDraft() {
+            const draftData = {
+                nama: namaInput.value,
+                grup: grupSelect.value,
+                items: listBarangRequest
+            };
+            localStorage.setItem('pr_form_draft', JSON.stringify(draftData));
         }
+
+        function loadDraft() {
+            const savedDraft = localStorage.getItem('pr_form_draft');
+            if (savedDraft) {
+                try {
+                    const draft = JSON.parse(savedDraft);
+                    if (draft.nama) namaInput.value = draft.nama;
+                    if (draft.grup) grupSelect.value = draft.grup;
+                    if (Array.isArray(draft.items) && draft.items.length > 0) {
+                        listBarangRequest = draft.items;
+                        renderTable();
+                    }
+                } catch (e) {
+                    console.error("Gagal membaca draft:", e);
+                }
+            }
+        }
+
+        namaInput.addEventListener('input', saveDraft);
+        grupSelect.addEventListener('change', saveDraft);
 
         function escapeRegex(text) {
             return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -391,22 +436,21 @@
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 
                 const data = await res.json();
-                if (Array.isArray(data)) {
-                    databaseBarang = data;
-                }
+                if (Array.isArray(data)) databaseBarang = data;
             } catch (error) {
                 console.error("Gagal memuat database:", error);
                 if (loader) {
                     loader.innerHTML = "<p style='color:red; font-weight:bold; text-align:center; padding:10px;'>Gagal memuat data. Silakan refresh halaman.</p>";
                 }
             } finally {
-                if (loader && databaseBarang.length > 0) {
+                if (loader && loader.innerHTML.indexOf("Gagal") === -1) {
                     loader.style.display = "none";
                 }
             }
         }
 
         loadBarang();
+        loadDraft(); // Load draft dari localStorage saat startup
 
         // Algoritma Search Autocomplete
         function searchBarang(keyword) {
@@ -423,14 +467,8 @@
                     let score = 0;
                     if (kode.startsWith(keyword)) score += 100;
                     else if (kode.includes(keyword)) score += 50;
-
                     if (nama.startsWith(keyword)) score += 30;
                     else if (nama.includes(keyword)) score += 10;
-
-                    terms.forEach(term => {
-                        if (kode.includes(term)) score += 20;
-                        if (nama.includes(term)) score += 10;
-                    });
 
                     return { item, score };
                 })
@@ -539,7 +577,24 @@
             });
         });
 
-        // TAMBAH BARANG KE TABEL
+        // RESET INPUT BARANG FORM
+        function resetItemForm() {
+            barangInput.value = '';
+            kodeInput.value = '';
+            kodeInput.placeholder = 'Otomatis terisi';
+            kodeInput.readOnly = true;
+            jumlahInput.value = '';
+            keteranganInput.value = '';
+            mesinInput.value = '';
+            
+            editingIndex = -1;
+            addBarangBtn.textContent = '➕ Tambah ke Daftar';
+            addBarangBtn.style.background = '#059669';
+            cancelEditBtn.style.display = 'none';
+            inputAreaTitle.textContent = '📍 Input Detail Barang:';
+        }
+
+        // TAMBAH / UPDATE BARANG KE TABEL (OPSI 2 & 5)
         addBarangBtn.addEventListener('click', () => {
             const namaBarang = barangInput.value.trim();
             let kodeBarang = kodeInput.value.trim();
@@ -552,22 +607,36 @@
                 return;
             }
 
+            // Batas maksimal 15 item jika menambah barang baru
+            if (editingIndex === -1 && listBarangRequest.length >= MAX_ITEMS) {
+                showAlert('warning', 'Batas Maksimal Tercapai', `Maksimal permintaan per PR adalah ${MAX_ITEMS} barang.`);
+                return;
+            }
+
             if (!kodeBarang) kodeBarang = "BARANG BARU";
 
-            listBarangRequest.push({ namaBarang, kodeBarang, jumlah, keterangan, mesin });
-            renderTable();
+            const itemData = { namaBarang, kodeBarang, jumlah, keterangan, mesin };
 
-            barangInput.value = '';
-            kodeInput.value = '';
-            kodeInput.placeholder = 'Otomatis terisi';
-            kodeInput.readOnly = true;
-            jumlahInput.value = '';
-            keteranganInput.value = '';
-            mesinInput.value = '';
+            if (editingIndex >= 0) {
+                listBarangRequest[editingIndex] = itemData; // Update item
+            } else {
+                listBarangRequest.push(itemData); // Tambah item baru
+            }
+
+            renderTable();
+            saveDraft();
+            resetItemForm();
+            
+            // OPSI 5: Focus kembali ke input nama barang
+            barangInput.focus();
         });
+
+        // BATAL EDIT ITEM
+        cancelEditBtn.addEventListener('click', resetItemForm);
 
         function renderTable() {
             barangTableBody.innerHTML = '';
+            itemCount.textContent = `(${listBarangRequest.length}/${MAX_ITEMS})`;
             
             if (listBarangRequest.length === 0) {
                 barangTableBody.appendChild(emptyRow);
@@ -584,17 +653,41 @@
                     <td>${item.kodeBarang}</td>
                     <td>${item.jumlah}</td>
                     <td>${item.mesin}</td>
-                    <td style="text-align:center;">
-                        <button type="button" class="btn-delete" onclick="hapusBarang(${index})">❌</button>
+                    <td>
+                        <div class="action-btns">
+                            <button type="button" class="btn-action btn-edit" onclick="editBarang(${index})">✏️ Edit</button>
+                            <button type="button" class="btn-action btn-delete" onclick="hapusBarang(${index})">❌</button>
+                        </div>
                     </td>
                 `;
                 barangTableBody.appendChild(tr);
             });
         }
 
+        // OPSI 2: EDIT BARANG
+        window.editBarang = function(index) {
+            const item = listBarangRequest[index];
+            barangInput.value = item.namaBarang;
+            kodeInput.value = item.kodeBarang;
+            kodeInput.readOnly = (item.kodeBarang !== "BARANG BARU");
+            jumlahInput.value = item.jumlah;
+            keteranganInput.value = item.keterangan;
+            mesinInput.value = item.mesin;
+
+            editingIndex = index;
+            addBarangBtn.textContent = '💾 Simpan Perubahan';
+            addBarangBtn.style.background = '#f59e0b';
+            cancelEditBtn.style.display = 'block';
+            inputAreaTitle.textContent = `✏️ Edit Barang #${index + 1}:`;
+            
+            barangInput.focus();
+        };
+
         window.hapusBarang = function(index) {
+            if (editingIndex === index) resetItemForm();
             listBarangRequest.splice(index, 1);
             renderTable();
+            saveDraft();
         };
 
         // SUBMIT FORM KE GOOGLE SHEETS BACKEND
@@ -611,8 +704,8 @@
             submitBtn.textContent = "Mengirim...";
 
             const payload = {
-                nama: document.getElementById('namaInput').value.trim(),
-                grup: document.getElementById('grupSelect').value,
+                nama: namaInput.value.trim(),
+                grup: grupSelect.value,
                 departemen: document.getElementById('deptInput').value,
                 items: listBarangRequest
             };
@@ -639,15 +732,18 @@
                 // TAMPILKAN CUSTOM MODAL SUKSES
                 showAlert('success', 'Berhasil Dikirim', 'Semua data Request PR Anda telah sukses tersimpan ke sistem!');
                 
+                // Clear Draft & Form setelah sukses
                 listBarangRequest = [];
+                localStorage.removeItem('pr_form_draft');
                 renderTable();
                 form.reset();
+                resetItemForm();
 
             } catch (error) {
                 console.error("SUBMIT ERROR:", error);
                 showAlert('error', 'Gagal Mengirim', error.message || 'Terjadi masalah teknis saat pengiriman.');
             } finally {
-                submitBtn.disabled = false;
+                submitBtn.disabled = listBarangRequest.length === 0;
                 submitBtn.textContent = originalText;
             }
         });
