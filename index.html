@@ -13,7 +13,7 @@
             font-family: 'Segoe UI', system-ui, sans-serif; 
         }
 
-        /* Body dengan Background Gambar & Flexbox Layout */
+        /* Body dengan Background Gambar Baru & Flexbox Layout */
         body { 
             display: flex; 
             flex-direction: column;
@@ -22,7 +22,7 @@
             min-height: 100vh; 
             padding: 20px; 
             color: #334155;
-            background: url('https://static.vecteezy.com/system/resources/previews/003/386/349/large_2x/machine-gears-background-free-photo.jpg') no-repeat center center fixed;
+            background: url('Background-Desktop.jpg') no-repeat center center fixed;
             background-size: cover;
             position: relative;
         }
@@ -31,11 +31,11 @@
         .container { 
             width: 100%; 
             max-width: 550px; 
-            background: rgba(255, 255, 255, 0.9) !important; 
+            background: rgba(255, 255, 255, 0.92) !important; 
             backdrop-filter: blur(8px); 
             padding: 30px; 
             border-radius: 16px; 
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             margin: auto;
         }
         
@@ -358,9 +358,9 @@
         let databaseBarang = [];
         let listBarangRequest = []; 
         let selectedIndex = -1;
-        let editingIndex = -1; // Indeks barang yang sedang di-edit
+        let editingIndex = -1;
         let searchTimer;
-        const MAX_ITEMS = 15; // Limitasi jumlah barang (Opsi 5)
+        const MAX_ITEMS = 15;
 
         // FUNGSI UNTUK MENAMPILKAN CUSTOM ALERT MODAL
         function showAlert(type, title, message) {
@@ -381,7 +381,7 @@
             }, 10);
         }
 
-        // FUNGSI UNTUK MENUTUP MODAL (OPSI 5: Tentukan Event Esc & Overlay)
+        // FUNGSI UNTUK MENUTUP MODAL
         function closeModal() {
             alertModal.style.opacity = '0';
             alertModal.querySelector('.custom-modal').style.transform = 'scale(0.9)';
@@ -394,7 +394,7 @@
             if (e.key === 'Escape' && alertModal.style.display === 'flex') closeModal();
         });
 
-        // OPSI 4: AUTO-SAVE LOCALSTORAGE (Simpan dan Muat Draft)
+        // AUTO-SAVE LOCALSTORAGE (Simpan dan Muat Draft)
         function saveDraft() {
             const draftData = {
                 nama: namaInput.value,
@@ -450,7 +450,7 @@
         }
 
         loadBarang();
-        loadDraft(); // Load draft dari localStorage saat startup
+        loadDraft();
 
         // Algoritma Search Autocomplete
         function searchBarang(keyword) {
@@ -594,7 +594,7 @@
             inputAreaTitle.textContent = '📍 Input Detail Barang:';
         }
 
-        // TAMBAH / UPDATE BARANG KE TABEL (OPSI 2 & 5)
+        // TAMBAH / UPDATE BARANG KE TABEL
         addBarangBtn.addEventListener('click', () => {
             const namaBarang = barangInput.value.trim();
             let kodeBarang = kodeInput.value.trim();
@@ -607,7 +607,6 @@
                 return;
             }
 
-            // Batas maksimal 15 item jika menambah barang baru
             if (editingIndex === -1 && listBarangRequest.length >= MAX_ITEMS) {
                 showAlert('warning', 'Batas Maksimal Tercapai', `Maksimal permintaan per PR adalah ${MAX_ITEMS} barang.`);
                 return;
@@ -618,20 +617,17 @@
             const itemData = { namaBarang, kodeBarang, jumlah, keterangan, mesin };
 
             if (editingIndex >= 0) {
-                listBarangRequest[editingIndex] = itemData; // Update item
+                listBarangRequest[editingIndex] = itemData;
             } else {
-                listBarangRequest.push(itemData); // Tambah item baru
+                listBarangRequest.push(itemData);
             }
 
             renderTable();
             saveDraft();
             resetItemForm();
-            
-            // OPSI 5: Focus kembali ke input nama barang
             barangInput.focus();
         });
 
-        // BATAL EDIT ITEM
         cancelEditBtn.addEventListener('click', resetItemForm);
 
         function renderTable() {
@@ -664,7 +660,7 @@
             });
         }
 
-        // OPSI 2: EDIT BARANG
+        // EDIT BARANG
         window.editBarang = function(index) {
             const item = listBarangRequest[index];
             barangInput.value = item.namaBarang;
@@ -729,10 +725,8 @@
                     throw new Error(result.message || "Gagal menyimpan data.");
                 }
 
-                // TAMPILKAN CUSTOM MODAL SUKSES
                 showAlert('success', 'Berhasil Dikirim', 'Semua data Request PR Anda telah sukses tersimpan ke sistem!');
                 
-                // Clear Draft & Form setelah sukses
                 listBarangRequest = [];
                 localStorage.removeItem('pr_form_draft');
                 renderTable();
