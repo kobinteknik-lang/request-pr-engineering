@@ -362,6 +362,7 @@
         const mesinInput = document.getElementById('mesinInput');
         const namaInput = document.getElementById('namaInput');
         const grupSelect = document.getElementById('grupSelect');
+        const deptInput = document.getElementById('deptInput');
         
         const suggestionsBox = document.getElementById('suggestions');
         const form = document.getElementById('prForm');
@@ -388,6 +389,17 @@
         let editingIndex = -1;
         let searchTimer;
         const MAX_ITEMS = 15;
+
+        // Helper: Safe Text Sanitizer (XSS Prevention)
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.toString()
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
 
         // Custom Modal Alert Function
         function showAlert(type, title, message) {
@@ -535,8 +547,8 @@
                 results.slice(0, 100).forEach((item) => {
                     const nama = item.nama || '';
                     const kode = item.kode || '';
-                    const highlightedNama = regex ? nama.replace(regex, '<mark>$1</mark>') : nama;
-                    const highlightedKode = regex ? kode.replace(regex, '<mark>$1</mark>') : kode;
+                    const highlightedNama = regex ? escapeHtml(nama).replace(regex, '<mark>$1</mark>') : escapeHtml(nama);
+                    const highlightedKode = regex ? escapeHtml(kode).replace(regex, '<mark>$1</mark>') : escapeHtml(kode);
 
                     const div = document.createElement('div');
                     div.className = 'suggestion-item';
@@ -560,7 +572,7 @@
             newBarangDiv.className = 'suggestion-item';
             newBarangDiv.style.cssText = "background: #fffbeb; border-top: 1px dashed #fcd34d;"; 
             newBarangDiv.innerHTML = `
-                <div class="suggestion-name" style="color: #b45309;">✨ Gunakan "${keyword}" sebagai Barang Baru</div>
+                <div class="suggestion-name" style="color: #b45309;">✨ Gunakan "${escapeHtml(keyword)}" sebagai Barang Baru</div>
                 <div class="suggestion-code" style="color: #d97706;">Klik untuk mengisi manual kode barang</div>
             `;
 
@@ -640,7 +652,10 @@
 
             if (!kodeBarang) kodeBarang = "BARANG BARU";
 
-            const itemData = { namaBarang, kodeBarang, jumlah, keterangan, mesin };
+            // Cek apakah barang ada di database master
+            const isFromDb = databaseBarang.some(item => item.nama === namaBarang && item.kode === kodeBarang);
+
+            const itemData = { namaBarang, kodeBarang, jumlah, keterangan, mesin, isFromDb };
 
             if (editingIndex >= 0) {
                 listBarangRequest[editingIndex] = itemData;
@@ -656,7 +671,7 @@
 
         cancelEditBtn.addEventListener('click', resetItemForm);
 
-        // Render Table
+        // Render Table (dengan Proteksi XSS)
         function renderTable() {
             barangTableBody.innerHTML = '';
             itemCount.textContent = `(${listBarangRequest.length}/${MAX_ITEMS})`;
@@ -672,10 +687,10 @@
             listBarangRequest.forEach((item, index) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td style="font-weight:600; color:#0f172a;">${item.namaBarang}</td>
-                    <td><span class="code-badge">${item.kodeBarang}</span></td>
+                    <td style="font-weight:600; color:#0f172a;">${escapeHtml(item.namaBarang)}</td>
+                    <td><span class="code-badge">${escapeHtml(item.kodeBarang)}</span></td>
                     <td><strong style="color:#2563eb;">${item.jumlah}</strong></td>
-                    <td style="color:#475569;">${item.mesin}</td>
+                    <td style="color:#475569;">${escapeHtml(item.mesin)}</td>
                     <td>
                         <div class="action-btns">
                             <button type="button" class="btn-action btn-edit" onclick="editBarang(${index})">✏️ Edit</button>
@@ -687,12 +702,15 @@
             });
         }
 
-        // Edit Item
+        // Edit Item (Fix Logika Readonly)
         window.editBarang = function(index) {
             const item = listBarangRequest[index];
             barangInput.value = item.namaBarang;
             kodeInput.value = item.kodeBarang;
-            kodeInput.readOnly = (item.kodeBarang !== "BARANG BARU");
+            
+            // Kunci input HANYA jika barang tersebut berasal dari Master Database
+            kodeInput.readOnly = !!item.isFromDb;
+            
             jumlahInput.value = item.jumlah;
             keteranganInput.value = item.keterangan;
             mesinInput.value = item.mesin;
@@ -730,7 +748,7 @@
             const payload = {
                 nama: namaInput.value.trim(),
                 grup: grupSelect.value,
-                departemen: document.getElementById('deptInput').value,
+                departemen: deptInput.value,
                 items: listBarangRequest
             };
 
@@ -759,6 +777,7 @@
                 localStorage.removeItem('pr_form_draft');
                 renderTable();
                 form.reset();
+                deptInput.value = "Engineering"; // Memastikan Dept tetap terisi
                 resetItemForm();
 
             } catch (error) {
