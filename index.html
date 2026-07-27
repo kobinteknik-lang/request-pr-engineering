@@ -275,7 +275,7 @@
                 
                 <div class="form-group">
                     <label for="jumlahInput">Jumlah Barang</label>
-                    <input type="number" id="jumlahInput" min="1" step="1" oninput="this.value = !!this.value && Math.abs(this.value) >= 1 ? Math.floor(Math.abs(this.value)) : null">
+                    <input type="number" id="jumlahInput" min="1" step="1">
                 </div>
                 
                 <div class="form-group">
@@ -343,7 +343,6 @@
         const inputAreaTitle = document.getElementById('inputAreaTitle');
         const itemCount = document.getElementById('itemCount');
         const barangTableBody = document.querySelector('#barangTable tbody');
-        const emptyRow = document.getElementById('emptyRow');
         const loader = document.getElementById('pageLoader');
 
         // Elemen Modal Alert Custom
@@ -443,7 +442,7 @@
                     loader.innerHTML = "<p style='color:red; font-weight:bold; text-align:center; padding:10px;'>Gagal memuat data. Silakan refresh halaman.</p>";
                 }
             } finally {
-                if (loader && loader.innerHTML.indexOf("Gagal") === -1) {
+                if (loader && !loader.innerHTML.includes("Gagal")) {
                     loader.style.display = "none";
                 }
             }
@@ -497,8 +496,8 @@
         function renderSuggestions(results, keyword) {
             suggestionsBox.innerHTML = '';
             const escapedKeyword = escapeRegex(keyword.trim());
-            const terms = escapedKeyword.split(/\s+/);
-            const regex = new RegExp(`(${terms.join('|')})`, 'gi');
+            const terms = escapedKeyword.split(/\s+/).filter(Boolean);
+            const regex = terms.length ? new RegExp(`(${terms.join('|')})`, 'gi') : null;
 
             if (results.length > 0) {
                 const infoDiv = document.createElement('div');
@@ -509,8 +508,8 @@
                 results.slice(0, 100).forEach((item) => {
                     const nama = item.nama || '';
                     const kode = item.kode || '';
-                    const highlightedNama = nama.replace(regex, '<mark>$1</mark>');
-                    const highlightedKode = kode.replace(regex, '<mark>$1</mark>');
+                    const highlightedNama = regex ? nama.replace(regex, '<mark>$1</mark>') : nama;
+                    const highlightedKode = regex ? kode.replace(regex, '<mark>$1</mark>') : kode;
 
                     const div = document.createElement('div');
                     div.className = 'suggestion-item';
@@ -598,12 +597,12 @@
         addBarangBtn.addEventListener('click', () => {
             const namaBarang = barangInput.value.trim();
             let kodeBarang = kodeInput.value.trim();
-            const jumlah = jumlahInput.value.trim();
+            const jumlah = parseInt(jumlahInput.value, 10);
             const keterangan = keteranganInput.value.trim();
             const mesin = mesinInput.value.trim();
 
-            if (!namaBarang || !jumlah || !keterangan || !mesin) {
-                showAlert('warning', 'Data Belum Lengkap', 'Mohon lengkapi seluruh detail data barang terlebih dahulu!');
+            if (!namaBarang || isNaN(jumlah) || jumlah <= 0 || !keterangan || !mesin) {
+                showAlert('warning', 'Data Belum Lengkap', 'Mohon lengkapi seluruh detail data barang dengan benar!');
                 return;
             }
 
@@ -635,7 +634,7 @@
             itemCount.textContent = `(${listBarangRequest.length}/${MAX_ITEMS})`;
             
             if (listBarangRequest.length === 0) {
-                barangTableBody.appendChild(emptyRow);
+                barangTableBody.innerHTML = '<tr id="emptyRow"><td colspan="5" style="text-align: center; padding: 15px; color: #94a3b8;">Belum ada barang di dalam daftar.</td></tr>';
                 submitBtn.disabled = true;
                 return;
             }
