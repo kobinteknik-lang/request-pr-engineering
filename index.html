@@ -4,145 +4,176 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FORM REQUEST PR ENGINEERING</title>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* Reset & Base */
+        /* Reset & Base Styling */
         * { 
             box-sizing: border-box; 
             margin: 0; 
             padding: 0; 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; 
         }
 
-        /* Body dengan Background Gambar Baru & Flexbox Layout */
         body { 
             display: flex; 
             flex-direction: column;
             justify-content: center; 
             align-items: center; 
             min-height: 100vh; 
-            padding: 20px; 
-            color: #334155;
-            background: url('Background-Desktop.jpg') no-repeat center center fixed;
+            padding: 24px 16px; 
+            color: #1e293b;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.65)), url('Background-Desktop.jpg') no-repeat center center fixed;
             background-size: cover;
             position: relative;
         }
         
-        /* Container Card dengan Efek Transparansi (Responsif) */
+        /* Modern Glassmorphism Container Card */
         .container { 
             width: 100%; 
-            max-width: 550px; 
-            background: rgba(255, 255, 255, 0.92) !important; 
-            backdrop-filter: blur(8px); 
-            padding: 30px; 
-            border-radius: 16px; 
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            max-width: 580px; 
+            background: rgba(255, 255, 255, 0.88) !important; 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 36px 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.6);
             margin: auto;
         }
-        
-        h2 { text-align: center; color: #0f172a; margin-bottom: 8px; font-size: 22px; }
-        .subtitle { text-align: center; color: #64748b; font-size: 13px; margin-bottom: 25px; }
 
-        /* Form Elements */
+        .badge-system {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #4338ca;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        h2 { text-align: center; color: #0f172a; margin-bottom: 4px; font-size: 22px; font-weight: 700; }
+        .subtitle { text-align: center; color: #64748b; font-size: 13px; margin-bottom: 24px; font-weight: 500; }
+
+        /* Form Controls */
         .form-group { margin-bottom: 18px; position: relative; }
-        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #475569; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #334155; }
         
         input, textarea, select { 
             width: 100%; 
             max-width: 100%;
-            padding: 12px; 
-            border-radius: 8px; 
-            border: 1px solid #cbd5e1; 
-            background: #f8fafc; 
-            font-size: 16px; /* Mencegah auto-zoom di iOS */
-            transition: all 0.2s;
+            padding: 12px 14px; 
+            border-radius: 10px; 
+            border: 1.5px solid #cbd5e1; 
+            background: #ffffff; 
+            font-size: 14px; 
+            color: #0f172a;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        input:focus, textarea:focus, select:focus { 
-            background: #fff; 
-            border-color: #2563eb; 
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); 
-            outline: none; 
-        }
-        input[readonly] { background: #e2e8f0; color: #475569; cursor: not-allowed; }
 
-        /* Button */
+        input:focus, textarea:focus, select:focus { 
+            background: #ffffff; 
+            border-color: #2563eb; 
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12); 
+            outline: none; 
+            transform: translateY(-1px);
+        }
+
+        input[readonly] { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; cursor: not-allowed; }
+
+        /* Buttons */
         .btn { 
             width: 100%; 
             padding: 12px; 
             background: #2563eb; 
             color: #fff; 
             border: none; 
-            border-radius: 8px; 
+            border-radius: 10px; 
             font-weight: 600; 
+            font-size: 14px;
             cursor: pointer;
-            transition: background 0.2s; 
+            transition: all 0.2s ease; 
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
             margin-top: 10px;
         }
-        .btn:hover { background: #1d4ed8; }
-        .btn:disabled { background: #94a3b8; cursor: not-allowed; }
 
-        /* Autocomplete / Suggestions Box */
+        .btn:hover { background: #1d4ed8; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35); }
+        .btn:active { transform: translateY(0); }
+        .btn:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        /* Autocomplete Suggestions */
         .suggestions-box { 
             position: absolute; 
             width: 100%; 
-            background: #fff; 
-            border: 1px solid #cbd5e1; 
-            border-top: none; 
-            max-height: 200px; 
+            background: #ffffff; 
+            border: 1px solid #e2e8f0; 
+            max-height: 220px; 
             overflow-y: auto; 
             display: none; 
             z-index: 999; 
-            border-radius: 0 0 8px 8px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-radius: 0 0 12px 12px; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
-        .suggestion-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; text-align: left; }
-        .suggestion-item:hover, .suggestion-item.active { background: #eff6ff; }
-        .suggestion-name { font-weight: 600; font-size: 14px; }
-        .suggestion-code { font-size: 11px; color: #64748b; }
-        mark { background: #ffe082; padding: 0 2px; }
 
-        /* Page Loader Styling */
+        .suggestion-item { padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f1f5f9; text-align: left; transition: background 0.15s; }
+        .suggestion-item:hover, .suggestion-item.active { background: #eff6ff; }
+        .suggestion-name { font-weight: 600; font-size: 13px; color: #0f172a; }
+        .suggestion-code { font-size: 11px; color: #64748b; margin-top: 2px; }
+        mark { background: #fef08a; padding: 0 2px; border-radius: 2px; color: #854d0e; font-weight: 600; }
+
+        /* Loader */
         #pageLoader {
             position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(255,255,255,0.9); 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(255,255,255,0.92); 
+            backdrop-filter: blur(4px);
             z-index: 9999; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            flex-direction: column;
-        }
-        .spinner {
-            border: 5px solid #f3f3f3; 
-            border-top: 5px solid #2563eb; 
-            border-radius: 50%; 
-            width: 50px; 
-            height: 50px; 
-            animation: spin 1s linear infinite;
-        }
-        .loader-text {
-            margin-top: 15px; 
-            font-weight: bold; 
-            color: #2563eb;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
         }
 
-        /* Styling Tabel Daftar Barang */
-        .table-responsive { width: 100%; overflow-x: auto; margin-top: 5px; border-radius: 8px; border: 1px solid #cbd5e1; }
+        .spinner {
+            border: 4px solid #e2e8f0; 
+            border-top: 4px solid #2563eb; 
+            border-radius: 50%; 
+            width: 44px; height: 44px; 
+            animation: spin 0.8s linear infinite;
+        }
+
+        .loader-text { margin-top: 14px; font-weight: 600; font-size: 14px; color: #2563eb; }
+
+        /* Table Design */
+        .table-responsive { width: 100%; overflow-x: auto; margin-top: 6px; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; }
-        th, td { padding: 10px; border: 1px solid #cbd5e1; text-align: left; }
-        th { background: #f1f5f9; color: #475569; font-weight: 600; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f1f5f9; }
+        th { background: #f8fafc; color: #475569; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #e2e8f0; }
+        table tbody tr:hover { background-color: #f8fafc; }
         
+        .code-badge {
+            background: #f1f5f9;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            color: #0f172a;
+            font-weight: 600;
+            border: 1px solid #e2e8f0;
+            display: inline-block;
+        }
+
         /* Action Buttons */
-        .action-btns { display: flex; gap: 4px; justify-content: center; }
-        .btn-action { border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; color: white; font-size: 12px; }
+        .action-btns { display: flex; gap: 6px; justify-content: center; }
+        .btn-action { border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; color: white; font-size: 12px; font-weight: 600; transition: opacity 0.2s; }
         .btn-edit { background: #f59e0b; }
         .btn-edit:hover { background: #d97706; }
         .btn-delete { background: #ef4444; }
         .btn-delete:hover { background: #dc2626; }
 
-        /* CUSTOM ALERT NOTIFICATION MODAL STYLING */
+        /* Modal Overlay */
         .custom-modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -155,58 +186,52 @@
             opacity: 0;
             transition: opacity 0.3s ease;
         }
+
         .custom-modal {
             background: #ffffff;
             width: 90%;
-            max-width: 400px;
+            max-width: 380px;
             padding: 24px;
-            border-radius: 16px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-radius: 18px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
             text-align: center;
             transform: scale(0.9);
             transition: transform 0.3s ease;
         }
+
         .modal-icon {
-            width: 56px; height: 56px;
+            width: 52px; height: 52px;
             border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            font-size: 24px; margin: 0 auto 16px auto;
+            font-size: 22px; margin: 0 auto 14px auto;
         }
+
         .modal-icon.success { background: #dcfce7; color: #16a34a; }
         .modal-icon.error { background: #fee2e2; color: #dc2626; }
         .modal-icon.warning { background: #fef3c7; color: #d97706; }
-        .modal-title { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
-        .modal-message { font-size: 14px; color: #64748b; line-height: 1.5; margin-bottom: 20px; }
+        .modal-title { font-size: 17px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
+        .modal-message { font-size: 13px; color: #64748b; line-height: 1.5; margin-bottom: 20px; }
+        
         .modal-btn {
             width: 100%; padding: 10px; border: none; border-radius: 8px;
-            font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;
         }
+
         .modal-btn.success { background: #16a34a; color: white; }
-        .modal-btn.success:hover { background: #15803d; }
         .modal-btn.error { background: #dc2626; color: white; }
-        .modal-btn.error:hover { background: #b91c1c; }
         .modal-btn.warning { background: #d97706; color: white; }
-        .modal-btn.warning:hover { background: #b45309; }
 
-        /* Footer responsif */
         .footer {
-            padding: 15px;
-            text-align: center;
-            color: white;
-            font-size: 11px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-            width: 100%;
-            margin-top: 20px;
+            padding: 15px; text-align: center; color: rgba(255,255,255,0.9);
+            font-size: 12px; font-weight: 500; text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+            width: 100%; margin-top: 15px;
         }
 
-        /* Loading Spinner Animation */
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Media query untuk HP */
         @media (max-width: 480px) {
-            .container { padding: 20px; border-radius: 12px; }
-            h2 { font-size: 18px; }
-            .btn { padding: 15px; } 
+            .container { padding: 24px 18px; border-radius: 16px; }
+            h2 { font-size: 19px; }
         }
     </style>
 </head>
@@ -229,6 +254,9 @@
     </div>
 
     <div class="container">
+        <div style="text-align: center;">
+            <span class="badge-system">⚙️ Internal System</span>
+        </div>
         <h2>FORM REQUEST PR ENGINEERING</h2>
         <div class="subtitle">Sistem Internal Permintaan Barang & Sparepart</div>
 
@@ -236,13 +264,13 @@
             <!-- Data Identitas Pemohon -->
             <div class="form-group">
                 <label for="namaInput">Nama Karyawan</label>
-                <input type="text" id="namaInput" name="nama" required>
+                <input type="text" id="namaInput" name="nama" placeholder="Masukkan nama Anda..." required>
             </div>
             
             <div class="form-group">
                 <label for="grupSelect">Grup / Nonshift</label>
                 <select id="grupSelect" name="grup" required>
-                    <option value="" disabled selected>-- Pilih --</option>
+                    <option value="" disabled selected>-- Pilih Group Kerja --</option>
                     <option value="Group A">Group A</option> 
                     <option value="Group B">Group B</option> 
                     <option value="Group C">Group C</option> 
@@ -256,36 +284,36 @@
                 <input type="text" id="deptInput" name="departemen" value="Engineering" readonly>
             </div>
             
-            <hr style="border: 1px dashed #cbd5e1; margin: 25px 0;">
+            <hr style="border: none; border-top: 1.5px dashed #cbd5e1; margin: 24px 0;">
 
             <!-- AREA INPUT BARANG -->
-            <div style="background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-                <strong style="font-size: 14px; display:block; margin-bottom: 12px; color: #1e293b;" id="inputAreaTitle">📍 Input Detail Barang:</strong>
+            <div style="background: rgba(248, 250, 252, 0.8); padding: 18px; border-radius: 14px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                <strong style="font-size: 13px; display:block; margin-bottom: 12px; color: #0f172a;" id="inputAreaTitle">📍 Input Detail Barang:</strong>
                 
                 <div class="form-group">
                     <label for="barangInput">Nama Barang / Sparepart</label>
-                    <input type="text" id="barangInput" autocomplete="off">
+                    <input type="text" id="barangInput" autocomplete="off" placeholder="Ketik nama atau kode barang...">
                     <div id="suggestions" class="suggestions-box"></div>
                 </div>
                 
                 <div class="form-group">
                     <label for="kodeInput">Kode Barang</label>
-                    <input type="text" id="kodeInput" readonly placeholder="Otomatis terisi">
+                    <input type="text" id="kodeInput" readonly placeholder="Otomatis terisi dari sistem">
                 </div>
                 
                 <div class="form-group">
                     <label for="jumlahInput">Jumlah Barang</label>
-                    <input type="number" id="jumlahInput" min="1" step="1">
+                    <input type="number" id="jumlahInput" min="1" step="1" placeholder="Contoh: 2">
                 </div>
                 
                 <div class="form-group">
                     <label for="keteranganInput">Keterangan Kebutuhan</label>
-                    <textarea id="keteranganInput" rows="2"></textarea>
+                    <textarea id="keteranganInput" rows="2" placeholder="Detail spesifikasi / alasan permintaan..."></textarea>
                 </div>
                 
                 <div class="form-group">
                     <label for="mesinInput">Untuk Mesin</label>
-                    <input type="text" id="mesinInput">
+                    <input type="text" id="mesinInput" placeholder="Nama / Kode mesin...">
                 </div>
                 
                 <div style="display: flex; gap: 8px;">
@@ -309,7 +337,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr id="emptyRow"><td colspan="5" style="text-align: center; padding: 15px; color: #94a3b8;">Belum ada barang di dalam daftar.</td></tr>
+                            <tr id="emptyRow"><td colspan="5" style="text-align: center; padding: 18px; color: #94a3b8;">Belum ada barang di dalam daftar.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -345,7 +373,7 @@
         const barangTableBody = document.querySelector('#barangTable tbody');
         const loader = document.getElementById('pageLoader');
 
-        // Elemen Modal Alert Custom
+        // Modal Elements
         const alertModal = document.getElementById('customAlertModal');
         const modalIcon = document.getElementById('modalIcon');
         const modalTitle = document.getElementById('modalTitle');
@@ -361,7 +389,7 @@
         let searchTimer;
         const MAX_ITEMS = 15;
 
-        // FUNGSI UNTUK MENAMPILKAN CUSTOM ALERT MODAL
+        // Custom Modal Alert Function
         function showAlert(type, title, message) {
             modalIcon.className = `modal-icon ${type}`;
             modalCloseBtn.className = `modal-btn ${type}`;
@@ -380,7 +408,6 @@
             }, 10);
         }
 
-        // FUNGSI UNTUK MENUTUP MODAL
         function closeModal() {
             alertModal.style.opacity = '0';
             alertModal.querySelector('.custom-modal').style.transform = 'scale(0.9)';
@@ -393,7 +420,7 @@
             if (e.key === 'Escape' && alertModal.style.display === 'flex') closeModal();
         });
 
-        // AUTO-SAVE LOCALSTORAGE (Simpan dan Muat Draft)
+        // Auto Save Draft
         function saveDraft() {
             const draftData = {
                 nama: namaInput.value,
@@ -427,7 +454,7 @@
             return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         }
 
-        // Load database barang dari Google Apps Script
+        // Fetch Data Barang
         async function loadBarang() {
             try {
                 if (loader) loader.style.display = "flex"; 
@@ -439,7 +466,7 @@
             } catch (error) {
                 console.error("Gagal memuat database:", error);
                 if (loader) {
-                    loader.innerHTML = "<p style='color:red; font-weight:bold; text-align:center; padding:10px;'>Gagal memuat data. Silakan refresh halaman.</p>";
+                    loader.innerHTML = "<p style='color:#ef4444; font-weight:600; text-align:center; padding:10px;'>Gagal memuat data. Silakan refresh halaman.</p>";
                 }
             } finally {
                 if (loader && !loader.innerHTML.includes("Gagal")) {
@@ -451,7 +478,7 @@
         loadBarang();
         loadDraft();
 
-        // Algoritma Search Autocomplete
+        // Autocomplete Search Algorithm
         function searchBarang(keyword) {
             const terms = keyword.toLowerCase().trim().split(/\s+/);
             return databaseBarang
@@ -501,7 +528,7 @@
 
             if (results.length > 0) {
                 const infoDiv = document.createElement('div');
-                infoDiv.style.cssText = "padding: 8px 12px; font-size: 11px; color: #94a3b8; border-bottom: 1px solid #f1f5f9; background: #f8fafc; font-weight: 500;";
+                infoDiv.style.cssText = "padding: 8px 12px; font-size: 11px; color: #94a3b8; border-bottom: 1px solid #f1f5f9; background: #f8fafc; font-weight: 600;";
                 infoDiv.textContent = `${results.length} data ditemukan`;
                 suggestionsBox.appendChild(infoDiv);
 
@@ -551,7 +578,7 @@
             suggestionsBox.style.display = 'block';
         }
 
-        // Navigasi Keyboard Dropdown
+        // Keyboard Navigation
         barangInput.addEventListener('keydown', function (e) {
             const items = suggestionsBox.querySelectorAll('.suggestion-item');
             if (!items.length) return;
@@ -576,11 +603,11 @@
             });
         });
 
-        // RESET INPUT BARANG FORM
+        // Reset Item Form
         function resetItemForm() {
             barangInput.value = '';
             kodeInput.value = '';
-            kodeInput.placeholder = 'Otomatis terisi';
+            kodeInput.placeholder = 'Otomatis terisi dari sistem';
             kodeInput.readOnly = true;
             jumlahInput.value = '';
             keteranganInput.value = '';
@@ -593,7 +620,7 @@
             inputAreaTitle.textContent = '📍 Input Detail Barang:';
         }
 
-        // TAMBAH / UPDATE BARANG KE TABEL
+        // Add / Update Item
         addBarangBtn.addEventListener('click', () => {
             const namaBarang = barangInput.value.trim();
             let kodeBarang = kodeInput.value.trim();
@@ -629,12 +656,13 @@
 
         cancelEditBtn.addEventListener('click', resetItemForm);
 
+        // Render Table
         function renderTable() {
             barangTableBody.innerHTML = '';
             itemCount.textContent = `(${listBarangRequest.length}/${MAX_ITEMS})`;
             
             if (listBarangRequest.length === 0) {
-                barangTableBody.innerHTML = '<tr id="emptyRow"><td colspan="5" style="text-align: center; padding: 15px; color: #94a3b8;">Belum ada barang di dalam daftar.</td></tr>';
+                barangTableBody.innerHTML = '<tr id="emptyRow"><td colspan="5" style="text-align: center; padding: 18px; color: #94a3b8;">Belum ada barang di dalam daftar.</td></tr>';
                 submitBtn.disabled = true;
                 return;
             }
@@ -644,10 +672,10 @@
             listBarangRequest.forEach((item, index) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${item.namaBarang}</td>
-                    <td>${item.kodeBarang}</td>
-                    <td>${item.jumlah}</td>
-                    <td>${item.mesin}</td>
+                    <td style="font-weight:600; color:#0f172a;">${item.namaBarang}</td>
+                    <td><span class="code-badge">${item.kodeBarang}</span></td>
+                    <td><strong style="color:#2563eb;">${item.jumlah}</strong></td>
+                    <td style="color:#475569;">${item.mesin}</td>
                     <td>
                         <div class="action-btns">
                             <button type="button" class="btn-action btn-edit" onclick="editBarang(${index})">✏️ Edit</button>
@@ -659,7 +687,7 @@
             });
         }
 
-        // EDIT BARANG
+        // Edit Item
         window.editBarang = function(index) {
             const item = listBarangRequest[index];
             barangInput.value = item.namaBarang;
@@ -678,6 +706,7 @@
             barangInput.focus();
         };
 
+        // Delete Item
         window.hapusBarang = function(index) {
             if (editingIndex === index) resetItemForm();
             listBarangRequest.splice(index, 1);
@@ -685,7 +714,7 @@
             saveDraft();
         };
 
-        // SUBMIT FORM KE GOOGLE SHEETS BACKEND
+        // Form Submission
         form.addEventListener('submit', async function (e) {
             e.preventDefault();
 
