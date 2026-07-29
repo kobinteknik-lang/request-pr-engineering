@@ -258,13 +258,18 @@
         <p class="loader-text">Memuat Database...</p>
     </div>
 
-    <!-- Custom Alert Modal Structure -->
+    <!-- Custom Alert & Confirmation Modal Structure -->
     <div id="customAlertModal" class="custom-modal-overlay">
         <div class="custom-modal">
             <div id="modalIcon" class="modal-icon">✔</div>
             <div id="modalTitle" class="modal-title">Notifikasi</div>
             <div id="modalMessage" class="modal-message">Pesan notifikasi di sini.</div>
-            <button id="modalCloseBtn" class="modal-btn">Oke</button>
+            
+            <!-- Dual Action Buttons -->
+            <div id="modalActions" style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                <button id="modalCancelBtn" class="modal-btn" style="background: #94a3b8; color: white; display: none;">Simpan Dulu</button>
+                <button id="modalCloseBtn" class="modal-btn">Oke</button>
+            </div>
         </div>
     </div>
 
@@ -425,6 +430,7 @@
         const modalTitle = document.getElementById('modalTitle');
         const modalMessage = document.getElementById('modalMessage');
         const modalCloseBtn = document.getElementById('modalCloseBtn');
+        const modalCancelBtn = document.getElementById('modalCancelBtn');
 
         const scriptURL = "https://script.google.com/macros/s/AKfycbxek8os1feQ0zocHA1e-Y-2wVKAMs8zj54gT5c88KUjsreKV3b1HHcRdLZsMKNWC25B/exec";
 
@@ -432,10 +438,11 @@
         let listBarangRequest = []; 
         let selectedIndex = -1;
         let editingIndex = -1;
+        let pendingDeleteIndex = -1; // Penampung index yang akan dihapus
         let searchTimer;
         const MAX_ITEMS = 15;
 
-        // Helper: Safe Text Sanitizer (XSS Prevention)
+        // Safe Text Sanitizer (XSS Prevention)
         function escapeHtml(str) {
             if (!str) return '';
             return str.toString()
@@ -448,8 +455,11 @@
 
         // Custom Modal Alert Function
         function showAlert(type, title, message) {
+            pendingDeleteIndex = -1; // Reset pending index
             modalIcon.className = `modal-icon ${type}`;
             modalCloseBtn.className = `modal-btn ${type}`;
+            modalCloseBtn.textContent = 'Oke';
+            modalCancelBtn.style.display = 'none'; // Sembunyikan tombol batal untuk alert biasa
             
             if (type === 'success') modalIcon.innerHTML = '✔';
             else if (type === 'error') modalIcon.innerHTML = '✖';
@@ -471,7 +481,43 @@
             setTimeout(() => { alertModal.style.display = 'none'; }, 300);
         }
 
-        modalCloseBtn.addEventListener('click', closeModal);
+        // FUNGSI HAPUS BARANG (Option 3 - Singkat, Padat & Modern)
+        function hapusBarang(index) {
+            pendingDeleteIndex = index;
+            const item = listBarangRequest[index];
+
+            modalIcon.className = 'modal-icon warning';
+            modalIcon.innerHTML = '🚚';
+            modalTitle.textContent = 'Lepas Barang Ini?';
+            modalMessage.innerHTML = `Hapus <strong>"${escapeHtml(item.namaBarang)}"</strong> dari list PR kamu?`;
+            
+            // Tampilkan tombol Batal & Ubah tombol Konfirmasi
+            modalCancelBtn.style.display = 'block';
+            modalCloseBtn.textContent = 'Hapus Aja ❌';
+            modalCloseBtn.className = 'modal-btn error';
+
+            alertModal.style.display = 'flex';
+            setTimeout(() => {
+                alertModal.style.opacity = '1';
+                alertModal.querySelector('.custom-modal').style.transform = 'scale(1)';
+            }, 10);
+        }
+
+        // Event Listener Tombol Modal
+        modalCloseBtn.addEventListener('click', () => {
+            // Jika eksekusi berasal dari konfirmasi hapus
+            if (pendingDeleteIndex >= 0) {
+                if (editingIndex === pendingDeleteIndex) resetItemForm();
+                listBarangRequest.splice(pendingDeleteIndex, 1);
+                renderTable();
+                saveDraft();
+                pendingDeleteIndex = -1;
+            }
+            closeModal();
+        });
+
+        modalCancelBtn.addEventListener('click', closeModal);
+        
         alertModal.addEventListener('click', (e) => { if (e.target === alertModal) closeModal(); });
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && alertModal.style.display === 'flex') closeModal();
@@ -802,17 +848,6 @@
             inputAreaTitle.textContent = `✏️ Edit Barang #${index + 1}:`;
             
             barangInput.focus();
-        }
-
-        // Delete Item dengan Konfirmasi
-        function hapusBarang(index) {
-            const item = listBarangRequest[index];
-            if (confirm(`Apakah Anda yakin ingin menghapus "${item.namaBarang}" dari daftar?`)) {
-                if (editingIndex === index) resetItemForm();
-                listBarangRequest.splice(index, 1);
-                renderTable();
-                saveDraft();
-            }
         }
 
         // Form Submission
