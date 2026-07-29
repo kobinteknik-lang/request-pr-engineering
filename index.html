@@ -31,6 +31,33 @@
             position: relative;
         }
         
+        /* Floating Music Toggle Button */
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 10px 16px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .music-control:hover {
+            transform: scale(1.05);
+            background: #ffffff;
+        }
+
         /* Modern Glassmorphism Container Card */
         .container { 
             width: 100%; 
@@ -252,6 +279,19 @@
 </head>
 
 <body>
+    <!-- ELEMEN AUDIO / BACKGROUND MUSIC -->
+    <!-- Ganti 'musik-background.mp3' dengan nama file MP3 yang ditaruh di repository Anda -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="musik-background.mp3" type="audio/mpeg">
+        Browser Anda tidak mendukung audio HTML5.
+    </audio>
+
+    <!-- FLOATING MUSIC TOGGLE BUTTON -->
+    <div id="musicToggleBtn" class="music-control">
+        <span id="musicIcon">🎵</span>
+        <span id="musicStatusText">Musik: Off</span>
+    </div>
+
     <!-- Page Loader -->
     <div id="pageLoader">
         <div class="spinner"></div>
@@ -265,7 +305,6 @@
             <div id="modalTitle" class="modal-title">Notifikasi</div>
             <div id="modalMessage" class="modal-message">Pesan notifikasi di sini.</div>
             
-            <!-- Dual Action Buttons -->
             <div id="modalActions" style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
                 <button id="modalCancelBtn" class="modal-btn" style="background: #94a3b8; color: white; display: none;">Simpan Dulu</button>
                 <button id="modalCloseBtn" class="modal-btn">Oke</button>
@@ -321,7 +360,6 @@
                     <input type="text" id="kodeInput" readonly placeholder="Otomatis terisi dari sistem">
                 </div>
                 
-                <!-- INPUT JUMLAH & SATUAN (Side-by-side) -->
                 <div class="form-row">
                     <div class="form-group">
                         <label for="jumlahInput">Jumlah</label>
@@ -344,7 +382,6 @@
                     </div>
                 </div>
 
-                <!-- TINGKAT URGENSI & MESIN (Side-by-side) -->
                 <div class="form-row">
                     <div class="form-group">
                         <label for="mesinInput">Untuk Mesin</label>
@@ -403,6 +440,12 @@
     <!-- JAVASCRIPT LOGIC -->
     <script>
     document.addEventListener('DOMContentLoaded', () => {
+        // Elements Referensi
+        const bgMusic = document.getElementById('bgMusic');
+        const musicToggleBtn = document.getElementById('musicToggleBtn');
+        const musicIcon = document.getElementById('musicIcon');
+        const musicStatusText = document.getElementById('musicStatusText');
+
         const barangInput = document.getElementById('barangInput');
         const kodeInput = document.getElementById('kodeInput');
         const jumlahInput = document.getElementById('jumlahInput');
@@ -440,7 +483,48 @@
         let editingIndex = -1;
         let pendingDeleteIndex = -1;
         let searchTimer;
+        let isMusicPlaying = false;
         const MAX_ITEMS = 15;
+
+        // ==========================================
+        // LOGIKA PENANGANAN MUSIK (BACKGROUND MUSIC)
+        // ==========================================
+        bgMusic.volume = 0.3; // Mengatur volume agar lembut (30%)
+
+        function toggleMusic() {
+            if (isMusicPlaying) {
+                bgMusic.pause();
+                musicIcon.textContent = '🎵';
+                musicStatusText.textContent = 'Musik: Off';
+                isMusicPlaying = false;
+            } else {
+                bgMusic.play().then(() => {
+                    musicIcon.textContent = '🔊';
+                    musicStatusText.textContent = 'Musik: On';
+                    isMusicPlaying = true;
+                }).catch(err => {
+                    console.log("Autoplay diblokir oleh browser:", err);
+                });
+            }
+        }
+
+        musicToggleBtn.addEventListener('click', toggleMusic);
+
+        // Menjalankan musik otomatis ketika pengguna pertama kali berinteraksi dengan halaman
+        const startMusicOnFirstInteraction = () => {
+            if (!isMusicPlaying) {
+                bgMusic.play().then(() => {
+                    musicIcon.textContent = '🔊';
+                    musicStatusText.textContent = 'Musik: On';
+                    isMusicPlaying = true;
+                }).catch(() => {});
+            }
+            document.removeEventListener('click', startMusicOnFirstInteraction);
+            document.removeEventListener('keydown', startMusicOnFirstInteraction);
+        };
+
+        document.addEventListener('click', startMusicOnFirstInteraction);
+        document.addEventListener('keydown', startMusicOnFirstInteraction);
 
         // Safe Text Sanitizer (XSS Prevention)
         function escapeHtml(str) {
@@ -664,7 +748,6 @@
                         suggestionsBox.style.display = 'none';
                         selectedIndex = -1;
                         
-                        // AUTO PINDAH KE JUMLAH SETELAH PILIH BARANG
                         jumlahInput.focus();
                     });
                     suggestionsBox.appendChild(div);
@@ -784,7 +867,7 @@
 
         // 7. Keterangan -> Auto Tambah Barang & Kembali ke Nama Barang
         keteranganInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) { // Shift+Enter untuk baris baru jika perlu
+            if (e.key === 'Enter' && !e.shiftKey) { 
                 e.preventDefault();
                 addBarangBtn.click();
             }
@@ -845,7 +928,6 @@
             saveDraft();
             resetItemForm();
             
-            // AUTOMATISASI ULANG KELOOPOK: Fokus kembali ke Nama Barang
             barangInput.focus();
         });
 
