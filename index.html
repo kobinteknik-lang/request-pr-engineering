@@ -438,7 +438,7 @@
         let listBarangRequest = []; 
         let selectedIndex = -1;
         let editingIndex = -1;
-        let pendingDeleteIndex = -1; // Penampung index yang akan dihapus
+        let pendingDeleteIndex = -1;
         let searchTimer;
         const MAX_ITEMS = 15;
 
@@ -455,11 +455,11 @@
 
         // Custom Modal Alert Function
         function showAlert(type, title, message) {
-            pendingDeleteIndex = -1; // Reset pending index
+            pendingDeleteIndex = -1;
             modalIcon.className = `modal-icon ${type}`;
             modalCloseBtn.className = `modal-btn ${type}`;
             modalCloseBtn.textContent = 'Oke';
-            modalCancelBtn.style.display = 'none'; // Sembunyikan tombol batal untuk alert biasa
+            modalCancelBtn.style.display = 'none';
             
             if (type === 'success') modalIcon.innerHTML = '✔';
             else if (type === 'error') modalIcon.innerHTML = '✖';
@@ -481,7 +481,6 @@
             setTimeout(() => { alertModal.style.display = 'none'; }, 300);
         }
 
-        // FUNGSI HAPUS BARANG (Option 3 - Singkat, Padat & Modern)
         function hapusBarang(index) {
             pendingDeleteIndex = index;
             const item = listBarangRequest[index];
@@ -491,7 +490,6 @@
             modalTitle.textContent = 'Lepas Barang Ini?';
             modalMessage.innerHTML = `Hapus <strong>"${escapeHtml(item.namaBarang)}"</strong> dari list PR kamu?`;
             
-            // Tampilkan tombol Batal & Ubah tombol Konfirmasi
             modalCancelBtn.style.display = 'block';
             modalCloseBtn.textContent = 'Hapus Aja ❌';
             modalCloseBtn.className = 'modal-btn error';
@@ -503,9 +501,7 @@
             }, 10);
         }
 
-        // Event Listener Tombol Modal
         modalCloseBtn.addEventListener('click', () => {
-            // Jika eksekusi berasal dari konfirmasi hapus
             if (pendingDeleteIndex >= 0) {
                 if (editingIndex === pendingDeleteIndex) resetItemForm();
                 listBarangRequest.splice(pendingDeleteIndex, 1);
@@ -557,7 +553,7 @@
             return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         }
 
-        // Fetch Data Barang dengan Timeout 15 Detik
+        // Fetch Data Barang
         async function loadBarang() {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 15000);
@@ -667,6 +663,9 @@
                         kodeInput.readOnly = true;
                         suggestionsBox.style.display = 'none';
                         selectedIndex = -1;
+                        
+                        // AUTO PINDAH KE JUMLAH SETELAH PILIH BARANG
+                        jumlahInput.focus();
                     });
                     suggestionsBox.appendChild(div);
                 });
@@ -697,18 +696,21 @@
         // Keyboard Navigation
         barangInput.addEventListener('keydown', function (e) {
             const items = suggestionsBox.querySelectorAll('.suggestion-item');
-            if (!items.length) return;
-
-            if (e.key === 'ArrowDown') {
+            
+            if (e.key === 'ArrowDown' && items.length) {
                 e.preventDefault();
                 selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
-            } else if (e.key === 'ArrowUp') {
+            } else if (e.key === 'ArrowUp' && items.length) {
                 e.preventDefault();
                 selectedIndex = Math.max(selectedIndex - 1, 0);
             } else if (e.key === 'Enter') {
-                if (selectedIndex >= 0) {
+                if (selectedIndex >= 0 && items[selectedIndex]) {
                     e.preventDefault();
                     items[selectedIndex].click();
+                } else if (kodeInput.value || barangInput.value) {
+                    e.preventDefault();
+                    suggestionsBox.style.display = 'none';
+                    jumlahInput.focus();
                 }
             }
 
@@ -717,6 +719,75 @@
                 item.classList.toggle('active', isActive);
                 if (isActive) item.scrollIntoView({ block: 'nearest' });
             });
+        });
+
+        // ==========================================
+        // LOGIK ALUR OTOMATIS (NAVIGASI TERARAH)
+        // ==========================================
+
+        // 1. Nama Karyawan -> Grup Select
+        namaInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (namaInput.value.trim()) grupSelect.focus();
+            }
+        });
+
+        // 2. Grup Select -> Nama Barang
+        grupSelect.addEventListener('change', () => barangInput.focus());
+        grupSelect.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (grupSelect.value) barangInput.focus();
+            }
+        });
+
+        // Kode Input (jika Diisi Manual) -> Jumlah
+        kodeInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                jumlahInput.focus();
+            }
+        });
+
+        // 3. Jumlah -> Satuan
+        jumlahInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (jumlahInput.value) satuanSelect.focus();
+            }
+        });
+
+        // 4. Satuan -> Mesin Input
+        satuanSelect.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                mesinInput.focus();
+            }
+        });
+
+        // 5. Mesin Input -> Urgensi
+        mesinInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                urgensiSelect.focus();
+            }
+        });
+
+        // 6. Urgensi -> Keterangan
+        urgensiSelect.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                keteranganInput.focus();
+            }
+        });
+
+        // 7. Keterangan -> Auto Tambah Barang & Kembali ke Nama Barang
+        keteranganInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) { // Shift+Enter untuk baris baru jika perlu
+                e.preventDefault();
+                addBarangBtn.click();
+            }
         });
 
         // Reset Item Form
@@ -773,12 +844,17 @@
             renderTable();
             saveDraft();
             resetItemForm();
+            
+            // AUTOMATISASI ULANG KELOOPOK: Fokus kembali ke Nama Barang
             barangInput.focus();
         });
 
-        cancelEditBtn.addEventListener('click', resetItemForm);
+        cancelEditBtn.addEventListener('click', () => {
+            resetItemForm();
+            barangInput.focus();
+        });
 
-        // Render Table dengan Event Delegation & Safe HTML
+        // Render Table
         function renderTable() {
             barangTableBody.innerHTML = '';
             itemCount.textContent = `(${listBarangRequest.length}/${MAX_ITEMS})`;
@@ -815,7 +891,7 @@
             });
         }
 
-        // Event Delegation untuk Tombol Edit & Delete di Tabel
+        // Event Delegation untuk Tombol Edit & Delete
         barangTableBody.addEventListener('click', (e) => {
             const btnEdit = e.target.closest('.btn-edit');
             const btnDelete = e.target.closest('.btn-delete');
@@ -891,7 +967,6 @@
 
                 showAlert('success', 'Berhasil Dikirim', 'Semua data Request PR Anda telah sukses tersimpan ke sistem!');
                 
-                // Reset state & hapus local storage
                 listBarangRequest = [];
                 localStorage.removeItem('pr_form_draft');
                 
@@ -909,7 +984,7 @@
             }
         });
 
-        // Sembunyikan Autocomplete jika Klik di Luar
+        // Hide Suggestions on Click Outside
         document.addEventListener('click', (e) => {
             if (!barangInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
                 suggestionsBox.style.display = 'none';
