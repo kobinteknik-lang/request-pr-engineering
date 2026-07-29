@@ -483,60 +483,44 @@
         let isMusicPlaying = false;
         const MAX_ITEMS = 15;
 
-        // ==========================================
-        // LOGIKA PENANGANAN MUSIK (AUTO ON SETELAH KLIK LAYAR)
-        // ==========================================
-        bgMusic.volume = 0.4; // Volume lembut 40%
-
-        function updateMusicUI(playing) {
-            if (playing) {
-                musicIcon.textContent = '🔊';
-                musicStatusText.textContent = 'Musik: On';
-                isMusicPlaying = true;
-            } else {
-                musicIcon.textContent = '🎵';
-                musicStatusText.textContent = 'Musik: Off';
-                isMusicPlaying = false;
-            }
-        }
+        // Kontrol Musik Volume
+        bgMusic.volume = 0.3;
 
         function toggleMusic() {
             if (isMusicPlaying) {
                 bgMusic.pause();
-                updateMusicUI(false);
+                musicIcon.textContent = '🎵';
+                musicStatusText.textContent = 'Musik: Off';
+                isMusicPlaying = false;
             } else {
                 bgMusic.play().then(() => {
-                    updateMusicUI(true);
+                    musicIcon.textContent = '🔊';
+                    musicStatusText.textContent = 'Musik: On';
+                    isMusicPlaying = true;
                 }).catch(err => {
                     console.log("Autoplay diblokir browser:", err);
                 });
             }
         }
 
-        musicToggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Mencegah bentrok dengan listener window
-            toggleMusic();
-        });
+        musicToggleBtn.addEventListener('click', toggleMusic);
 
-        // AUTO ON SAAT ADA INTERAKSI PERTAMA DI LAYAR
-        const playOnFirstInteraction = () => {
+        // Auto Play Musik saat interaksi pertama
+        const startMusicOnFirstInteraction = () => {
             if (!isMusicPlaying) {
                 bgMusic.play().then(() => {
-                    updateMusicUI(true);
-                }).catch(err => {
-                    console.log("Gagal memutar audio:", err);
-                });
+                    musicIcon.textContent = '🔊';
+                    musicStatusText.textContent = 'Musik: On';
+                    isMusicPlaying = true;
+                }).catch(() => {});
             }
-            window.removeEventListener('click', playOnFirstInteraction);
-            window.removeEventListener('keydown', playOnFirstInteraction);
-            window.removeEventListener('touchstart', playOnFirstInteraction);
+            document.removeEventListener('click', startMusicOnFirstInteraction);
+            document.removeEventListener('keydown', startMusicOnFirstInteraction);
         };
 
-        window.addEventListener('click', playOnFirstInteraction);
-        window.addEventListener('keydown', playOnFirstInteraction);
-        window.addEventListener('touchstart', playOnFirstInteraction);
+        document.addEventListener('click', startMusicOnFirstInteraction);
+        document.addEventListener('keydown', startMusicOnFirstInteraction);
 
-        // Safe Text Sanitizer (XSS Prevention)
         function escapeHtml(str) {
             if (!str) return '';
             return str.toString()
@@ -809,9 +793,7 @@
             });
         });
 
-        // ==========================================
-        // LOGIKA AUTO NAVIGASI (TEKAN ENTER)
-        // ==========================================
+        // LOGIKA AUTO NAVIGASI (ENTER)
         namaInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
