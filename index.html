@@ -34,8 +34,8 @@
         /* Modern Glassmorphism Container Card */
         .container { 
             width: 100%; 
-            max-width: 580px; 
-            background: rgba(255, 255, 255, 0.88) !important; 
+            max-width: 620px; 
+            background: rgba(255, 255, 255, 0.90) !important; 
             backdrop-filter: blur(16px); 
             -webkit-backdrop-filter: blur(16px);
             padding: 36px 30px; 
@@ -63,6 +63,9 @@
 
         /* Form Controls */
         .form-group { margin-bottom: 18px; position: relative; }
+        .form-row { display: flex; gap: 12px; }
+        .form-row .form-group { flex: 1; }
+
         label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #334155; }
         
         input, textarea, select { 
@@ -165,6 +168,17 @@
             display: inline-block;
         }
 
+        .urgency-badge {
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+        .urgency-normal { background: #e0f2fe; color: #0369a1; }
+        .urgency-urgent { background: #fee2e2; color: #dc2626; }
+
         /* Action Buttons */
         .action-btns { display: flex; gap: 6px; justify-content: center; }
         .btn-action { border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; color: white; font-size: 12px; font-weight: 600; transition: opacity 0.2s; }
@@ -232,6 +246,7 @@
         @media (max-width: 480px) {
             .container { padding: 24px 18px; border-radius: 16px; }
             h2 { font-size: 19px; }
+            .form-row { flex-direction: column; gap: 0; }
         }
     </style>
 </head>
@@ -301,19 +316,47 @@
                     <input type="text" id="kodeInput" readonly placeholder="Otomatis terisi dari sistem">
                 </div>
                 
-                <div class="form-group">
-                    <label for="jumlahInput">Jumlah Barang</label>
-                    <input type="number" id="jumlahInput" min="1" step="1" placeholder="Contoh: 2">
+                <!-- INPUT JUMLAH & SATUAN (Side-by-side) -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="jumlahInput">Jumlah</label>
+                        <input type="number" id="jumlahInput" min="1" step="1" oninput="this.value = !!this.value && Math.abs(this.value) >= 1 ? Math.abs(this.value) : ''" placeholder="Contoh: 2">
+                    </div>
+                    <div class="form-group">
+                        <label for="satuanSelect">Satuan</label>
+                        <select id="satuanSelect">
+                            <option value="Pcs">Pcs</option>
+                            <option value="Box">Box</option>
+                            <option value="Set">Set</option>
+                            <option value="Unit">Unit</option>
+                            <option value="Roll">Roll</option>
+                            <option value="Meter">Meter</option>
+                            <option value="Kg">Kg</option>
+                            <option value="Liter">Liter</option>
+                            <option value="Pack">Pack</option>
+                            <option value="Can">Can</option>
+                        </select>
+                    </div>
                 </div>
-                
+
+                <!-- TINGKAT URGENSI & MESIN (Side-by-side) -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="mesinInput">Untuk Mesin</label>
+                        <input type="text" id="mesinInput" placeholder="Nama / Kode mesin...">
+                    </div>
+                    <div class="form-group">
+                        <label for="urgensiSelect">Tingkat Urgensi</label>
+                        <select id="urgensiSelect">
+                            <option value="Normal">🔵 Normal</option>
+                            <option value="Urgent">🔴 Urgent (Darurat)</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label for="keteranganInput">Keterangan Kebutuhan</label>
                     <textarea id="keteranganInput" rows="2" placeholder="Detail spesifikasi / alasan permintaan..."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="mesinInput">Untuk Mesin</label>
-                    <input type="text" id="mesinInput" placeholder="Nama / Kode mesin...">
                 </div>
                 
                 <div style="display: flex; gap: 8px;">
@@ -332,7 +375,7 @@
                                 <th>Barang</th>
                                 <th>Kode</th>
                                 <th>Qty</th>
-                                <th>Mesin</th>
+                                <th>Status</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -358,6 +401,8 @@
         const barangInput = document.getElementById('barangInput');
         const kodeInput = document.getElementById('kodeInput');
         const jumlahInput = document.getElementById('jumlahInput');
+        const satuanSelect = document.getElementById('satuanSelect');
+        const urgensiSelect = document.getElementById('urgensiSelect');
         const keteranganInput = document.getElementById('keteranganInput');
         const mesinInput = document.getElementById('mesinInput');
         const namaInput = document.getElementById('namaInput');
@@ -466,11 +511,16 @@
             return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         }
 
-        // Fetch Data Barang
+        // Fetch Data Barang dengan Timeout 15 Detik
         async function loadBarang() {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000);
+
             try {
                 if (loader) loader.style.display = "flex"; 
-                const res = await fetch(`${scriptURL}?action=getBarang`);
+                const res = await fetch(`${scriptURL}?action=getBarang`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 
                 const data = await res.json();
@@ -478,10 +528,18 @@
             } catch (error) {
                 console.error("Gagal memuat database:", error);
                 if (loader) {
-                    loader.innerHTML = "<p style='color:#ef4444; font-weight:600; text-align:center; padding:10px;'>Gagal memuat data. Silakan refresh halaman.</p>";
+                    const isTimeout = error.name === 'AbortError';
+                    loader.innerHTML = `
+                        <div style="text-align:center; padding:20px;">
+                            <p style="color:#ef4444; font-weight:600; margin-bottom:12px;">
+                                ${isTimeout ? 'Koneksi lambat / Server Timeout.' : 'Gagal memuat database master.'}
+                            </p>
+                            <button onclick="location.reload()" class="btn" style="width:auto; padding:8px 18px; background:#2563eb;">Coba Lagi 🔄</button>
+                        </div>
+                    `;
                 }
             } finally {
-                if (loader && !loader.innerHTML.includes("Gagal")) {
+                if (loader && !loader.innerHTML.includes("Coba Lagi")) {
                     loader.style.display = "none";
                 }
             }
@@ -622,6 +680,8 @@
             kodeInput.placeholder = 'Otomatis terisi dari sistem';
             kodeInput.readOnly = true;
             jumlahInput.value = '';
+            satuanSelect.value = 'Pcs';
+            urgensiSelect.value = 'Normal';
             keteranganInput.value = '';
             mesinInput.value = '';
             
@@ -637,11 +697,13 @@
             const namaBarang = barangInput.value.trim();
             let kodeBarang = kodeInput.value.trim();
             const jumlah = parseInt(jumlahInput.value, 10);
+            const satuan = satuanSelect.value;
+            const urgensi = urgensiSelect.value;
             const keterangan = keteranganInput.value.trim();
             const mesin = mesinInput.value.trim();
 
-            if (!namaBarang || isNaN(jumlah) || jumlah <= 0 || !keterangan || !mesin) {
-                showAlert('warning', 'Data Belum Lengkap', 'Mohon lengkapi seluruh detail data barang dengan benar!');
+            if (!namaBarang || !jumlah || isNaN(jumlah) || jumlah <= 0 || !keterangan || !mesin) {
+                showAlert('warning', 'Data Belum Lengkap', 'Mohon isi nama barang, jumlah (minimal 1), mesin, dan keterangan kebutuhan!');
                 return;
             }
 
@@ -652,10 +714,9 @@
 
             if (!kodeBarang) kodeBarang = "BARANG BARU";
 
-            // Cek apakah barang ada di database master
             const isFromDb = databaseBarang.some(item => item.nama === namaBarang && item.kode === kodeBarang);
 
-            const itemData = { namaBarang, kodeBarang, jumlah, keterangan, mesin, isFromDb };
+            const itemData = { namaBarang, kodeBarang, jumlah, satuan, urgensi, keterangan, mesin, isFromDb };
 
             if (editingIndex >= 0) {
                 listBarangRequest[editingIndex] = itemData;
@@ -671,7 +732,7 @@
 
         cancelEditBtn.addEventListener('click', resetItemForm);
 
-        // Render Table (dengan Proteksi XSS)
+        // Render Table dengan Event Delegation & Safe HTML
         function renderTable() {
             barangTableBody.innerHTML = '';
             itemCount.textContent = `(${listBarangRequest.length}/${MAX_ITEMS})`;
@@ -686,15 +747,21 @@
 
             listBarangRequest.forEach((item, index) => {
                 const tr = document.createElement('tr');
+                const isUrgent = item.urgensi === 'Urgent';
+                const urgensiClass = isUrgent ? 'urgency-urgent' : 'urgency-normal';
+
                 tr.innerHTML = `
-                    <td style="font-weight:600; color:#0f172a;">${escapeHtml(item.namaBarang)}</td>
+                    <td style="font-weight:600; color:#0f172a;">
+                        ${escapeHtml(item.namaBarang)}
+                        <div style="font-weight:normal; font-size:11px; color:#64748b; margin-top:2px;">Mesin: ${escapeHtml(item.mesin)}</div>
+                    </td>
                     <td><span class="code-badge">${escapeHtml(item.kodeBarang)}</span></td>
-                    <td><strong style="color:#2563eb;">${item.jumlah}</strong></td>
-                    <td style="color:#475569;">${escapeHtml(item.mesin)}</td>
+                    <td><strong style="color:#2563eb;">${item.jumlah}</strong> <span style="font-size:11px; color:#64748b;">${escapeHtml(item.satuan)}</span></td>
+                    <td><span class="urgency-badge ${urgensiClass}">${escapeHtml(item.urgensi)}</span></td>
                     <td>
                         <div class="action-btns">
-                            <button type="button" class="btn-action btn-edit" onclick="editBarang(${index})">✏️ Edit</button>
-                            <button type="button" class="btn-action btn-delete" onclick="hapusBarang(${index})">❌</button>
+                            <button type="button" class="btn-action btn-edit" data-index="${index}">✏️</button>
+                            <button type="button" class="btn-action btn-delete" data-index="${index}">❌</button>
                         </div>
                     </td>
                 `;
@@ -702,16 +769,29 @@
             });
         }
 
-        // Edit Item (Fix Logika Readonly)
-        window.editBarang = function(index) {
+        // Event Delegation untuk Tombol Edit & Delete di Tabel
+        barangTableBody.addEventListener('click', (e) => {
+            const btnEdit = e.target.closest('.btn-edit');
+            const btnDelete = e.target.closest('.btn-delete');
+
+            if (btnEdit) {
+                const index = parseInt(btnEdit.dataset.index, 10);
+                editBarang(index);
+            } else if (btnDelete) {
+                const index = parseInt(btnDelete.dataset.index, 10);
+                hapusBarang(index);
+            }
+        });
+
+        // Edit Item Function
+        function editBarang(index) {
             const item = listBarangRequest[index];
             barangInput.value = item.namaBarang;
             kodeInput.value = item.kodeBarang;
-            
-            // Kunci input HANYA jika barang tersebut berasal dari Master Database
             kodeInput.readOnly = !!item.isFromDb;
-            
             jumlahInput.value = item.jumlah;
+            satuanSelect.value = item.satuan || 'Pcs';
+            urgensiSelect.value = item.urgensi || 'Normal';
             keteranganInput.value = item.keterangan;
             mesinInput.value = item.mesin;
 
@@ -722,15 +802,18 @@
             inputAreaTitle.textContent = `✏️ Edit Barang #${index + 1}:`;
             
             barangInput.focus();
-        };
+        }
 
-        // Delete Item
-        window.hapusBarang = function(index) {
-            if (editingIndex === index) resetItemForm();
-            listBarangRequest.splice(index, 1);
-            renderTable();
-            saveDraft();
-        };
+        // Delete Item dengan Konfirmasi
+        function hapusBarang(index) {
+            const item = listBarangRequest[index];
+            if (confirm(`Apakah Anda yakin ingin menghapus "${item.namaBarang}" dari daftar?`)) {
+                if (editingIndex === index) resetItemForm();
+                listBarangRequest.splice(index, 1);
+                renderTable();
+                saveDraft();
+            }
+        }
 
         // Form Submission
         form.addEventListener('submit', async function (e) {
@@ -773,11 +856,13 @@
 
                 showAlert('success', 'Berhasil Dikirim', 'Semua data Request PR Anda telah sukses tersimpan ke sistem!');
                 
+                // Reset state & hapus local storage
                 listBarangRequest = [];
                 localStorage.removeItem('pr_form_draft');
-                renderTable();
+                
                 form.reset();
-                deptInput.value = "Engineering"; // Memastikan Dept tetap terisi
+                deptInput.value = "Engineering"; 
+                renderTable();
                 resetItemForm();
 
             } catch (error) {
@@ -789,7 +874,7 @@
             }
         });
 
-        // Hide Suggestions on Outside Click
+        // Sembunyikan Autocomplete jika Klik di Luar
         document.addEventListener('click', (e) => {
             if (!barangInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
                 suggestionsBox.style.display = 'none';
