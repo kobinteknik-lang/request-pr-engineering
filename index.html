@@ -3,441 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PR Engineering Workspace</title>
+    <title>FORM REQUEST PR ENGINEERING</title>
+    <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- PWA Manifest Generated Dynamically -->
-    <script id="pwa-manifest-script">
+    <!-- PWA Manifest Dinamis -->
+    <script>
         const manifestData = {
             "name": "PR Engineering App",
             "short_name": "PR Eng",
             "start_url": "./",
             "display": "standalone",
             "background_color": "#0f172a",
-            "theme_color": "#2563eb",
-            "icons": [{
-                "src": "https://cdn-icons-png.flaticon.com/512/900/900782.png",
-                "sizes": "512x512",
-                "type": "image/png"
-            }]
+            "theme_color": "#2563eb"
         };
         const stringManifest = JSON.stringify(manifestData);
         const blob = new Blob([stringManifest], {type: 'application/json'});
-        const manifestURL = URL.createObjectURL(blob);
         const link = document.createElement('link');
         link.rel = 'manifest';
-        link.href = manifestURL;
+        link.href = URL.createObjectURL(blob);
         document.head.appendChild(link);
     </script>
 
     <style>
-        :root {
-            --bg-body: #0f172a;
-            --surface-card: #ffffff;
-            --surface-subtle: #f8fafc;
-            --border-color: #e2e8f0;
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --primary-light: #eff6ff;
-            --text-dark: #0f172a;
-            --text-muted: #64748b;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --radius-md: 12px;
-            --radius-lg: 18px;
-            --shadow-subtle: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
-            --shadow-elevated: 0 20px 25px -5px rgba(15, 23, 42, 0.1);
+        /* Reset & Base Styling */
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; 
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        input, textarea, select {
-            -webkit-user-select: text;
-            -moz-user-select: text;
-            -ms-user-select: text;
-            user-select: text;
-        }
-
-        body {
-            background: #0f172a;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.12) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
-            min-height: 100vh;
-            color: var(--text-dark);
-            padding: 20px;
-            display: flex;
+        body { 
+            display: flex; 
             flex-direction: column;
-            align-items: center;
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 24px 16px; 
+            color: #1e293b;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.65)), url('Background-Desktop.jpg') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
         }
-
-        /* Top Navigation Bar */
-        .app-header {
-            width: 100%;
-            max-width: 1280px;
+        
+        /* Floating Music & PWA Control */
+        .top-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 24px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: var(--radius-lg);
-            margin-bottom: 24px;
-            box-shadow: var(--shadow-subtle);
-        }
-
-        .brand-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .brand-logo {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #2563eb, #3b82f6);
-            color: #fff;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
-        }
-
-        .brand-title h1 {
-            font-size: 16px;
-            font-weight: 800;
-            color: var(--text-dark);
-            letter-spacing: -0.3px;
-        }
-
-        .brand-title p {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
             gap: 10px;
         }
 
-        .btn-header {
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-dark);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s ease;
-        }
-
-        .btn-header:hover {
-            background: var(--surface-subtle);
-            border-color: #cbd5e1;
-        }
-
-        .btn-install-pwa {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: #fff;
-            border: none;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-            display: none;
-        }
-
-        .btn-install-pwa:hover {
-            background: linear-gradient(135deg, #059669, #047857);
-        }
-
-        /* Layout Main Grid */
-        .app-layout {
-            width: 100%;
-            max-width: 1280px;
-            display: grid;
-            grid-template-columns: 420px 1fr;
-            gap: 24px;
-            align-items: start;
-        }
-
-        @media (max-width: 1024px) {
-            .app-layout {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Surface Panel Card */
-        .panel-card {
-            background: var(--surface-card);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-elevated);
-            padding: 24px;
-        }
-
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .panel-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--text-dark);
+        .control-btn {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 10px 16px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             display: flex;
             align-items: center;
             gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
-        /* Form Controls */
-        .form-group {
-            margin-bottom: 16px;
-            position: relative;
+        .control-btn:hover {
+            transform: scale(1.05);
+            background: #ffffff;
         }
 
-        .form-row {
-            display: flex;
-            gap: 12px;
+        /* Container Card */
+        .container { 
+            width: 100%; 
+            max-width: 620px; 
+            background: rgba(255, 255, 255, 0.92) !important; 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 36px 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            margin: auto;
         }
 
-        .form-row .form-group {
-            flex: 1;
-        }
-
-        label {
-            display: block;
-            font-size: 12px;
+        .badge-system {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #4338ca;
+            font-size: 11px;
             font-weight: 700;
-            color: #475569;
-            margin-bottom: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            margin-bottom: 8px;
         }
+        
+        h2 { text-align: center; color: #0f172a; margin-bottom: 4px; font-size: 22px; font-weight: 700; }
+        .subtitle { text-align: center; color: #64748b; font-size: 13px; margin-bottom: 24px; font-weight: 500; }
 
-        input, select, textarea {
-            width: 100%;
-            padding: 10px 14px;
-            font-size: 13px;
-            border-radius: var(--radius-md);
-            border: 1.5px solid var(--border-color);
-            background: #ffffff;
-            color: var(--text-dark);
-            outline: none;
+        /* Form Controls */
+        .form-group { margin-bottom: 18px; position: relative; }
+        .form-row { display: flex; gap: 12px; }
+        .form-row .form-group { flex: 1; }
+
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #334155; }
+        
+        input, textarea, select { 
+            width: 100%; 
+            max-width: 100%;
+            padding: 12px 14px; 
+            border-radius: 10px; 
+            border: 1.5px solid #cbd5e1; 
+            background: #ffffff; 
+            font-size: 14px; 
+            color: #0f172a;
             transition: all 0.2s ease;
         }
 
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        input:focus, textarea:focus, select:focus { 
+            background: #ffffff; 
+            border-color: #2563eb; 
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12); 
+            outline: none; 
         }
 
-        input[readonly] {
-            background: var(--surface-subtle);
-            color: var(--text-muted);
-            cursor: not-allowed;
-        }
+        input[readonly] { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; cursor: not-allowed; }
 
         /* Buttons */
-        .btn {
-            width: 100%;
-            padding: 12px;
-            border-radius: var(--radius-md);
-            border: none;
-            background: var(--primary);
-            color: #ffffff;
-            font-size: 13px;
-            font-weight: 700;
+        .btn { 
+            width: 100%; 
+            padding: 12px; 
+            background: #2563eb; 
+            color: #fff; 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: 600; 
+            font-size: 14px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
+            transition: all 0.2s ease; 
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+            margin-top: 10px;
         }
 
-        .btn:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
+        .btn:hover { background: #1d4ed8; transform: translateY(-1px); }
+        .btn:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        /* Autocomplete Suggestions */
+        .suggestions-box { 
+            position: absolute; 
+            width: 100%; 
+            background: #ffffff; 
+            border: 1px solid #e2e8f0; 
+            max-height: 220px; 
+            overflow-y: auto; 
+            display: none; 
+            z-index: 999; 
+            border-radius: 0 0 12px 12px; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
-        .btn:disabled {
-            background: #94a3b8;
-            box-shadow: none;
-            cursor: not-allowed;
-            transform: none;
+        .suggestion-item { padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f1f5f9; text-align: left; transition: background 0.15s; }
+        .suggestion-item:hover, .suggestion-item.active { background: #eff6ff; }
+        .suggestion-name { font-weight: 600; font-size: 13px; color: #0f172a; }
+        .suggestion-code { font-size: 11px; color: #64748b; margin-top: 2px; }
+        mark { background: #fef08a; padding: 0 2px; border-radius: 2px; color: #854d0e; font-weight: 600; }
+
+        /* Loader */
+        #pageLoader {
+            position: fixed; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(255,255,255,0.92); 
+            backdrop-filter: blur(4px);
+            z-index: 9999; 
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
         }
 
-        /* Suggestions Box */
-        .suggestions-box {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-elevated);
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 100;
-            display: none;
-            margin-top: 4px;
+        .spinner {
+            border: 4px solid #e2e8f0; 
+            border-top: 4px solid #2563eb; 
+            border-radius: 50%; 
+            width: 44px; height: 44px; 
+            animation: spin 0.8s linear infinite;
         }
 
-        .suggestion-item {
-            padding: 10px 12px;
-            cursor: pointer;
-            border-bottom: 1px solid var(--surface-subtle);
-            transition: background 0.15s ease;
-        }
+        .loader-text { margin-top: 14px; font-weight: 600; font-size: 14px; color: #2563eb; }
 
-        .suggestion-item:hover, .suggestion-item.active {
-            background: var(--primary-light);
-        }
-
-        .suggestion-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-
-        .suggestion-code {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        /* Metrics Grid Header */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .metric-card {
-            background: var(--surface-subtle);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 12px;
-            text-align: center;
-        }
-
-        .metric-value {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        .metric-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-
-        /* Data Table Styling */
-        .table-container {
-            overflow-x: auto;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            text-align: left;
-        }
-
-        th {
-            background: var(--surface-subtle);
-            padding: 12px;
-            font-size: 11px;
-            font-weight: 700;
-            color: #475569;
-            text-transform: uppercase;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        td {
-            padding: 12px;
-            border-bottom: 1px solid var(--border-color);
-            background: #ffffff;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        .badge-code {
-            background: var(--surface-subtle);
-            border: 1px solid var(--border-color);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-        .badge-urgency {
+        /* Table Design */
+        .table-responsive { width: 100%; overflow-x: auto; margin-top: 6px; border-radius: 10px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f1f5f9; }
+        th { background: #f8fafc; color: #475569; font-weight: 600; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
+        
+        .code-badge {
+            background: #f1f5f9;
             padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
+            border-radius: 6px;
+            font-size: 11px;
+            color: #0f172a;
+            font-weight: 600;
+            border: 1px solid #e2e8f0;
+            display: inline-block;
         }
 
+        .urgency-badge {
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-block;
+        }
         .urgency-normal { background: #e0f2fe; color: #0369a1; }
         .urgency-urgent { background: #fee2e2; color: #dc2626; }
 
-        .action-btns {
-            display: flex;
-            gap: 6px;
-        }
-
-        .btn-icon {
-            border: none;
-            background: transparent;
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            transition: background 0.2s ease;
-        }
-
-        .btn-icon-edit { color: var(--warning); }
-        .btn-icon-edit:hover { background: #fef3c7; }
-        .btn-icon-delete { color: var(--danger); }
-        .btn-icon-delete:hover { background: #fee2e2; }
+        .action-btns { display: flex; gap: 6px; justify-content: center; }
+        .btn-action { border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; color: white; font-size: 12px; font-weight: 600; }
+        .btn-edit { background: #f59e0b; }
+        .btn-delete { background: #ef4444; }
 
         /* Modal Overlay */
-        .modal-overlay {
+        .custom-modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.6);
@@ -447,153 +242,144 @@
             justify-content: center;
             align-items: center;
             opacity: 0;
-            transition: opacity 0.2s ease;
+            transition: opacity 0.3s ease;
         }
 
-        .modal-card {
+        .custom-modal {
             background: #ffffff;
             width: 90%;
             max-width: 380px;
             padding: 24px;
-            border-radius: var(--radius-lg);
+            border-radius: 18px;
             text-align: center;
-            box-shadow: var(--shadow-elevated);
         }
 
         .modal-icon {
-            width: 48px;
-            height: 48px;
+            width: 52px; height: 52px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 12px auto;
-            font-size: 20px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 22px; margin: 0 auto 14px auto;
         }
 
-        .modal-icon.success { background: #dcfce7; color: var(--success); }
-        .modal-icon.error { background: #fee2e2; color: var(--danger); }
-        .modal-icon.warning { background: #fef3c7; color: var(--warning); }
-
-        /* Fullscreen Page Loader */
-        #pageLoader {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #0f172a;
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: #ffffff;
+        .modal-icon.success { background: #dcfce7; color: #16a34a; }
+        .modal-icon.error { background: #fee2e2; color: #dc2626; }
+        .modal-icon.warning { background: #fef3c7; color: #d97706; }
+        .modal-title { font-size: 17px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
+        .modal-message { font-size: 13px; color: #64748b; margin-bottom: 20px; }
+        
+        .modal-btn {
+            width: 100%; padding: 10px; border: none; border-radius: 8px;
+            font-size: 13px; font-weight: 600; cursor: pointer;
         }
 
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+        .footer {
+            padding: 15px; text-align: center; color: rgba(255,255,255,0.9);
+            font-size: 12px; font-weight: 500; width: 100%; margin-top: 15px;
         }
 
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        footer {
-            margin-top: 30px;
-            font-size: 12px;
-            color: var(--text-muted);
-            text-align: center;
+        @media (max-width: 480px) {
+            .container { padding: 24px 18px; border-radius: 16px; }
+            h2 { font-size: 19px; }
+            .form-row { flex-direction: column; gap: 0; }
         }
     </style>
 </head>
+
 <body oncontextmenu="return false;">
 
-    <!-- Background Music -->
+    <!-- BACKGROUND MUSIC -->
     <audio id="bgMusic" loop preload="auto">
         <source src="musik-background.mp3" type="audio/mpeg">
     </audio>
 
+    <!-- FLOATING CONTROLS -->
+    <div class="top-controls">
+        <div id="pwaInstallBtn" class="control-btn" style="display: none; background: #10b981; color: white;">
+            <span>📲</span> Install App
+        </div>
+        <div id="musicToggleBtn" class="control-btn">
+            <span id="musicIcon">🎵</span>
+            <span id="musicStatusText">Musik: Off</span>
+        </div>
+    </div>
+
     <!-- Page Loader -->
     <div id="pageLoader">
         <div class="spinner"></div>
-        <p style="margin-top: 14px; font-weight: 600; font-size: 14px;">Memuat System Engine...</p>
+        <p class="loader-text">Memuat Database...</p>
     </div>
 
-    <!-- Application Top Bar -->
-    <header class="app-header">
-        <div class="brand-container">
-            <div class="brand-logo">⚙️</div>
-            <div class="brand-title">
-                <h1>ENGINEERING PR WORKSPACE</h1>
-                <p>Enterprise Internal Procurement System</p>
+    <!-- Custom Modal Structure -->
+    <div id="customAlertModal" class="custom-modal-overlay">
+        <div class="custom-modal">
+            <div id="modalIcon" class="modal-icon">✔</div>
+            <div id="modalTitle" class="modal-title">Notifikasi</div>
+            <div id="modalMessage" class="modal-message">Pesan notifikasi di sini.</div>
+            
+            <div id="modalActions" style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                <button id="modalCancelBtn" class="modal-btn" style="background: #94a3b8; color: white; display: none;">Batal</button>
+                <button id="modalCloseBtn" class="modal-btn" style="background: #2563eb; color: white;">Oke</button>
             </div>
         </div>
-        <div class="header-actions">
-            <button id="pwaInstallBtn" class="btn-header btn-install-pwa">
-                📲 Install App
-            </button>
-            <button id="musicToggleBtn" class="btn-header">
-                <span id="musicIcon">🎵</span>
-                <span id="musicText">Audio: Off</span>
-            </button>
+    </div>
+
+    <div class="container">
+        <div style="text-align: center;">
+            <span class="badge-system">⚙️ Internal System</span>
         </div>
-    </header>
+        <h2>FORM REQUEST PR ENGINEERING</h2>
+        <div class="subtitle">Sistem Internal Permintaan Barang & Sparepart</div>
 
-    <!-- Main Workspace Layout -->
-    <main class="app-layout">
-        
-        <!-- Left Panel: Form Input Workspace -->
-        <section class="panel-card">
-            <div class="panel-header">
-                <span class="panel-title">📝 Form Permintaan</span>
-                <span id="formStatusBadge" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 10px; background: #e0e7ff; color: #4338ca;">MODE BARU</span>
+        <form id="prForm">
+            <!-- Data Identitas Pemohon -->
+            <div class="form-group">
+                <label for="namaInput">Nama Karyawan</label>
+                <input type="text" id="namaInput" name="nama" placeholder="Masukkan nama Anda..." required>
             </div>
+            
+            <div class="form-group">
+                <label for="grupSelect">Grup / Nonshift</label>
+                <select id="grupSelect" name="grup" required>
+                    <option value="" disabled selected>-- Pilih Group Kerja --</option>
+                    <option value="Group A">Group A</option> 
+                    <option value="Group B">Group B</option> 
+                    <option value="Group C">Group C</option> 
+                    <option value="Group D">Group D</option> 
+                    <option value="Nonshift">Nonshift</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="deptInput">Departemen</label>
+                <input type="text" id="deptInput" name="departemen" value="Engineering" readonly>
+            </div>
+            
+            <hr style="border: none; border-top: 1.5px dashed #cbd5e1; margin: 24px 0;">
 
-            <form id="prForm">
+            <!-- AREA INPUT BARANG -->
+            <div style="background: rgba(248, 250, 252, 0.8); padding: 18px; border-radius: 14px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                <strong style="font-size: 13px; display:block; margin-bottom: 12px; color: #0f172a;" id="inputAreaTitle">📍 Input Detail Barang:</strong>
+                
                 <div class="form-group">
-                    <label>Nama Pemohon</label>
-                    <input type="text" id="namaInput" placeholder="Ketik nama lengkap..." required>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Grup Kerja</label>
-                        <select id="grupSelect" required>
-                            <option value="" disabled selected>-- Pilih --</option>
-                            <option value="Group A">Group A</option>
-                            <option value="Group B">Group B</option>
-                            <option value="Group C">Group C</option>
-                            <option value="Group D">Group D</option>
-                            <option value="Nonshift">Nonshift</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Departemen</label>
-                        <input type="text" id="deptInput" value="Engineering" readonly>
-                    </div>
-                </div>
-
-                <div style="border-top: 1px dashed var(--border-color); margin: 18px 0;"></div>
-
-                <div class="form-group">
-                    <label>Barang / Sparepart</label>
-                    <input type="text" id="barangInput" autocomplete="off" placeholder="Cari nama atau kode barang...">
+                    <label for="barangInput">Nama Barang / Sparepart</label>
+                    <input type="text" id="barangInput" autocomplete="off" placeholder="Ketik nama atau kode barang...">
                     <div id="suggestions" class="suggestions-box"></div>
                 </div>
-
+                
                 <div class="form-group">
-                    <label>Kode Barang</label>
-                    <input type="text" id="kodeInput" readonly placeholder="Terisi otomatis">
+                    <label for="kodeInput">Kode Barang</label>
+                    <input type="text" id="kodeInput" readonly placeholder="Otomatis terisi dari sistem">
                 </div>
-
+                
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Jumlah</label>
-                        <input type="number" id="jumlahInput" min="1" step="1" placeholder="Qty">
+                        <label for="jumlahInput">Jumlah</label>
+                        <input type="number" id="jumlahInput" min="1" step="1" oninput="this.value = !!this.value && Math.abs(this.value) >= 1 ? Math.abs(this.value) : ''" placeholder="Contoh: 2">
                     </div>
                     <div class="form-group">
-                        <label>Satuan</label>
+                        <label for="satuanSelect">Satuan</label>
                         <select id="satuanSelect">
                             <option value="Pcs">Pcs</option>
                             <option value="Box">Box</option>
@@ -603,144 +389,89 @@
                             <option value="Meter">Meter</option>
                             <option value="Kg">Kg</option>
                             <option value="Liter">Liter</option>
+                            <option value="Pack">Pack</option>
+                            <option value="Can">Can</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Peruntukan Mesin</label>
-                        <input type="text" id="mesinInput" placeholder="Kode / Nama Mesin">
+                        <label for="mesinInput">Untuk Mesin</label>
+                        <input type="text" id="mesinInput" placeholder="Nama / Kode mesin...">
                     </div>
                     <div class="form-group">
-                        <label>Urgensi</label>
+                        <label for="urgensiSelect">Tingkat Urgensi</label>
                         <select id="urgensiSelect">
-                            <option value="Normal">Normal</option>
-                            <option value="Urgent">Urgent</option>
+                            <option value="Normal">🔵 Normal</option>
+                            <option value="Urgent">🔴 Urgent (Darurat)</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Keterangan Specific</label>
-                    <textarea id="keteranganInput" rows="2" placeholder="Spesifikasi / Alasan kebutuhan..."></textarea>
+                    <label for="keteranganInput">Keterangan Kebutuhan</label>
+                    <textarea id="keteranganInput" rows="2" placeholder="Detail spesifikasi / alasan permintaan..."></textarea>
                 </div>
-
+                
                 <div style="display: flex; gap: 8px;">
-                    <button type="button" id="addBarangBtn" class="btn" style="background: #059669;">➕ Tambah Barang</button>
-                    <button type="button" id="cancelEditBtn" class="btn" style="background: #64748b; display: none;">Batal</button>
-                </div>
-            </form>
-        </section>
-
-        <!-- Right Panel: Summary & Data Table Workspace -->
-        <section class="panel-card">
-            <div class="panel-header">
-                <span class="panel-title">🛒 Daftar Permintaan Barang</span>
-            </div>
-
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <div id="metricTotal" class="metric-value">0</div>
-                    <div class="metric-label">TOTAL ITEM</div>
-                </div>
-                <div class="metric-card">
-                    <div id="metricUrgent" class="metric-value" style="color: var(--danger);">0</div>
-                    <div class="metric-label">URGENT</div>
-                </div>
-                <div class="metric-card">
-                    <div id="metricLimit" class="metric-value" style="color: var(--text-muted);">15</div>
-                    <div class="metric-label">MAX LIMIT</div>
+                    <button type="button" id="addBarangBtn" class="btn" style="background: #059669; margin-top: 5px;">➕ Tambah ke Daftar</button>
+                    <button type="button" id="cancelEditBtn" class="btn" style="background: #64748b; margin-top: 5px; display: none;">Batal</button>
                 </div>
             </div>
 
-            <div class="table-container">
-                <table id="barangTable">
-                    <thead>
-                        <tr>
-                            <th>Detail Barang</th>
-                            <th>Kode</th>
-                            <th>Qty</th>
-                            <th>Urgensi</th>
-                            <th style="text-align: center;">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">Belum ada item dalam daftar permintaan.</td></tr>
-                    </tbody>
-                </table>
+            <!-- TABEL KERANJANG DAFTAR BARANG -->
+            <div class="form-group">
+                <label>Daftar Permintaan Barang Saat Ini: <span id="itemCount" style="color:#2563eb; font-weight:bold;">(0/15)</span></label>
+                <div class="table-responsive">
+                    <table id="barangTable">
+                        <thead>
+                            <tr>
+                                <th>Barang</th>
+                                <th>Kode</th>
+                                <th>Qty</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="emptyRow"><td colspan="5" style="text-align: center; padding: 18px; color: #94a3b8;">Belum ada barang di dalam daftar.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-
-            <button type="button" id="submitBtn" class="btn" style="margin-top: 20px; font-size: 14px; padding: 14px;" disabled>
-                🚀 Submit Request PR
-            </button>
-        </section>
-
-    </main>
-
-    <!-- Custom Modal Component -->
-    <div id="customAlertModal" class="modal-overlay">
-        <div class="modal-card">
-            <div id="modalIcon" class="modal-icon">✔</div>
-            <h3 id="modalTitle" style="font-size: 16px; margin-bottom: 6px;">Notifikasi</h3>
-            <p id="modalMessage" style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4;"></p>
-            <div style="display: flex; gap: 8px;">
-                <button id="modalCancelBtn" class="btn" style="background: #94a3b8; display: none;">Batal</button>
-                <button id="modalCloseBtn" class="btn">OK</button>
-            </div>
-        </div>
+            
+            <!-- BUTTON SUBMIT UTAMA -->
+            <button type="submit" class="btn" id="submitBtn" disabled>Kirim Request PR</button>
+        </form>
     </div>
 
-    <footer>
-        &copy; 2026 Department of Engineering — Enterprise System Workspace
+    <footer class="footer">
+        &copy; 2026 Departemen Engineering - Sistem PR Internal
     </footer>
 
-    <!-- Logic Engine & Protections -->
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-    // --- 1. PROTEKSI SCRIPT (ANTI-INSPECT ELEMENT & DEVTOOLS LOCK) ---
-    (function applyProtections() {
-        // Bloking Shortcut Keyboard DevTools
-        document.addEventListener('keydown', (e) => {
-            if (
-                e.key === 'F12' ||
-                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) ||
-                (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.key === 'S' || e.key === 's'))
-            ) {
-                e.preventDefault();
-                return false;
-            }
-        });
+    // --- Anti Inspect Element Sederhana (Aman & Ringan) ---
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || (e.ctrlKey && e.key === 'U')) {
+            e.preventDefault();
+        }
+    });
 
-        // Loop Debugger untuk mengacaukan pembukaan DevTools
-        setInterval(() => {
-            const startTime = performance.now();
-            debugger;
-            const endTime = performance.now();
-            if (endTime - startTime > 100) {
-                document.body.innerHTML = '<div style="color:white;text-align:center;padding:50px;font-family:sans-serif;"><h1>Akses Ditolak</h1><p>Sistem mendeteksi aktivitas DevTools / Inspection.</p></div>';
-            }
-        }, 1000);
-    })();
-
-    // --- 2. REGISTRASI PWA (SERVICE WORKER VIA BLOB) ---
+    // --- Registrasi PWA Service Worker ---
     if ('serviceWorker' in navigator) {
         const swCode = `
-            const CACHE_NAME = 'pr-eng-v1';
-            self.addEventListener('install', (e) => {
-                e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(['./'])));
-            });
             self.addEventListener('fetch', (e) => {
-                e.respondWith(caches.match(e.request).then((res) => res || fetch(e.request)));
+                e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
             });
         `;
         const blob = new Blob([swCode], {type: 'application/javascript'});
-        const swUrl = URL.createObjectURL(blob);
-        navigator.serviceWorker.register(swUrl).catch(() => {});
+        navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
     }
 
     let deferredPrompt;
     const pwaInstallBtn = document.getElementById('pwaInstallBtn');
-
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
@@ -751,19 +482,17 @@
         if (deferredPrompt) {
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                pwaInstallBtn.style.display = 'none';
-            }
+            if (outcome === 'accepted') pwaInstallBtn.style.display = 'none';
             deferredPrompt = null;
         }
     });
 
-    // --- 3. LOGIKA APLIKASI UTAMA ---
+    // --- Core Logic Application ---
     document.addEventListener('DOMContentLoaded', () => {
         const bgMusic = document.getElementById('bgMusic');
         const musicToggleBtn = document.getElementById('musicToggleBtn');
         const musicIcon = document.getElementById('musicIcon');
-        const musicText = document.getElementById('musicText');
+        const musicStatusText = document.getElementById('musicStatusText');
 
         const barangInput = document.getElementById('barangInput');
         const kodeInput = document.getElementById('kodeInput');
@@ -781,10 +510,8 @@
         const submitBtn = document.getElementById('submitBtn');
         const addBarangBtn = document.getElementById('addBarangBtn');
         const cancelEditBtn = document.getElementById('cancelEditBtn');
-        const formStatusBadge = document.getElementById('formStatusBadge');
-        
-        const metricTotal = document.getElementById('metricTotal');
-        const metricUrgent = document.getElementById('metricUrgent');
+        const inputAreaTitle = document.getElementById('inputAreaTitle');
+        const itemCount = document.getElementById('itemCount');
         const barangTableBody = document.querySelector('#barangTable tbody');
         const loader = document.getElementById('pageLoader');
 
@@ -806,22 +533,23 @@
         let isMusicPlaying = false;
         const MAX_ITEMS = 15;
 
-        bgMusic.volume = 0.2;
+        bgMusic.volume = 0.3;
 
-        musicToggleBtn.addEventListener('click', () => {
+        function toggleMusic() {
             if (isMusicPlaying) {
                 bgMusic.pause();
                 musicIcon.textContent = '🎵';
-                musicText.textContent = 'Audio: Off';
+                musicStatusText.textContent = 'Musik: Off';
                 isMusicPlaying = false;
             } else {
                 bgMusic.play().then(() => {
                     musicIcon.textContent = '🔊';
-                    musicText.textContent = 'Audio: On';
+                    musicStatusText.textContent = 'Musik: On';
                     isMusicPlaying = true;
                 }).catch(() => {});
             }
-        });
+        }
+        musicToggleBtn.addEventListener('click', toggleMusic);
 
         function escapeHtml(str) {
             if (!str) return '';
@@ -833,7 +561,9 @@
         function showAlert(type, title, message) {
             pendingDeleteIndex = -1;
             modalIcon.className = `modal-icon ${type}`;
-            modalCloseBtn.textContent = 'OK';
+            modalCloseBtn.className = `modal-btn`;
+            modalCloseBtn.style.background = type === 'error' ? '#dc2626' : (type === 'warning' ? '#d97706' : '#2563eb');
+            modalCloseBtn.textContent = 'Oke';
             modalCancelBtn.style.display = 'none';
             
             if (type === 'success') modalIcon.innerHTML = '✔';
@@ -866,16 +596,12 @@
         modalCancelBtn.addEventListener('click', closeModal);
 
         function saveDraft() {
-            const draftData = {
-                nama: namaInput.value,
-                grup: grupSelect.value,
-                items: listBarangRequest
-            };
-            localStorage.setItem('pr_app_workspace_draft', JSON.stringify(draftData));
+            const draftData = { nama: namaInput.value, grup: grupSelect.value, items: listBarangRequest };
+            localStorage.setItem('pr_form_draft', JSON.stringify(draftData));
         }
 
         function loadDraft() {
-            const savedDraft = localStorage.getItem('pr_app_workspace_draft');
+            const savedDraft = localStorage.getItem('pr_form_draft');
             if (savedDraft) {
                 try {
                     const draft = JSON.parse(savedDraft);
@@ -892,14 +618,16 @@
         namaInput.addEventListener('input', saveDraft);
         grupSelect.addEventListener('change', saveDraft);
 
+        // --- MENGAMBIL DATABASE BARANG ---
         async function loadBarang() {
             try {
+                if (loader) loader.style.display = "flex"; 
                 const res = await fetch(`${scriptURL}?action=getBarang`);
                 if (!res.ok) throw new Error();
                 const data = await res.json();
                 if (Array.isArray(data)) databaseBarang = data;
             } catch (error) {
-                console.warn("Server database offline / terisolasi.");
+                console.error("Gagal memuat database barang:", error);
             } finally {
                 if (loader) loader.style.display = "none";
             }
@@ -911,8 +639,10 @@
         function searchBarang(keyword) {
             const terms = keyword.toLowerCase().trim().split(/\s+/);
             return databaseBarang.filter(item => {
-                const fullText = `${item.nama || ''} ${item.kode || ''}`.toLowerCase();
-                return terms.every(t => fullText.includes(t));
+                const nama = (item.nama || '').toLowerCase();
+                const kode = (item.kode || '').toLowerCase();
+                const fullText = `${nama} ${kode}`;
+                return terms.every(term => fullText.includes(term));
             });
         }
 
@@ -936,7 +666,7 @@
         function renderSuggestions(results, keyword) {
             suggestionsBox.innerHTML = '';
             if (results.length > 0) {
-                results.slice(0, 15).forEach((item) => {
+                results.slice(0, 30).forEach((item) => {
                     const div = document.createElement('div');
                     div.className = 'suggestion-item';
                     div.innerHTML = `
@@ -946,6 +676,7 @@
                     div.addEventListener('click', () => {
                         barangInput.value = item.nama;
                         kodeInput.value = item.kode;
+                        kodeInput.readOnly = true;
                         suggestionsBox.style.display = 'none';
                         jumlahInput.focus();
                     });
@@ -953,24 +684,30 @@
                 });
             }
 
-            const customDiv = document.createElement('div');
-            customDiv.className = 'suggestion-item';
-            customDiv.style.background = '#fffbeb';
-            customDiv.innerHTML = `<div class="suggestion-name" style="color:#b45309;">✨ Gunakan "${escapeHtml(keyword)}" (Manual)</div>`;
-            customDiv.addEventListener('click', () => {
+            const newBarangDiv = document.createElement('div');
+            newBarangDiv.className = 'suggestion-item';
+            newBarangDiv.style.cssText = "background: #fffbeb; border-top: 1px dashed #fcd34d;"; 
+            newBarangDiv.innerHTML = `
+                <div class="suggestion-name" style="color: #b45309;">✨ Gunakan "${escapeHtml(keyword)}" (Barang Baru)</div>
+                <div class="suggestion-code" style="color: #d97706;">Klik untuk isi manual kode barang</div>
+            `;
+            newBarangDiv.addEventListener('click', () => {
                 barangInput.value = keyword;
-                kodeInput.value = "BARANG BARU";
+                kodeInput.value = ''; 
+                kodeInput.placeholder = "Isi kode manual / BARANG BARU";
                 kodeInput.readOnly = false;
+                kodeInput.focus();
                 suggestionsBox.style.display = 'none';
-                jumlahInput.focus();
             });
-            suggestionsBox.appendChild(customDiv);
+
+            suggestionsBox.appendChild(newBarangDiv);
             suggestionsBox.style.display = 'block';
         }
 
         function resetItemForm() {
             barangInput.value = '';
             kodeInput.value = '';
+            kodeInput.placeholder = 'Otomatis terisi dari sistem';
             kodeInput.readOnly = true;
             jumlahInput.value = '';
             satuanSelect.value = 'Pcs';
@@ -979,12 +716,10 @@
             mesinInput.value = '';
             
             editingIndex = -1;
-            addBarangBtn.textContent = '➕ Tambah Barang';
+            addBarangBtn.textContent = '➕ Tambah ke Daftar';
             addBarangBtn.style.background = '#059669';
             cancelEditBtn.style.display = 'none';
-            formStatusBadge.textContent = 'MODE BARU';
-            formStatusBadge.style.background = '#e0e7ff';
-            formStatusBadge.style.color = '#4338ca';
+            inputAreaTitle.textContent = '📍 Input Detail Barang:';
         }
 
         addBarangBtn.addEventListener('click', () => {
@@ -997,12 +732,12 @@
             const mesin = mesinInput.value.trim();
 
             if (!namaBarang || !jumlah || isNaN(jumlah) || jumlah <= 0 || !keterangan || !mesin) {
-                showAlert('warning', 'Data Belum Lengkap', 'Lengkapi Nama Barang, Jumlah (Min. 1), Mesin, dan Keterangan.');
+                showAlert('warning', 'Data Belum Lengkap', 'Mohon isi nama barang, jumlah (minimal 1), mesin, dan keterangan!');
                 return;
             }
 
             if (editingIndex === -1 && listBarangRequest.length >= MAX_ITEMS) {
-                showAlert('warning', 'Limit Tercapai', `Maksimal Permintaan per-PR adalah ${MAX_ITEMS} Item.`);
+                showAlert('warning', 'Batas Maksimal', `Maksimal permintaan per PR adalah ${MAX_ITEMS} barang.`);
                 return;
             }
 
@@ -1018,19 +753,17 @@
             renderTable();
             saveDraft();
             resetItemForm();
+            barangInput.focus();
         });
 
         cancelEditBtn.addEventListener('click', resetItemForm);
 
         function renderTable() {
             barangTableBody.innerHTML = '';
-            metricTotal.textContent = listBarangRequest.length;
+            itemCount.textContent = `(${listBarangRequest.length}/${MAX_ITEMS})`;
             
-            const urgentCount = listBarangRequest.filter(i => i.urgensi === 'Urgent').length;
-            metricUrgent.textContent = urgentCount;
-
             if (listBarangRequest.length === 0) {
-                barangTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">Belum ada item dalam daftar permintaan.</td></tr>';
+                barangTableBody.innerHTML = '<tr id="emptyRow"><td colspan="5" style="text-align: center; padding: 18px; color: #94a3b8;">Belum ada barang di dalam daftar.</td></tr>';
                 submitBtn.disabled = true;
                 return;
             }
@@ -1040,19 +773,19 @@
             listBarangRequest.forEach((item, index) => {
                 const tr = document.createElement('tr');
                 const isUrgent = item.urgensi === 'Urgent';
-                
+
                 tr.innerHTML = `
-                    <td>
-                        <strong style="color: var(--text-dark);">${escapeHtml(item.namaBarang)}</strong>
-                        <div style="font-size: 11px; color: var(--text-muted);">Mesin: ${escapeHtml(item.mesin)}</div>
+                    <td style="font-weight:600; color:#0f172a;">
+                        ${escapeHtml(item.namaBarang)}
+                        <div style="font-weight:normal; font-size:11px; color:#64748b; margin-top:2px;">Mesin: ${escapeHtml(item.mesin)}</div>
                     </td>
-                    <td><span class="badge-code">${escapeHtml(item.kodeBarang)}</span></td>
-                    <td><strong style="color: var(--primary);">${item.jumlah}</strong> ${escapeHtml(item.satuan)}</td>
-                    <td><span class="badge-urgency ${isUrgent ? 'urgency-urgent' : 'urgency-normal'}">${escapeHtml(item.urgensi)}</span></td>
+                    <td><span class="code-badge">${escapeHtml(item.kodeBarang)}</span></td>
+                    <td><strong style="color:#2563eb;">${item.jumlah}</strong> <span style="font-size:11px; color:#64748b;">${escapeHtml(item.satuan)}</span></td>
+                    <td><span class="urgency-badge ${isUrgent ? 'urgency-urgent' : 'urgency-normal'}">${escapeHtml(item.urgensi)}</span></td>
                     <td>
-                        <div class="action-btns" style="justify-content: center;">
-                            <button class="btn-icon btn-icon-edit" onclick="editItem(${index})">✏️</button>
-                            <button class="btn-icon btn-icon-delete" onclick="deleteItem(${index})">🗑️</button>
+                        <div class="action-btns">
+                            <button type="button" class="btn-action btn-edit" onclick="editBarang(${index})">✏️</button>
+                            <button type="button" class="btn-action btn-delete" onclick="hapusBarang(${index})">❌</button>
                         </div>
                     </td>
                 `;
@@ -1060,49 +793,50 @@
             });
         }
 
-        window.editItem = function(index) {
+        window.editBarang = function(index) {
             const item = listBarangRequest[index];
             barangInput.value = item.namaBarang;
             kodeInput.value = item.kodeBarang;
             jumlahInput.value = item.jumlah;
-            satuanSelect.value = item.satuan;
-            urgensiSelect.value = item.urgensi;
+            satuanSelect.value = item.satuan || 'Pcs';
+            urgensiSelect.value = item.urgensi || 'Normal';
             keteranganInput.value = item.keterangan;
             mesinInput.value = item.mesin;
 
             editingIndex = index;
-            addBarangBtn.textContent = '💾 Update Item';
+            addBarangBtn.textContent = '💾 Simpan Perubahan';
             addBarangBtn.style.background = '#f59e0b';
             cancelEditBtn.style.display = 'block';
-            formStatusBadge.textContent = `EDIT ITEM #${index + 1}`;
-            formStatusBadge.style.background = '#fef3c7';
-            formStatusBadge.style.color = '#b45309';
+            inputAreaTitle.textContent = `✏️ Edit Barang #${index + 1}:`;
+            barangInput.focus();
         };
 
-        window.deleteItem = function(index) {
+        window.hapusBarang = function(index) {
             pendingDeleteIndex = index;
             const item = listBarangRequest[index];
 
             modalIcon.className = 'modal-icon warning';
-            modalIcon.innerHTML = '🗑️';
-            modalTitle.textContent = 'Hapus Item';
-            modalMessage.textContent = `Apakah Anda yakin ingin menghapus "${item.namaBarang}" dari daftar?`;
+            modalIcon.innerHTML = '🚚';
+            modalTitle.textContent = 'Lepas Barang Ini?';
+            modalMessage.innerHTML = `Hapus <strong>"${escapeHtml(item.namaBarang)}"</strong> dari list PR kamu?`;
             
             modalCancelBtn.style.display = 'block';
-            modalCloseBtn.textContent = 'Hapus';
-            
+            modalCloseBtn.textContent = 'Hapus Aja ❌';
+
             alertModal.style.display = 'flex';
             setTimeout(() => { alertModal.style.opacity = '1'; }, 10);
         };
 
-        submitBtn.addEventListener('click', async () => {
-            if (!namaInput.value.trim() || !grupSelect.value) {
-                showAlert('warning', 'Identitas Kosong', 'Mohon lengkapi Nama Karyawan dan Grup Kerja.');
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            if (listBarangRequest.length === 0) {
+                showAlert('warning', 'Daftar Kosong', 'Daftar barang belanja masih kosong!');
                 return;
             }
 
             submitBtn.disabled = true;
-            submitBtn.textContent = "Mengirim Request Engine...";
+            submitBtn.textContent = "Mengirim...";
 
             const payload = {
                 nama: namaInput.value.trim(),
@@ -1121,18 +855,20 @@
                 const result = await response.json();
                 if (result.result !== "success") throw new Error(result.message);
 
-                showAlert('success', 'Berhasil Terkirim', 'Request PR Anda sukses tersimpan ke Database Engineering!');
+                showAlert('success', 'Berhasil Dikirim', 'Semua data Request PR Anda telah sukses tersimpan!');
+                
                 listBarangRequest = [];
-                localStorage.removeItem('pr_app_workspace_draft');
+                localStorage.removeItem('pr_form_draft');
                 form.reset();
-                deptInput.value = "Engineering";
+                deptInput.value = "Engineering"; 
                 renderTable();
                 resetItemForm();
+
             } catch (error) {
-                showAlert('error', 'Gagal Mengirim', error.message || 'Terjadi kesalahan jaringan.');
+                showAlert('error', 'Gagal Mengirim', error.message || 'Terjadi masalah teknis.');
             } finally {
                 submitBtn.disabled = listBarangRequest.length === 0;
-                submitBtn.textContent = "🚀 Submit Request PR";
+                submitBtn.textContent = "Kirim Request PR";
             }
         });
 
