@@ -451,7 +451,7 @@
     </footer>
 
     <!-- JAVASCRIPT LOGIC -->
-    <script>
+   <script>
     // --- Anti Inspect Element Sederhana (Aman & Ringan) ---
     document.addEventListener('keydown', (e) => {
         if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || (e.ctrlKey && e.key === 'U')) {
@@ -475,17 +475,19 @@
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        pwaInstallBtn.style.display = 'flex';
+        if (pwaInstallBtn) pwaInstallBtn.style.display = 'flex';
     });
 
-    pwaInstallBtn.addEventListener('click', async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') pwaInstallBtn.style.display = 'none';
-            deferredPrompt = null;
-        }
-    });
+    if (pwaInstallBtn) {
+        pwaInstallBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') pwaInstallBtn.style.display = 'none';
+                deferredPrompt = null;
+            }
+        });
+    }
 
     // --- Core Logic Application ---
     document.addEventListener('DOMContentLoaded', () => {
@@ -533,23 +535,24 @@
         let isMusicPlaying = false;
         const MAX_ITEMS = 15;
 
-        bgMusic.volume = 0.3;
+        if (bgMusic) bgMusic.volume = 0.3;
 
         function toggleMusic() {
+            if (!bgMusic) return;
             if (isMusicPlaying) {
                 bgMusic.pause();
-                musicIcon.textContent = '🎵';
-                musicStatusText.textContent = 'Musik: Off';
+                if (musicIcon) musicIcon.textContent = '🎵';
+                if (musicStatusText) musicStatusText.textContent = 'Musik: Off';
                 isMusicPlaying = false;
             } else {
                 bgMusic.play().then(() => {
-                    musicIcon.textContent = '🔊';
-                    musicStatusText.textContent = 'Musik: On';
+                    if (musicIcon) musicIcon.textContent = '🔊';
+                    if (musicStatusText) musicStatusText.textContent = 'Musik: On';
                     isMusicPlaying = true;
                 }).catch(() => {});
             }
         }
-        musicToggleBtn.addEventListener('click', toggleMusic);
+        if (musicToggleBtn) musicToggleBtn.addEventListener('click', toggleMusic);
 
         function escapeHtml(str) {
             if (!str) return '';
@@ -618,19 +621,24 @@
         namaInput.addEventListener('input', saveDraft);
         grupSelect.addEventListener('change', saveDraft);
 
-        // --- MENGAMBIL DATABASE BARANG ---
-        async function loadBarang() {
-            try {
-                if (loader) loader.style.display = "flex"; 
-                const res = await fetch(`${scriptURL}?action=getBarang`);
-                if (!res.ok) throw new Error();
-                const data = await res.json();
-                if (Array.isArray(data)) databaseBarang = data;
-            } catch (error) {
-                console.error("Gagal memuat database barang:", error);
-            } finally {
-                if (loader) loader.style.display = "none";
-            }
+        // --- MENGAMBIL DATABASE BARANG (NON-BLOCKING FAST LOAD) ---
+        function loadBarang() {
+            // Langsung sembunyikan loader agar UI instan bisa digunakan
+            if (loader) loader.style.display = "none"; 
+
+            fetch(`${scriptURL}?action=getBarang`)
+                .then(res => {
+                    if (!res.ok) throw new Error("HTTP Status " + res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    if (Array.isArray(data)) {
+                        databaseBarang = data;
+                    }
+                })
+                .catch(error => {
+                    console.warn("Koneksi database master lambat, mode manual aktif:", error);
+                });
         }
 
         loadBarang();
@@ -827,6 +835,7 @@
             setTimeout(() => { alertModal.style.opacity = '1'; }, 10);
         };
 
+        // --- HANDLER SUBMIT PENCEGAH ERROR DOCTYPE / JSON ---
         form.addEventListener('submit', async function (e) {
             e.preventDefault();
 
@@ -852,8 +861,19 @@
                     body: JSON.stringify(payload)
                 });
 
-                const result = await response.json();
-                if (result.result !== "success") throw new Error(result.message);
+                const rawText = await response.text();
+                let result;
+
+                try {
+                    result = JSON.parse(rawText);
+                } catch (jsonErr) {
+                    // Mencegah crash jika server Apps Script mengembalikan HTML
+                    throw new Error("Respon server bukan JSON. Pastikan akses deployment Apps Script diset ke 'Anyone'.");
+                }
+
+                if (result.result !== "success") {
+                    throw new Error(result.message || "Gagal menyimpan data.");
+                }
 
                 showAlert('success', 'Berhasil Dikirim', 'Semua data Request PR Anda telah sukses tersimpan!');
                 
@@ -865,6 +885,7 @@
                 resetItemForm();
 
             } catch (error) {
+                console.error("SUBMIT ERROR:", error);
                 showAlert('error', 'Gagal Mengirim', error.message || 'Terjadi masalah teknis.');
             } finally {
                 submitBtn.disabled = listBarangRequest.length === 0;
@@ -878,6 +899,6 @@
             }
         });
     });
-    </script>
+</script>
 </body>
 </html>
