@@ -179,7 +179,6 @@
         .suggestion-item:hover, .suggestion-item.active { background: #eff6ff; }
         .suggestion-name { font-weight: 600; font-size: 13px; color: #0f172a; }
         .suggestion-code { font-size: 11px; color: #64748b; margin-top: 2px; }
-        mark { background: #fef08a; padding: 0 2px; border-radius: 2px; color: #854d0e; font-weight: 600; }
 
         /* Loader Overlay (Full Screen Blocking) */
         #pageLoader {
@@ -331,7 +330,7 @@
         </div>
     </div>
 
-    <!-- Container Card (Secara Default Disembunyikan Sampai DB Selesai Dimuat) -->
+    <!-- Container Card -->
     <div class="container" id="mainContainer">
         <div style="text-align: center;">
             <span class="badge-system">⚙️ Internal System</span>
@@ -541,7 +540,6 @@
         let listBarangRequest = []; 
         let selectedIndex = -1;
         let editingIndex = -1;
-        let pendingDeleteIndex = -1;
         let searchTimer;
         let isMusicPlaying = false;
         const MAX_ITEMS = 15;
@@ -573,7 +571,6 @@
         }
 
         function showAlert(type, title, message, closeText = 'Oke', showCancel = false, cancelText = 'Batal', onConfirm = null) {
-            pendingDeleteIndex = -1;
             modalIcon.className = `modal-icon ${type}`;
             modalCloseBtn.className = `modal-btn`;
             modalCloseBtn.style.background = type === 'error' ? '#dc2626' : (type === 'warning' ? '#d97706' : '#2563eb');
@@ -593,7 +590,6 @@
             modalTitle.textContent = title;
             modalMessage.innerHTML = message;
 
-            // Simpan callback sementara
             modalCloseBtn.onclick = () => {
                 closeModal();
                 if (onConfirm) onConfirm();
@@ -633,9 +629,8 @@
         namaInput.addEventListener('input', saveDraft);
         grupSelect.addEventListener('change', saveDraft);
 
-        // --- PROSES MEMUAT DATABASE SEBELUM APLIKASI TAMPIL (BLOCKING LOAD) ---
+        // --- PROSES MEMUAT DATABASE SEBELUM APLIKASI TAMPIL ---
         function loadBarang() {
-            // Tampilkan loader & sembunyikan form
             loader.style.display = "flex";
             loader.style.opacity = "1";
             mainContainer.style.display = "none";
@@ -657,8 +652,6 @@
                 })
                 .catch(error => {
                     console.warn("Gagal memuat database master:", error);
-                    
-                    // Tampilkan dialog gagal, tapi izinkan pengguna memilih mencoba lagi atau isi manual
                     showAlert(
                         'warning', 
                         'Koneksi Database Gagal', 
@@ -666,10 +659,9 @@
                         'Coba Lagi 🔄',
                         true,
                         'Masuk Manual ✏️',
-                        () => { loadBarang(); } // Jika 'Coba Lagi' di-klik
+                        () => { loadBarang(); }
                     );
 
-                    // Penganganan jika pengguna memilih tombol 'Masuk Manual' (Modal Cancel)
                     modalCancelBtn.onclick = () => {
                         closeModal();
                         showFormView();
@@ -678,7 +670,6 @@
         }
 
         function showFormView() {
-            // Sembunyikan loader dan munculkan Form utama
             loader.style.opacity = "0";
             setTimeout(() => {
                 loader.style.display = "none";
@@ -720,8 +711,40 @@
             }, 200);
         });
 
+        // --- DUKUNGAN NAVIGASI KEYBOARD PADA SUGGESTIONS ---
+        barangInput.addEventListener('keydown', function(e) {
+            const items = suggestionsBox.querySelectorAll('.suggestion-item');
+            if (!items.length || suggestionsBox.style.display === 'none') return;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedIndex = (selectedIndex + 1) % items.length;
+                updateActiveSuggestion(items);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+                updateActiveSuggestion(items);
+            } else if (e.key === 'Enter' && selectedIndex >= 0) {
+                e.preventDefault();
+                items[selectedIndex].click();
+            }
+        });
+
+        function updateActiveSuggestion(items) {
+            items.forEach((item, idx) => {
+                if (idx === selectedIndex) {
+                    item.classList.add('active');
+                    item.scrollIntoView({ block: 'nearest' });
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
         function renderSuggestions(results, keyword) {
             suggestionsBox.innerHTML = '';
+            selectedIndex = -1;
+
             if (results.length > 0) {
                 results.slice(0, 30).forEach((item) => {
                     const div = document.createElement('div');
@@ -773,6 +796,7 @@
             mesinInput.value = '';
             
             editingIndex = -1;
+            selectedIndex = -1;
             addBarangBtn.textContent = '➕ Tambah ke Daftar';
             addBarangBtn.style.background = '#059669';
             cancelEditBtn.style.display = 'none';
