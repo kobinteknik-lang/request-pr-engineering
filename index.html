@@ -81,7 +81,7 @@
             background: #ffffff;
         }
 
-        /* Container Card - Sembunyi Secara Default Sebelum DB Muat */
+        /* Container Card */
         .container { 
             width: 100%; 
             max-width: 620px; 
@@ -93,7 +93,7 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             border: 1px solid rgba(255, 255, 255, 0.6);
             margin: auto;
-            display: none; /* Disembunyikan dulu */
+            display: none;
             opacity: 0;
             transition: opacity 0.4s ease-in-out;
         }
@@ -180,7 +180,7 @@
         .suggestion-name { font-weight: 600; font-size: 13px; color: #0f172a; }
         .suggestion-code { font-size: 11px; color: #64748b; margin-top: 2px; }
 
-        /* Loader Overlay (Full Screen Blocking) */
+        /* Loader Overlay */
         #pageLoader {
             position: fixed; 
             top: 0; left: 0; width: 100%; height: 100%; 
@@ -291,7 +291,8 @@
     </style>
 </head>
 
-<body oncontextmenu="return false;">
+<!-- Atribut oncontextmenu="return false;" telah dihapus dari tag body -->
+<body>
 
     <!-- BACKGROUND MUSIC -->
     <audio id="bgMusic" loop preload="auto">
@@ -309,7 +310,7 @@
         </div>
     </div>
 
-    <!-- Page Loader (Blocking Mode) -->
+    <!-- Page Loader -->
     <div id="pageLoader">
         <div class="spinner"></div>
         <p class="loader-text" id="loaderTitle">Memuat Database Master...</p>
@@ -370,7 +371,7 @@
                 
                 <div class="form-group">
                     <label for="barangInput">Nama Barang / Sparepart</label>
-                    <input type="text" id="barangInput" autocomplete="off" placeholder="Ketik nama atau kode barang...">
+                    <input type="text" id="barangInput" autocomplete="off" placeholder="Ketik atau tempel nama/kode barang...">
                     <div id="suggestions" class="suggestions-box"></div>
                 </div>
                 
@@ -458,17 +459,11 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-    // --- Anti Inspect Element Sederhana ---
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || (e.ctrlKey && e.key === 'U')) {
-            e.preventDefault();
-        }
-    });
-
     // --- Registrasi PWA Service Worker ---
     if ('serviceWorker' in navigator) {
         const swCode = `
             self.addEventListener('fetch', (e) => {
+                if (e.request.method !== 'GET') return;
                 e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
             });
         `;
@@ -629,7 +624,6 @@
         namaInput.addEventListener('input', saveDraft);
         grupSelect.addEventListener('change', saveDraft);
 
-        // --- PROSES MEMUAT DATABASE SEBELUM APLIKASI TAMPIL ---
         function loadBarang() {
             loader.style.display = "flex";
             loader.style.opacity = "1";
@@ -680,7 +674,6 @@
             }, 300);
         }
 
-        // Inisialisasi awal
         loadBarang();
         loadDraft();
 
@@ -694,6 +687,7 @@
             });
         }
 
+        // Event listener saat pengguna mengetik
         barangInput.addEventListener('input', function () {
             clearTimeout(searchTimer);
             const keyword = this.value.trim();
@@ -711,7 +705,22 @@
             }, 200);
         });
 
-        // --- DUKUNGAN NAVIGASI KEYBOARD PADA SUGGESTIONS ---
+        // Handler khusus untuk mendukung PASTE/TEMPEL dari WhatsApp, Catatan, dll.
+        barangInput.addEventListener('paste', function () {
+            setTimeout(() => {
+                const keyword = this.value.trim();
+                kodeInput.value = '';
+                selectedIndex = -1;
+
+                if (keyword) {
+                    clearTimeout(searchTimer);
+                    const results = searchBarang(keyword);
+                    renderSuggestions(results, keyword);
+                }
+            }, 50);
+        });
+
+        // Navigasi Keyboard pada Suggestions
         barangInput.addEventListener('keydown', function(e) {
             const items = suggestionsBox.querySelectorAll('.suggestion-item');
             if (!items.length || suggestionsBox.style.display === 'none') return;
