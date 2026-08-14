@@ -84,11 +84,11 @@
         /* Container Card */
         .container { 
             width: 100%; 
-            max-width: 620px; 
+            max-width: 680px; 
             background: rgba(255, 255, 255, 0.92) !important; 
             backdrop-filter: blur(16px); 
             -webkit-backdrop-filter: blur(16px);
-            padding: 36px 30px; 
+            padding: 30px 24px; 
             border-radius: 20px; 
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             border: 1px solid rgba(255, 255, 255, 0.6);
@@ -112,7 +112,44 @@
         }
         
         h2 { text-align: center; color: #0f172a; margin-bottom: 4px; font-size: 22px; font-weight: 700; }
-        .subtitle { text-align: center; color: #64748b; font-size: 13px; margin-bottom: 24px; font-weight: 500; }
+        .subtitle { text-align: center; color: #64748b; font-size: 13px; margin-bottom: 20px; font-weight: 500; }
+
+        /* TAB NAVIGATION STYLING */
+        .tab-navigation {
+            display: flex;
+            gap: 8px;
+            background: rgba(226, 232, 240, 0.7);
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: #ffffff;
+            color: #2563eb;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
 
         /* Form Controls */
         .form-group { margin-bottom: 18px; position: relative; }
@@ -204,9 +241,9 @@
 
         /* Table Design */
         .table-responsive { width: 100%; overflow-x: auto; margin-top: 6px; border-radius: 10px; border: 1px solid #e2e8f0; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f1f5f9; }
-        th { background: #f8fafc; color: #475569; font-weight: 600; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; background: #fff; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #f1f5f9; }
+        th { background: #f8fafc; color: #475569; font-weight: 600; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
         
         .code-badge {
             background: #f1f5f9;
@@ -284,14 +321,13 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         @media (max-width: 480px) {
-            .container { padding: 24px 18px; border-radius: 16px; }
+            .container { padding: 24px 16px; border-radius: 16px; }
             h2 { font-size: 19px; }
             .form-row { flex-direction: column; gap: 0; }
         }
     </style>
 </head>
 
-<!-- Atribut oncontextmenu="return false;" telah dihapus dari tag body -->
 <body>
 
     <!-- BACKGROUND MUSIC -->
@@ -336,121 +372,155 @@
         <div style="text-align: center;">
             <span class="badge-system">⚙️ Internal System</span>
         </div>
-        <h2>FORM REQUEST PR ENGINEERING</h2>
-        <div class="subtitle">Sistem Internal Permintaan Barang & Sparepart</div>
+        <h2>SISTEM PR ENGINEERING</h2>
+        <div class="subtitle">Aplikasi Permintaan & Riwayat PR Sparepart</div>
 
-        <form id="prForm">
-            <!-- Data Identitas Pemohon -->
-            <div class="form-group">
-                <label for="namaInput">Nama Karyawan</label>
-                <input type="text" id="namaInput" name="nama" placeholder="Masukkan nama Anda..." required>
-            </div>
-            
-            <div class="form-group">
-                <label for="grupSelect">Grup / Nonshift</label>
-                <select id="grupSelect" name="grup" required>
-                    <option value="" disabled selected>-- Pilih Group Kerja --</option>
-                    <option value="Group A">Group A</option> 
-                    <option value="Group B">Group B</option> 
-                    <option value="Group C">Group C</option> 
-                    <option value="Group D">Group D</option> 
-                    <option value="Nonshift">Nonshift</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="deptInput">Departemen</label>
-                <input type="text" id="deptInput" name="departemen" value="Engineering" readonly>
-            </div>
-            
-            <hr style="border: none; border-top: 1.5px dashed #cbd5e1; margin: 24px 0;">
+        <!-- TAB NAVIGATION -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" id="tabFormBtn" onclick="switchTab('formTab')">📝 Form Request</button>
+            <button class="tab-btn" id="tabHistoryBtn" onclick="switchTab('historyTab')">📋 Riwayat Request</button>
+        </div>
 
-            <!-- AREA INPUT BARANG -->
-            <div style="background: rgba(248, 250, 252, 0.8); padding: 18px; border-radius: 14px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-                <strong style="font-size: 13px; display:block; margin-bottom: 12px; color: #0f172a;" id="inputAreaTitle">📍 Input Detail Barang:</strong>
-                
+        <!-- TAB 1: FORM INPUT -->
+        <div id="formTab" class="tab-content active">
+            <form id="prForm">
+                <!-- Data Identitas Pemohon -->
                 <div class="form-group">
-                    <label for="barangInput">Nama Barang / Sparepart</label>
-                    <input type="text" id="barangInput" autocomplete="off" placeholder="Ketik atau tempel nama/kode barang...">
-                    <div id="suggestions" class="suggestions-box"></div>
+                    <label for="namaInput">Nama Karyawan</label>
+                    <input type="text" id="namaInput" name="nama" placeholder="Masukkan nama Anda..." required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="kodeInput">Kode Barang</label>
-                    <input type="text" id="kodeInput" readonly placeholder="Otomatis terisi dari sistem">
+                    <label for="grupSelect">Grup / Nonshift</label>
+                    <select id="grupSelect" name="grup" required>
+                        <option value="" disabled selected>-- Pilih Group Kerja --</option>
+                        <option value="Group A">Group A</option> 
+                        <option value="Group B">Group B</option> 
+                        <option value="Group C">Group C</option> 
+                        <option value="Group D">Group D</option> 
+                        <option value="Nonshift">Nonshift</option>
+                    </select>
                 </div>
                 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="jumlahInput">Jumlah</label>
-                        <input type="number" id="jumlahInput" min="1" step="1" oninput="this.value = !!this.value && Math.abs(this.value) >= 1 ? Math.abs(this.value) : ''" placeholder="Contoh: 2">
-                    </div>
-                    <div class="form-group">
-                        <label for="satuanSelect">Satuan</label>
-                        <select id="satuanSelect">
-                            <option value="Pcs">Pcs</option>
-                            <option value="Box">Box</option>
-                            <option value="Set">Set</option>
-                            <option value="Unit">Unit</option>
-                            <option value="Roll">Roll</option>
-                            <option value="Meter">Meter</option>
-                            <option value="Kg">Kg</option>
-                            <option value="Liter">Liter</option>
-                            <option value="Pack">Pack</option>
-                            <option value="Can">Can</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="mesinInput">Untuk Mesin</label>
-                        <input type="text" id="mesinInput" placeholder="Nama / Kode mesin...">
-                    </div>
-                    <div class="form-group">
-                        <label for="urgensiSelect">Tingkat Urgensi</label>
-                        <select id="urgensiSelect">
-                            <option value="Normal">🔵 Normal</option>
-                            <option value="Urgent">🔴 Urgent (Darurat)</option>
-                        </select>
-                    </div>
-                </div>
-
                 <div class="form-group">
-                    <label for="keteranganInput">Keterangan Kebutuhan</label>
-                    <textarea id="keteranganInput" rows="2" placeholder="Detail spesifikasi / alasan permintaan..."></textarea>
+                    <label for="deptInput">Departemen</label>
+                    <input type="text" id="deptInput" name="departemen" value="Engineering" readonly>
                 </div>
                 
-                <div style="display: flex; gap: 8px;">
-                    <button type="button" id="addBarangBtn" class="btn" style="background: #059669; margin-top: 5px;">➕ Tambah ke Daftar</button>
-                    <button type="button" id="cancelEditBtn" class="btn" style="background: #64748b; margin-top: 5px; display: none;">Batal</button>
+                <hr style="border: none; border-top: 1.5px dashed #cbd5e1; margin: 24px 0;">
+
+                <!-- AREA INPUT BARANG -->
+                <div style="background: rgba(248, 250, 252, 0.8); padding: 18px; border-radius: 14px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                    <strong style="font-size: 13px; display:block; margin-bottom: 12px; color: #0f172a;" id="inputAreaTitle">📍 Input Detail Barang:</strong>
+                    
+                    <div class="form-group">
+                        <label for="barangInput">Nama Barang / Sparepart</label>
+                        <input type="text" id="barangInput" autocomplete="off" placeholder="Ketik atau tempel nama/kode barang...">
+                        <div id="suggestions" class="suggestions-box"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="kodeInput">Kode Barang</label>
+                        <input type="text" id="kodeInput" readonly placeholder="Otomatis terisi dari sistem">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="jumlahInput">Jumlah</label>
+                            <input type="number" id="jumlahInput" min="1" step="1" oninput="this.value = !!this.value && Math.abs(this.value) >= 1 ? Math.abs(this.value) : ''" placeholder="Contoh: 2">
+                        </div>
+                        <div class="form-group">
+                            <label for="satuanSelect">Satuan</label>
+                            <select id="satuanSelect">
+                                <option value="Pcs">Pcs</option>
+                                <option value="Box">Box</option>
+                                <option value="Set">Set</option>
+                                <option value="Unit">Unit</option>
+                                <option value="Roll">Roll</option>
+                                <option value="Meter">Meter</option>
+                                <option value="Kg">Kg</option>
+                                <option value="Liter">Liter</option>
+                                <option value="Pack">Pack</option>
+                                <option value="Can">Can</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="mesinInput">Untuk Mesin</label>
+                            <input type="text" id="mesinInput" placeholder="Nama / Kode mesin...">
+                        </div>
+                        <div class="form-group">
+                            <label for="urgensiSelect">Tingkat Urgensi</label>
+                            <select id="urgensiSelect">
+                                <option value="Normal">🔵 Normal</option>
+                                <option value="Urgent">🔴 Urgent (Darurat)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="keteranganInput">Keterangan Kebutuhan</label>
+                        <textarea id="keteranganInput" rows="2" placeholder="Detail spesifikasi / alasan permintaan..."></textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" id="addBarangBtn" class="btn" style="background: #059669; margin-top: 5px;">➕ Tambah ke Daftar</button>
+                        <button type="button" id="cancelEditBtn" class="btn" style="background: #64748b; margin-top: 5px; display: none;">Batal</button>
+                    </div>
                 </div>
+
+                <!-- TABEL KERANJANG DAFTAR BARANG -->
+                <div class="form-group">
+                    <label>Daftar Permintaan Barang Saat Ini: <span id="itemCount" style="color:#2563eb; font-weight:bold;">(0/15)</span></label>
+                    <div class="table-responsive">
+                        <table id="barangTable">
+                            <thead>
+                                <tr>
+                                    <th>Barang</th>
+                                    <th>Kode</th>
+                                    <th>Qty</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr id="emptyRow"><td colspan="5" style="text-align: center; padding: 18px; color: #94a3b8;">Belum ada barang di dalam daftar.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- BUTTON SUBMIT UTAMA -->
+                <button type="submit" class="btn" id="submitBtn" disabled>Kirim Request PR</button>
+            </form>
+        </div>
+
+        <!-- TAB 2: HISTORY INPUT -->
+        <div id="historyTab" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px;">
+                <input type="text" id="searchHistoryInput" placeholder="🔍 Cari nama/barang/mesin..." style="padding: 8px 12px; font-size: 13px;">
+                <button type="button" id="refreshHistoryBtn" onclick="loadHistoryData()" style="padding: 8px 14px; background: #0284c7; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; font-size: 12px;">🔄 Refresh</button>
             </div>
 
-            <!-- TABEL KERANJANG DAFTAR BARANG -->
-            <div class="form-group">
-                <label>Daftar Permintaan Barang Saat Ini: <span id="itemCount" style="color:#2563eb; font-weight:bold;">(0/15)</span></label>
-                <div class="table-responsive">
-                    <table id="barangTable">
-                        <thead>
-                            <tr>
-                                <th>Barang</th>
-                                <th>Kode</th>
-                                <th>Qty</th>
-                                <th>Status</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr id="emptyRow"><td colspan="5" style="text-align: center; padding: 18px; color: #94a3b8;">Belum ada barang di dalam daftar.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="table-responsive" style="max-height: 480px; overflow-y: auto;">
+                <table id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>Waktu & Pemohon</th>
+                            <th>Barang / Mesin</th>
+                            <th>Qty</th>
+                            <th>Urgensi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr><td colspan="4" style="text-align: center; padding: 20px; color: #64748b;">Memuat data riwayat...</td></tr>
+                    </tbody>
+                </table>
             </div>
-            
-            <!-- BUTTON SUBMIT UTAMA -->
-            <button type="submit" class="btn" id="submitBtn" disabled>Kirim Request PR</button>
-        </form>
+        </div>
+
     </div>
 
     <footer class="footer">
@@ -489,6 +559,20 @@
             }
         });
     }
+
+    // --- Switch Tab Functionality ---
+    window.switchTab = function(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        if (tabId === 'formTab') {
+            document.getElementById('tabFormBtn').classList.add('active');
+        } else {
+            document.getElementById('tabHistoryBtn').classList.add('active');
+            loadHistoryData(); // Reload history saat tab diklik
+        }
+    };
 
     // --- Core Logic Application ---
     document.addEventListener('DOMContentLoaded', () => {
@@ -532,6 +616,7 @@
         const scriptURL = "https://script.google.com/macros/s/AKfycbxek8os1feQ0zocHA1e-Y-2wVKAMs8zj54gT5c88KUjsreKV3b1HHcRdLZsMKNWC25B/exec";
 
         let databaseBarang = [];
+        let historyDataList = [];
         let listBarangRequest = []; 
         let selectedIndex = -1;
         let editingIndex = -1;
@@ -630,38 +715,79 @@
             mainContainer.style.display = "none";
             mainContainer.style.opacity = "0";
 
-            if (loaderTitle) loaderTitle.textContent = "Memuat Database Master...";
-            if (loaderSubtext) loaderSubtext.textContent = "Mengunduh katalog barang terbaru...";
-
             fetch(`${scriptURL}?action=getBarang`)
-                .then(res => {
-                    if (!res.ok) throw new Error("HTTP Status " + res.status);
-                    return res.json();
-                })
+                .then(res => res.json())
                 .then(data => {
-                    if (Array.isArray(data)) {
-                        databaseBarang = data;
-                    }
+                    if (Array.isArray(data)) databaseBarang = data;
                     showFormView();
                 })
                 .catch(error => {
                     console.warn("Gagal memuat database master:", error);
-                    showAlert(
-                        'warning', 
-                        'Koneksi Database Gagal', 
-                        'Gagal mengambil database master dari server. Ingin mencoba memuat ulang atau tetap masuk secara manual?',
-                        'Coba Lagi 🔄',
-                        true,
-                        'Masuk Manual ✏️',
-                        () => { loadBarang(); }
-                    );
-
-                    modalCancelBtn.onclick = () => {
-                        closeModal();
-                        showFormView();
-                    };
+                    showFormView();
                 });
         }
+
+        // --- LOAD HISTORY DATA FROM GOOGLE SHEETS ---
+        window.loadHistoryData = function() {
+            const historyBody = document.getElementById('historyTableBody');
+            historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #64748b;">🔄 Mengambil data dari server...</td></tr>';
+
+            fetch(`${scriptURL}?action=getHistory`)
+                .then(res => res.json())
+                .then(data => {
+                    if (Array.isArray(data) && data.length > 0) {
+                        historyDataList = data;
+                        renderHistoryTable(historyDataList);
+                    } else {
+                        historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #94a3b8;">Belum ada riwayat permintaan.</td></tr>';
+                    }
+                })
+                .catch(err => {
+                    console.error("Gagal load history:", err);
+                    historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #dc2626;">❌ Gagal memuat data riwayat. Periksa koneksi internet/Apps Script Anda.</td></tr>';
+                });
+        };
+
+        function renderHistoryTable(data) {
+            const historyBody = document.getElementById('historyTableBody');
+            historyBody.innerHTML = '';
+
+            if (data.length === 0) {
+                historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #94a3b8;">Tidak ada data ditemukan.</td></tr>';
+                return;
+            }
+
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                const isUrgent = item.urgensi === 'Urgent';
+
+                tr.innerHTML = `
+                    <td>
+                        <strong style="color:#0f172a; display:block;">${escapeHtml(item.nama)}</strong>
+                        <span style="font-size:10px; color:#64748b;">${escapeHtml(item.grup)} • ${escapeHtml(item.timestamp)}</span>
+                    </td>
+                    <td>
+                        <strong style="color:#2563eb; display:block;">${escapeHtml(item.barang)}</strong>
+                        <span style="font-size:10px; color:#64748b;">Kode: ${escapeHtml(item.kode)} | Mesin: ${escapeHtml(item.mesin)}</span>
+                    </td>
+                    <td><strong>${escapeHtml(item.qty.toString())}</strong> <span style="font-size:10px; color:#64748b;">${escapeHtml(item.satuan)}</span></td>
+                    <td><span class="urgency-badge ${isUrgent ? 'urgency-urgent' : 'urgency-normal'}">${escapeHtml(item.urgensi)}</span></td>
+                `;
+                historyBody.appendChild(tr);
+            });
+        }
+
+        // Search Filter di Halaman History
+        document.getElementById('searchHistoryInput').addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            const filtered = historyDataList.filter(item => {
+                return item.nama.toLowerCase().includes(query) ||
+                       item.barang.toLowerCase().includes(query) ||
+                       item.kode.toLowerCase().includes(query) ||
+                       item.mesin.toLowerCase().includes(query);
+            });
+            renderHistoryTable(filtered);
+        });
 
         function showFormView() {
             loader.style.opacity = "0";
@@ -687,7 +813,6 @@
             });
         }
 
-        // Event listener saat pengguna mengetik
         barangInput.addEventListener('input', function () {
             clearTimeout(searchTimer);
             const keyword = this.value.trim();
@@ -705,7 +830,6 @@
             }, 200);
         });
 
-        // Handler khusus untuk mendukung PASTE/TEMPEL dari WhatsApp, Catatan, dll.
         barangInput.addEventListener('paste', function () {
             setTimeout(() => {
                 const keyword = this.value.trim();
@@ -719,36 +843,6 @@
                 }
             }, 50);
         });
-
-        // Navigasi Keyboard pada Suggestions
-        barangInput.addEventListener('keydown', function(e) {
-            const items = suggestionsBox.querySelectorAll('.suggestion-item');
-            if (!items.length || suggestionsBox.style.display === 'none') return;
-
-            if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                selectedIndex = (selectedIndex + 1) % items.length;
-                updateActiveSuggestion(items);
-            } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                selectedIndex = (selectedIndex - 1 + items.length) % items.length;
-                updateActiveSuggestion(items);
-            } else if (e.key === 'Enter' && selectedIndex >= 0) {
-                e.preventDefault();
-                items[selectedIndex].click();
-            }
-        });
-
-        function updateActiveSuggestion(items) {
-            items.forEach((item, idx) => {
-                if (idx === selectedIndex) {
-                    item.classList.add('active');
-                    item.scrollIntoView({ block: 'nearest' });
-                } else {
-                    item.classList.remove('active');
-                }
-            });
-        }
 
         function renderSuggestions(results, keyword) {
             suggestionsBox.innerHTML = '';
@@ -920,7 +1014,7 @@
             );
         };
 
-        // --- HANDLER SUBMIT DATA PR ---
+        // --- SUBMIT FORM ---
         form.addEventListener('submit', async function (e) {
             e.preventDefault();
 
@@ -947,17 +1041,9 @@
                 });
 
                 const rawText = await response.text();
-                let result;
+                let result = JSON.parse(rawText);
 
-                try {
-                    result = JSON.parse(rawText);
-                } catch (jsonErr) {
-                    throw new Error("Respon server bukan JSON. Pastikan akses deployment Apps Script diset ke 'Anyone'.");
-                }
-
-                if (result.result !== "success") {
-                    throw new Error(result.message || "Gagal menyimpan data.");
-                }
+                if (result.result !== "success") throw new Error(result.message || "Gagal menyimpan data.");
 
                 showAlert('success', 'Berhasil Dikirim', 'Semua data Request PR Anda telah sukses tersimpan!');
                 
