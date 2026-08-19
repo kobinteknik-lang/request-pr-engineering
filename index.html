@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- PWA Manifest Dinamis (Dioptimasi tanpa Memory Leak) -->
+    <!-- PWA Manifest Dinamis -->
     <script>
         (function() {
             const manifestData = {
@@ -97,7 +97,6 @@
             border: 1px solid rgba(255, 255, 255, 0.6);
             margin: auto;
             opacity: 1;
-            transition: opacity 0.3s ease-in-out;
         }
 
         .badge-system {
@@ -214,11 +213,11 @@
         .suggestion-name { font-weight: 600; font-size: 13px; color: #0f172a; }
         .suggestion-code { font-size: 11px; color: #64748b; margin-top: 2px; }
 
-        /* Loader Overlay Nonaktif secara Default (Hanya aktif saat aksi khusus) */
+        /* Page Loader Overlay */
         #pageLoader {
             position: fixed; 
             top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(15, 23, 42, 0.88); 
+            background: rgba(15, 23, 42, 0.85); 
             backdrop-filter: blur(8px);
             z-index: 9999; 
             display: none; 
@@ -345,7 +344,7 @@
         </div>
     </div>
 
-    <!-- Page Loader (Diaktifkan Hanya saat Proses Berat) -->
+    <!-- Page Loader Overlay -->
     <div id="pageLoader">
         <div class="spinner"></div>
         <p class="loader-text" id="loaderTitle">Memuat Data...</p>
@@ -530,7 +529,7 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-    // Registrasi PWA Service Worker (Dioptimasi tanpa Memory Leak)
+    // Registrasi PWA Service Worker
     if ('serviceWorker' in navigator) {
         const swCode = `
             self.addEventListener('fetch', (e) => {
@@ -584,6 +583,10 @@
         const musicIcon = document.getElementById('musicIcon');
         const musicStatusText = document.getElementById('musicStatusText');
 
+        const loader = document.getElementById('pageLoader');
+        const loaderTitle = document.getElementById('loaderTitle');
+        const loaderSubtext = document.getElementById('loaderSubtext');
+
         const barangInput = document.getElementById('barangInput');
         const kodeInput = document.getElementById('kodeInput');
         const jumlahInput = document.getElementById('jumlahInput');
@@ -624,7 +627,19 @@
 
         if (bgMusic) bgMusic.volume = 0.3;
 
-        // Formating input jumlah
+        // Kontrol Tampilan Loading Page Overlay
+        function showLoader(title = "Memuat Data...", subtext = "Harap tunggu sebentar...") {
+            if (loaderTitle) loaderTitle.textContent = title;
+            if (loaderSubtext) loaderSubtext.textContent = subtext;
+            loader.style.display = "flex";
+            setTimeout(() => { loader.style.opacity = "1"; }, 10);
+        }
+
+        function hideLoader() {
+            loader.style.opacity = "0";
+            setTimeout(() => { loader.style.display = "none"; }, 300);
+        }
+
         jumlahInput.addEventListener('input', function() {
             if (this.value && parseFloat(this.value) < 1) {
                 this.value = 1;
@@ -714,7 +729,7 @@
         namaInput.addEventListener('input', saveDraft);
         grupSelect.addEventListener('change', saveDraft);
 
-        // Load History Data Dari Apps Script
+        // Load History Data dari Apps Script
         window.loadHistoryData = function() {
             const historyBody = document.getElementById('historyTableBody');
             historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #64748b;">🔄 Mengambil data dari server...</td></tr>';
@@ -766,7 +781,7 @@
             historyBody.appendChild(fragment);
         }
 
-        // Search Filter di History (Debounced)
+        // Search Filter di History
         document.getElementById('searchHistoryInput').addEventListener('input', function() {
             clearTimeout(historySearchTimer);
             const query = this.value.toLowerCase().trim();
@@ -781,10 +796,9 @@
             }, 200);
         });
 
-        // Load Draft saat Halaman Siap
         loadDraft();
 
-        // Autocomplete Optimization
+        // Server-Side Search Autocomplete dengan Layar Loading
         function triggerSearch(keyword) {
             if (keyword.length < 2) {
                 suggestionsBox.style.display = 'none';
@@ -793,12 +807,21 @@
 
             clearTimeout(searchTimer);
             searchTimer = setTimeout(() => {
+                // Aktifkan Layar Loading saat Memuat Nama Barang
+                showLoader("Mencari Nama Barang...", `Menghubungkan ke 20.000+ database master untuk "${keyword}"`);
+
                 fetch(`${scriptURL}?action=searchBarang&q=${encodeURIComponent(keyword)}`)
                     .then(res => res.json())
                     .then(results => {
                         renderSuggestions(results, keyword);
                     })
-                    .catch(err => console.error("Gagal melakukan pencarian:", err));
+                    .catch(err => {
+                        console.error("Gagal melakukan pencarian:", err);
+                    })
+                    .finally(() => {
+                        // Sembunyikan Layar Loading setelah pencarian selesai
+                        hideLoader();
+                    });
             }, 300);
         }
 
@@ -816,7 +839,7 @@
             }, 50);
         });
 
-        // Keyboard Navigation pada Autocomplete
+        // Keyboard Navigation Autocomplete
         barangInput.addEventListener('keydown', function(e) {
             const items = suggestionsBox.querySelectorAll('.suggestion-item');
             if (!items.length || suggestionsBox.style.display === 'none') return;
@@ -1035,6 +1058,7 @@
 
             submitBtn.disabled = true;
             submitBtn.textContent = "Mengirim...";
+            showLoader("Mengirim Request PR...", "Menyimpan data permintaan Anda ke database server");
 
             const payload = {
                 nama: namaInput.value.trim(),
@@ -1068,6 +1092,7 @@
                 console.error("SUBMIT ERROR:", error);
                 showAlert('error', 'Gagal Mengirim', error.message || 'Terjadi masalah teknis.');
             } finally {
+                hideLoader();
                 submitBtn.disabled = listBarangRequest.length === 0;
                 submitBtn.textContent = "Kirim Request PR";
             }
