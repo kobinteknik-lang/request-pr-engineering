@@ -627,7 +627,7 @@
 
         if (bgMusic) bgMusic.volume = 0.3;
 
-        // Kontrol Tampilan Loading Page Overlay
+        // Fungsi Tampil/Sembunyi Loader
         function showLoader(title = "Memuat Data...", subtext = "Harap tunggu sebentar...") {
             if (loaderTitle) loaderTitle.textContent = title;
             if (loaderSubtext) loaderSubtext.textContent = subtext;
@@ -798,7 +798,7 @@
 
         loadDraft();
 
-        // Server-Side Search Autocomplete dengan Layar Loading
+        // Pencarian Server Autocomplete + Tampilan Loading Screen
         function triggerSearch(keyword) {
             if (keyword.length < 2) {
                 suggestionsBox.style.display = 'none';
@@ -807,7 +807,7 @@
 
             clearTimeout(searchTimer);
             searchTimer = setTimeout(() => {
-                // Aktifkan Layar Loading saat Memuat Nama Barang
+                // Tampilkan Animasi Loading Saat Mencari Data
                 showLoader("Mencari Nama Barang...", `Menghubungkan ke 20.000+ database master untuk "${keyword}"`);
 
                 fetch(`${scriptURL}?action=searchBarang&q=${encodeURIComponent(keyword)}`)
@@ -819,7 +819,7 @@
                         console.error("Gagal melakukan pencarian:", err);
                     })
                     .finally(() => {
-                        // Sembunyikan Layar Loading setelah pencarian selesai
+                        // Sembunyikan Loading Screen Setelah Respons Selesai
                         hideLoader();
                     });
             }, 300);
@@ -839,7 +839,7 @@
             }, 50);
         });
 
-        // Keyboard Navigation Autocomplete
+        // Navigasi Keyboard Autocomplete
         barangInput.addEventListener('keydown', function(e) {
             const items = suggestionsBox.querySelectorAll('.suggestion-item');
             if (!items.length || suggestionsBox.style.display === 'none') return;
