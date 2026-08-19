@@ -433,7 +433,7 @@
                             <label for="satuanSelect">Satuan</label>
                             <select id="satuanSelect">
                                 <option value="Pcs">Pcs</option>
-                                <option value="Pcs">Btg</option>
+                                <option value="Btg">Btg</option>
                                 <option value="Box">Box</option>
                                 <option value="Set">Set</option>
                                 <option value="Unit">Unit</option>
@@ -441,7 +441,7 @@
                                 <option value="Meter">Meter</option>
                                 <option value="Kg">Kg</option>
                                 <option value="Liter">Liter</option>
-                                <option value="Liter">Pail</option>
+                                <option value="Pail">Pail</option>
                                 <option value="Pack">Pack</option>
                                 <option value="Can">Can</option>
                             </select>
@@ -572,7 +572,7 @@
             document.getElementById('tabFormBtn').classList.add('active');
         } else {
             document.getElementById('tabHistoryBtn').classList.add('active');
-            loadHistoryData(); // Reload history saat tab diklik
+            loadHistoryData();
         }
     };
 
@@ -585,8 +585,6 @@
 
         const mainContainer = document.getElementById('mainContainer');
         const loader = document.getElementById('pageLoader');
-        const loaderTitle = document.getElementById('loaderTitle');
-        const loaderSubtext = document.getElementById('loaderSubtext');
 
         const barangInput = document.getElementById('barangInput');
         const kodeInput = document.getElementById('kodeInput');
@@ -831,6 +829,38 @@
                 renderSuggestions(results, keyword);
             }, 200);
         });
+
+        // Keydown Event untuk Navigasi Panah Keyboard pada Autocomplete
+        barangInput.addEventListener('keydown', function(e) {
+            const items = suggestionsBox.querySelectorAll('.suggestion-item');
+            if (!items.length || suggestionsBox.style.display === 'none') return;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedIndex = (selectedIndex + 1) % items.length;
+                updateSuggestionHighlight(items);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+                updateSuggestionHighlight(items);
+            } else if (e.key === 'Enter') {
+                if (selectedIndex >= 0 && items[selectedIndex]) {
+                    e.preventDefault();
+                    items[selectedIndex].click();
+                }
+            }
+        });
+
+        function updateSuggestionHighlight(items) {
+            items.forEach((item, idx) => {
+                if (idx === selectedIndex) {
+                    item.classList.add('active');
+                    item.scrollIntoView({ block: 'nearest' });
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
 
         barangInput.addEventListener('paste', function () {
             setTimeout(() => {
