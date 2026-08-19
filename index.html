@@ -9,22 +9,25 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- PWA Manifest Dinamis -->
+    <!-- PWA Manifest Dinamis (Dioptimasi tanpa Memory Leak) -->
     <script>
-        const manifestData = {
-            "name": "PR Engineering App",
-            "short_name": "PR Eng",
-            "start_url": "./",
-            "display": "standalone",
-            "background_color": "#0f172a",
-            "theme_color": "#2563eb"
-        };
-        const stringManifest = JSON.stringify(manifestData);
-        const blob = new Blob([stringManifest], {type: 'application/json'});
-        const link = document.createElement('link');
-        link.rel = 'manifest';
-        link.href = URL.createObjectURL(blob);
-        document.head.appendChild(link);
+        (function() {
+            const manifestData = {
+                "name": "PR Engineering App",
+                "short_name": "PR Eng",
+                "start_url": "./",
+                "display": "standalone",
+                "background_color": "#0f172a",
+                "theme_color": "#2563eb"
+            };
+            const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
+            const blobUrl = URL.createObjectURL(blob);
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = blobUrl;
+            document.head.appendChild(link);
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+        })();
     </script>
 
     <style>
@@ -49,7 +52,7 @@
             position: relative;
         }
         
-        /* Floating Music & PWA Control */
+        /* Floating Controls */
         .top-controls {
             position: fixed;
             bottom: 20px;
@@ -81,7 +84,7 @@
             background: #ffffff;
         }
 
-        /* Container Card (Mulai dari tersembunyi sampai server siap) */
+        /* Container Card */
         .container { 
             width: 100%; 
             max-width: 680px; 
@@ -93,9 +96,8 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             border: 1px solid rgba(255, 255, 255, 0.6);
             margin: auto;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.4s ease-in-out;
+            opacity: 1;
+            transition: opacity 0.3s ease-in-out;
         }
 
         .badge-system {
@@ -143,13 +145,8 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
         /* Form Controls */
         .form-group { margin-bottom: 18px; position: relative; }
@@ -217,16 +214,17 @@
         .suggestion-name { font-weight: 600; font-size: 13px; color: #0f172a; }
         .suggestion-code { font-size: 11px; color: #64748b; margin-top: 2px; }
 
-        /* Loader Overlay Aktif di Awal */
+        /* Loader Overlay Nonaktif secara Default (Hanya aktif saat aksi khusus) */
         #pageLoader {
             position: fixed; 
             top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(15, 23, 42, 0.88); 
             backdrop-filter: blur(8px);
             z-index: 9999; 
-            display: flex; 
+            display: none; 
             justify-content: center; align-items: center; flex-direction: column;
-            transition: opacity 0.4s ease;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .spinner {
@@ -284,7 +282,7 @@
             justify-content: center;
             align-items: center;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.2s ease;
         }
 
         .custom-modal {
@@ -332,7 +330,7 @@
 <body>
 
     <!-- BACKGROUND MUSIC -->
-    <audio id="bgMusic" loop preload="auto">
+    <audio id="bgMusic" loop preload="none">
         <source src="musik-background.mp3" type="audio/mpeg">
     </audio>
 
@@ -347,11 +345,11 @@
         </div>
     </div>
 
-    <!-- Page Loader (Tampil Otomatis Saat Pertama Dibuka) -->
+    <!-- Page Loader (Diaktifkan Hanya saat Proses Berat) -->
     <div id="pageLoader">
         <div class="spinner"></div>
-        <p class="loader-text" id="loaderTitle">Menghubungkan Server Database...</p>
-        <p class="loader-subtext" id="loaderSubtext">Menyiapkan 20.000+ data barang, harap tunggu sebentar</p>
+        <p class="loader-text" id="loaderTitle">Memuat Data...</p>
+        <p class="loader-subtext" id="loaderSubtext">Mohon tunggu sebentar</p>
     </div>
 
     <!-- Custom Modal Structure -->
@@ -428,7 +426,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="jumlahInput">Jumlah</label>
-                            <input type="number" id="jumlahInput" min="1" step="1" oninput="this.value = !!this.value && Math.abs(this.value) >= 1 ? Math.abs(this.value) : ''" placeholder="Contoh: 2">
+                            <input type="number" id="jumlahInput" min="1" step="1" placeholder="Contoh: 2">
                         </div>
                         <div class="form-group">
                             <label for="satuanSelect">Satuan</label>
@@ -518,7 +516,7 @@
                         </tr>
                     </thead>
                     <tbody id="historyTableBody">
-                        <tr><td colspan="4" style="text-align: center; padding: 20px; color: #64748b;">Memuat data riwayat...</td></tr>
+                        <tr><td colspan="4" style="text-align: center; padding: 20px; color: #64748b;">Klik 'Refresh' atau buka tab ini untuk memuat data.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -532,7 +530,7 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-    // --- Registrasi PWA Service Worker ---
+    // Registrasi PWA Service Worker (Dioptimasi tanpa Memory Leak)
     if ('serviceWorker' in navigator) {
         const swCode = `
             self.addEventListener('fetch', (e) => {
@@ -541,7 +539,9 @@
             });
         `;
         const blob = new Blob([swCode], {type: 'application/javascript'});
-        navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+        const swUrl = URL.createObjectURL(blob);
+        navigator.serviceWorker.register(swUrl).catch(() => {});
+        setTimeout(() => URL.revokeObjectURL(swUrl), 5000);
     }
 
     let deferredPrompt;
@@ -563,7 +563,7 @@
         });
     }
 
-    // --- Switch Tab Functionality ---
+    // Switch Tab Functionality
     window.switchTab = function(tabId) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -577,15 +577,12 @@
         }
     };
 
-    // --- Core Logic Application ---
+    // Core Application Logic
     document.addEventListener('DOMContentLoaded', () => {
         const bgMusic = document.getElementById('bgMusic');
         const musicToggleBtn = document.getElementById('musicToggleBtn');
         const musicIcon = document.getElementById('musicIcon');
         const musicStatusText = document.getElementById('musicStatusText');
-
-        const mainContainer = document.getElementById('mainContainer');
-        const loader = document.getElementById('pageLoader');
 
         const barangInput = document.getElementById('barangInput');
         const kodeInput = document.getElementById('kodeInput');
@@ -620,11 +617,19 @@
         let listBarangRequest = []; 
         let selectedIndex = -1;
         let editingIndex = -1;
-        let searchTimer;
+        let searchTimer = null;
+        let historySearchTimer = null;
         let isMusicPlaying = false;
         const MAX_ITEMS = 15;
 
         if (bgMusic) bgMusic.volume = 0.3;
+
+        // Formating input jumlah
+        jumlahInput.addEventListener('input', function() {
+            if (this.value && parseFloat(this.value) < 1) {
+                this.value = 1;
+            }
+        });
 
         function toggleMusic() {
             if (!bgMusic) return;
@@ -709,37 +714,7 @@
         namaInput.addEventListener('input', saveDraft);
         grupSelect.addEventListener('change', saveDraft);
 
-        // --- CEK KESIAPAN DATABASE SERVER SAAT WEB DIBUKA ---
-        function checkServerReady() {
-            loader.style.display = "flex";
-            loader.style.opacity = "1";
-            mainContainer.style.display = "none";
-            mainContainer.style.opacity = "0";
-
-            // Ping server untuk memastikan Google Apps Script siap menerima pencarian
-            fetch(`${scriptURL}?action=ping`)
-                .then(res => res.json())
-                .then(data => {
-                    hideLoaderShowApp();
-                })
-                .catch(err => {
-                    console.warn("Ping server lambat/gagal, tetap membuka aplikasi:", err);
-                    hideLoaderShowApp();
-                });
-        }
-
-        function hideLoaderShowApp() {
-            loader.style.opacity = "0";
-            setTimeout(() => {
-                loader.style.display = "none";
-                mainContainer.style.display = "block";
-                setTimeout(() => {
-                    mainContainer.style.opacity = "1";
-                }, 50);
-            }, 300);
-        }
-
-        // --- LOAD HISTORY DATA FROM GOOGLE SHEETS ---
+        // Load History Data Dari Apps Script
         window.loadHistoryData = function() {
             const historyBody = document.getElementById('historyTableBody');
             historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #64748b;">🔄 Mengambil data dari server...</td></tr>';
@@ -769,6 +744,7 @@
                 return;
             }
 
+            const fragment = document.createDocumentFragment();
             data.forEach(item => {
                 const tr = document.createElement('tr');
                 const isUrgent = item.urgensi === 'Urgent';
@@ -785,39 +761,37 @@
                     <td><strong>${escapeHtml(item.qty.toString())}</strong> <span style="font-size:10px; color:#64748b;">${escapeHtml(item.satuan)}</span></td>
                     <td><span class="urgency-badge ${isUrgent ? 'urgency-urgent' : 'urgency-normal'}">${escapeHtml(item.urgensi)}</span></td>
                 `;
-                historyBody.appendChild(tr);
+                fragment.appendChild(tr);
             });
+            historyBody.appendChild(fragment);
         }
 
-        // Search Filter di Halaman History
+        // Search Filter di History (Debounced)
         document.getElementById('searchHistoryInput').addEventListener('input', function() {
+            clearTimeout(historySearchTimer);
             const query = this.value.toLowerCase().trim();
-            const filtered = historyDataList.filter(item => {
-                return item.nama.toLowerCase().includes(query) ||
-                       item.barang.toLowerCase().includes(query) ||
-                       item.kode.toLowerCase().includes(query) ||
-                       item.mesin.toLowerCase().includes(query);
-            });
-            renderHistoryTable(filtered);
+            historySearchTimer = setTimeout(() => {
+                const filtered = historyDataList.filter(item => {
+                    return item.nama.toLowerCase().includes(query) ||
+                           item.barang.toLowerCase().includes(query) ||
+                           item.kode.toLowerCase().includes(query) ||
+                           item.mesin.toLowerCase().includes(query);
+                });
+                renderHistoryTable(filtered);
+            }, 200);
         });
 
-        // Jalankan Pengecekan Server & Load Draft
-        checkServerReady();
+        // Load Draft saat Halaman Siap
         loadDraft();
 
-        // --- PENCARIAN SERVER-SIDE AUTOCOMPLETE (20.000 DATA) ---
-        barangInput.addEventListener('input', function () {
-            clearTimeout(searchTimer);
-            const keyword = this.value.trim();
-            kodeInput.value = '';
-            selectedIndex = -1;
-
+        // Autocomplete Optimization
+        function triggerSearch(keyword) {
             if (keyword.length < 2) {
                 suggestionsBox.style.display = 'none';
                 return;
             }
 
-            // Debounce: Tunggu 300ms setelah mengetik untuk mengurangi panggilan server
+            clearTimeout(searchTimer);
             searchTimer = setTimeout(() => {
                 fetch(`${scriptURL}?action=searchBarang&q=${encodeURIComponent(keyword)}`)
                     .then(res => res.json())
@@ -826,9 +800,23 @@
                     })
                     .catch(err => console.error("Gagal melakukan pencarian:", err));
             }, 300);
+        }
+
+        barangInput.addEventListener('input', function () {
+            kodeInput.value = '';
+            selectedIndex = -1;
+            triggerSearch(this.value.trim());
         });
 
-        // Keydown Event untuk Navigasi Panah Keyboard pada Autocomplete
+        barangInput.addEventListener('paste', function () {
+            setTimeout(() => {
+                kodeInput.value = '';
+                selectedIndex = -1;
+                triggerSearch(this.value.trim());
+            }, 50);
+        });
+
+        // Keyboard Navigation pada Autocomplete
         barangInput.addEventListener('keydown', function(e) {
             const items = suggestionsBox.querySelectorAll('.suggestion-item');
             if (!items.length || suggestionsBox.style.display === 'none') return;
@@ -860,25 +848,11 @@
             });
         }
 
-        barangInput.addEventListener('paste', function () {
-            setTimeout(() => {
-                const keyword = this.value.trim();
-                kodeInput.value = '';
-                selectedIndex = -1;
-
-                if (keyword.length >= 2) {
-                    clearTimeout(searchTimer);
-                    fetch(`${scriptURL}?action=searchBarang&q=${encodeURIComponent(keyword)}`)
-                        .then(res => res.json())
-                        .then(results => renderSuggestions(results, keyword))
-                        .catch(err => console.error(err));
-                }
-            }, 50);
-        });
-
         function renderSuggestions(results, keyword) {
             suggestionsBox.innerHTML = '';
             selectedIndex = -1;
+
+            const fragment = document.createDocumentFragment();
 
             if (results && results.length > 0) {
                 results.forEach((item) => {
@@ -895,7 +869,7 @@
                         suggestionsBox.style.display = 'none';
                         jumlahInput.focus();
                     });
-                    suggestionsBox.appendChild(div);
+                    fragment.appendChild(div);
                 });
             }
 
@@ -915,7 +889,8 @@
                 suggestionsBox.style.display = 'none';
             });
 
-            suggestionsBox.appendChild(newBarangDiv);
+            fragment.appendChild(newBarangDiv);
+            suggestionsBox.appendChild(fragment);
             suggestionsBox.style.display = 'block';
         }
 
@@ -985,6 +960,7 @@
             }
 
             submitBtn.disabled = false;
+            const fragment = document.createDocumentFragment();
 
             listBarangRequest.forEach((item, index) => {
                 const tr = document.createElement('tr');
@@ -1005,8 +981,10 @@
                         </div>
                     </td>
                 `;
-                barangTableBody.appendChild(tr);
+                fragment.appendChild(tr);
             });
+
+            barangTableBody.appendChild(fragment);
         }
 
         window.editBarang = function(index) {
@@ -1046,7 +1024,7 @@
             );
         };
 
-        // --- SUBMIT FORM ---
+        // Submit Form
         form.addEventListener('submit', async function (e) {
             e.preventDefault();
 
@@ -1101,6 +1079,6 @@
             }
         });
     });
-</script>
+    </script>
 </body>
 </html>
