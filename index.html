@@ -27,12 +27,13 @@
             min-height: 100vh; 
             padding: 24px 16px; 
             color: #1e293b;
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.65)), #0f172a;
+            /* Background Image dengan Fallback Gradient */
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.55), rgba(15, 23, 42, 0.75)), url('Background-Desktop.jpg') no-repeat center center fixed;
             background-size: cover;
             position: relative;
         }
 
-        /* Floating Music & PWA Control */
+        /* Floating Controls */
         .top-controls {
             position: fixed;
             bottom: 20px;
@@ -68,7 +69,7 @@
         .container { 
             width: 100%; 
             max-width: 680px; 
-            background: rgba(255, 255, 255, 0.95); 
+            background: rgba(255, 255, 255, 0.92) !important; 
             backdrop-filter: blur(16px); 
             -webkit-backdrop-filter: blur(16px);
             padding: 30px 24px; 
@@ -76,7 +77,7 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             border: 1px solid rgba(255, 255, 255, 0.6);
             margin: auto;
-            display: block; /* Mengubah default dari none ke block agar selalu tampil jika loader bermasalah */
+            display: block;
         }
 
         .badge-system {
@@ -618,6 +619,7 @@
 
         if (bgMusic) bgMusic.volume = 0.3;
 
+        // Handler untuk tombol musik
         function toggleMusic() {
             if (!bgMusic) return;
             if (isMusicPlaying) {
@@ -630,7 +632,9 @@
                     if (musicIcon) musicIcon.textContent = '🔊';
                     if (musicStatusText) musicStatusText.textContent = 'Musik: On';
                     isMusicPlaying = true;
-                }).catch(() => {});
+                }).catch(err => {
+                    console.warn("Autoplay terhalang oleh browser:", err);
+                });
             }
         }
         if (musicToggleBtn) musicToggleBtn.addEventListener('click', toggleMusic);
@@ -1038,4 +1042,4 @@
     });
 </script>
 </body>
-</html>  
+</html>
