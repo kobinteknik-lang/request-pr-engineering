@@ -1,1076 +1,1041 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FORM REQUEST PR ENGINEERING</title>
-    <!-- Google Fonts: Plus Jakarta Sans -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- PWA Manifest Dinamis -->
-    <script>
-        const manifestData = {
-            "name": "PR Engineering App",
-            "short_name": "PR Eng",
-            "start_url": "./",
-            "display": "standalone",
-            "background_color": "#0f172a",
-            "theme_color": "#2563eb"
-        };
-        const stringManifest = JSON.stringify(manifestData);
-        const blob = new Blob([stringManifest], {type: 'application/json'});
-        const link = document.createElement('link');
-        link.rel = 'manifest';
-        link.href = URL.createObjectURL(blob);
-        document.head.appendChild(link);
-    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FORM REQUEST PR ENGINEERING</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <style>
-        /* Reset & Base Styling */
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; 
-        }
+    <style>
+        /* Reset & Base Styling */
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; 
+        }
 
-        body { 
-            display: flex; 
-            flex-direction: column;
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            padding: 24px 16px; 
-            color: #1e293b;
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.65)), url('Background-Desktop.jpg') no-repeat center center fixed;
-            background-size: cover;
-            position: relative;
-        }
-        
-        /* Floating Music & PWA Control */
-        .top-controls {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            gap: 10px;
-        }
+        body { 
+            display: flex; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 24px 16px; 
+            color: #1e293b;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.65)), #0f172a;
+            background-size: cover;
+            position: relative;
+        }
 
-        .control-btn {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            padding: 10px 16px;
-            border-radius: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #0f172a;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
+        /* Floating Music & PWA Control */
+        .top-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            gap: 10px;
+        }
 
-        .control-btn:hover {
-            transform: scale(1.05);
-            background: #ffffff;
-        }
+        .control-btn {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 10px 16px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
 
-        /* Container Card */
-        .container { 
-            width: 100%; 
-            max-width: 680px; 
-            background: rgba(255, 255, 255, 0.92) !important; 
-            backdrop-filter: blur(16px); 
-            -webkit-backdrop-filter: blur(16px);
-            padding: 30px 24px; 
-            border-radius: 20px; 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            margin: auto;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.4s ease-in-out;
-        }
+        .control-btn:hover {
+            transform: scale(1.05);
+            background: #ffffff;
+        }
 
-        .badge-system {
-            display: inline-block;
-            background: #e0e7ff;
-            color: #4338ca;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 12px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-        
-        h2 { text-align: center; color: #0f172a; margin-bottom: 4px; font-size: 22px; font-weight: 700; }
-        .subtitle { text-align: center; color: #64748b; font-size: 13px; margin-bottom: 20px; font-weight: 500; }
+        /* Container Card */
+        .container { 
+            width: 100%; 
+            max-width: 680px; 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 30px 24px; 
+            border-radius: 20px; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            margin: auto;
+            display: block; /* Mengubah default dari none ke block agar selalu tampil jika loader bermasalah */
+        }
 
-        /* TAB NAVIGATION STYLING */
-        .tab-navigation {
-            display: flex;
-            gap: 8px;
-            background: rgba(226, 232, 240, 0.7);
-            padding: 4px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
+        .badge-system {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #4338ca;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        h2 { text-align: center; color: #0f172a; margin-bottom: 4px; font-size: 22px; font-weight: 700; }
+        .subtitle { text-align: center; color: #64748b; font-size: 13px; margin-bottom: 20px; font-weight: 500; }
 
-        .tab-btn {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            background: transparent;
-            font-size: 13px;
-            font-weight: 600;
-            color: #64748b;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
+        /* TAB NAVIGATION STYLING */
+        .tab-navigation {
+            display: flex;
+            gap: 8px;
+            background: rgba(226, 232, 240, 0.7);
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
 
-        .tab-btn.active {
-            background: #ffffff;
-            color: #2563eb;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
 
-        .tab-content {
-            display: none;
-        }
+        .tab-btn.active {
+            background: #ffffff;
+            color: #2563eb;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
 
-        .tab-content.active {
-            display: block;
-        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
-        /* Form Controls */
-        .form-group { margin-bottom: 18px; position: relative; }
-        .form-row { display: flex; gap: 12px; }
-        .form-row .form-group { flex: 1; }
+        /* Form Controls */
+        .form-group { margin-bottom: 18px; position: relative; }
+        .form-row { display: flex; gap: 12px; }
+        .form-row .form-group { flex: 1; }
 
-        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #334155; }
-        
-        input, textarea, select { 
-            width: 100%; 
-            max-width: 100%;
-            padding: 12px 14px; 
-            border-radius: 10px; 
-            border: 1.5px solid #cbd5e1; 
-            background: #ffffff; 
-            font-size: 14px; 
-            color: #0f172a;
-            transition: all 0.2s ease;
-        }
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #334155; }
+        
+        input, textarea, select { 
+            width: 100%; 
+            max-width: 100%;
+            padding: 12px 14px; 
+            border-radius: 10px; 
+            border: 1.5px solid #cbd5e1; 
+            background: #ffffff; 
+            font-size: 14px; 
+            color: #0f172a;
+            transition: all 0.2s ease;
+        }
 
-        input:focus, textarea:focus, select:focus { 
-            background: #ffffff; 
-            border-color: #2563eb; 
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12); 
-            outline: none; 
-        }
+        input:focus, textarea:focus, select:focus { 
+            background: #ffffff; 
+            border-color: #2563eb; 
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12); 
+            outline: none; 
+        }
 
-        input[readonly] { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; cursor: not-allowed; }
+        input[readonly] { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; cursor: not-allowed; }
 
-        /* Buttons */
-        .btn { 
-            width: 100%; 
-            padding: 12px; 
-            background: #2563eb; 
-            color: #fff; 
-            border: none; 
-            border-radius: 10px; 
-            font-weight: 600; 
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s ease; 
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-            margin-top: 10px;
-        }
+        /* Buttons */
+        .btn { 
+            width: 100%; 
+            padding: 12px; 
+            background: #2563eb; 
+            color: #fff; 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: 600; 
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease; 
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+            margin-top: 10px;
+        }
 
-        .btn:hover { background: #1d4ed8; transform: translateY(-1px); }
-        .btn:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; transform: none; }
+        .btn:hover { background: #1d4ed8; transform: translateY(-1px); }
+        .btn:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; transform: none; }
 
-        /* Autocomplete Suggestions */
-        .suggestions-box { 
-            position: absolute; 
-            width: 100%; 
-            background: #ffffff; 
-            border: 1px solid #e2e8f0; 
-            max-height: 220px; 
-            overflow-y: auto; 
-            display: none; 
-            z-index: 999; 
-            border-radius: 0 0 12px 12px; 
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
+        /* Autocomplete Suggestions */
+        .suggestions-box { 
+            position: absolute; 
+            width: 100%; 
+            background: #ffffff; 
+            border: 1px solid #e2e8f0; 
+            max-height: 220px; 
+            overflow-y: auto; 
+            display: none; 
+            z-index: 999; 
+            border-radius: 0 0 12px 12px; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
 
-        .suggestion-item { padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f1f5f9; text-align: left; transition: background 0.15s; }
-        .suggestion-item:hover, .suggestion-item.active { background: #eff6ff; }
-        .suggestion-name { font-weight: 600; font-size: 13px; color: #0f172a; }
-        .suggestion-code { font-size: 11px; color: #64748b; margin-top: 2px; }
+        .suggestion-item { padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f1f5f9; text-align: left; transition: background 0.15s; }
+        .suggestion-item:hover, .suggestion-item.active { background: #eff6ff; }
+        .suggestion-name { font-weight: 600; font-size: 13px; color: #0f172a; }
+        .suggestion-code { font-size: 11px; color: #64748b; margin-top: 2px; }
 
-        /* Loader Overlay */
-        #pageLoader {
-            position: fixed; 
-            top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(15, 23, 42, 0.85); 
-            backdrop-filter: blur(8px);
-            z-index: 9999; 
-            display: flex; justify-content: center; align-items: center; flex-direction: column;
-            transition: opacity 0.3s ease;
-        }
+        /* Loader Overlay */
+        #pageLoader {
+            position: fixed; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(15, 23, 42, 0.85); 
+            backdrop-filter: blur(8px);
+            z-index: 9999; 
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
+            transition: opacity 0.3s ease;
+        }
 
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.2); 
-            border-top: 4px solid #2563eb; 
-            border-radius: 50%; 
-            width: 50px; height: 50px; 
-            animation: spin 0.8s linear infinite;
-        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.2); 
+            border-top: 4px solid #2563eb; 
+            border-radius: 50%; 
+            width: 50px; height: 50px; 
+            animation: spin 0.8s linear infinite;
+        }
 
-        .loader-text { margin-top: 16px; font-weight: 600; font-size: 15px; color: #ffffff; letter-spacing: 0.3px; }
-        .loader-subtext { margin-top: 6px; font-size: 12px; color: #94a3b8; }
+        .loader-text { margin-top: 16px; font-weight: 600; font-size: 15px; color: #ffffff; letter-spacing: 0.3px; }
+        .loader-subtext { margin-top: 6px; font-size: 12px; color: #94a3b8; }
 
-        /* Table Design */
-        .table-responsive { width: 100%; overflow-x: auto; margin-top: 6px; border-radius: 10px; border: 1px solid #e2e8f0; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; background: #fff; }
-        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #f1f5f9; }
-        th { background: #f8fafc; color: #475569; font-weight: 600; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
-        
-        .code-badge {
-            background: #f1f5f9;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            color: #0f172a;
-            font-weight: 600;
-            border: 1px solid #e2e8f0;
-            display: inline-block;
-        }
+        /* Table Design */
+        .table-responsive { width: 100%; overflow-x: auto; margin-top: 6px; border-radius: 10px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; background: #fff; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #f1f5f9; }
+        th { background: #f8fafc; color: #475569; font-weight: 600; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
+        
+        .code-badge {
+            background: #f1f5f9;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            color: #0f172a;
+            font-weight: 600;
+            border: 1px solid #e2e8f0;
+            display: inline-block;
+        }
 
-        .urgency-badge {
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            display: inline-block;
-        }
-        .urgency-normal { background: #e0f2fe; color: #0369a1; }
-        .urgency-urgent { background: #fee2e2; color: #dc2626; }
+        .urgency-badge {
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+        .urgency-normal { background: #e0f2fe; color: #0369a1; }
+        .urgency-urgent { background: #fee2e2; color: #dc2626; }
 
-        .action-btns { display: flex; gap: 6px; justify-content: center; }
-        .btn-action { border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; color: white; font-size: 12px; font-weight: 600; }
-        .btn-edit { background: #f59e0b; }
-        .btn-delete { background: #ef4444; }
+        .action-btns { display: flex; gap: 6px; justify-content: center; }
+        .btn-action { border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; color: white; font-size: 12px; font-weight: 600; }
+        .btn-edit { background: #f59e0b; }
+        .btn-delete { background: #ef4444; }
 
-        /* Modal Overlay */
-        .custom-modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
-            z-index: 10000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
+        /* Modal Overlay */
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
 
-        .custom-modal {
-            background: #ffffff;
-            width: 90%;
-            max-width: 380px;
-            padding: 24px;
-            border-radius: 18px;
-            text-align: center;
-        }
+        .custom-modal {
+            background: #ffffff;
+            width: 90%;
+            max-width: 380px;
+            padding: 24px;
+            border-radius: 18px;
+            text-align: center;
+        }
 
-        .modal-icon {
-            width: 52px; height: 52px;
-            border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 22px; margin: 0 auto 14px auto;
-        }
+        .modal-icon {
+            width: 52px; height: 52px;
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 22px; margin: 0 auto 14px auto;
+        }
 
-        .modal-icon.success { background: #dcfce7; color: #16a34a; }
-        .modal-icon.error { background: #fee2e2; color: #dc2626; }
-        .modal-icon.warning { background: #fef3c7; color: #d97706; }
-        .modal-title { font-size: 17px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
-        .modal-message { font-size: 13px; color: #64748b; margin-bottom: 20px; }
-        
-        .modal-btn {
-            width: 100%; padding: 10px; border: none; border-radius: 8px;
-            font-size: 13px; font-weight: 600; cursor: pointer;
-        }
+        .modal-icon.success { background: #dcfce7; color: #16a34a; }
+        .modal-icon.error { background: #fee2e2; color: #dc2626; }
+        .modal-icon.warning { background: #fef3c7; color: #d97706; }
+        .modal-title { font-size: 17px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
+        .modal-message { font-size: 13px; color: #64748b; margin-bottom: 20px; }
+        
+        .modal-btn {
+            width: 100%; padding: 10px; border: none; border-radius: 8px;
+            font-size: 13px; font-weight: 600; cursor: pointer;
+        }
 
-        .footer {
-            padding: 15px; text-align: center; color: rgba(255,255,255,0.9);
-            font-size: 12px; font-weight: 500; width: 100%; margin-top: 15px;
-        }
+        .footer {
+            padding: 15px; text-align: center; color: rgba(255,255,255,0.9);
+            font-size: 12px; font-weight: 500; width: 100%; margin-top: 15px;
+        }
 
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        @media (max-width: 480px) {
-            .container { padding: 24px 16px; border-radius: 16px; }
-            h2 { font-size: 19px; }
-            .form-row { flex-direction: column; gap: 0; }
-        }
-    </style>
+        @media (max-width: 480px) {
+            .container { padding: 24px 16px; border-radius: 16px; }
+            h2 { font-size: 19px; }
+            .form-row { flex-direction: column; gap: 0; }
+        }
+    </style>
 </head>
 
 <body>
 
-    <!-- BACKGROUND MUSIC -->
-    <audio id="bgMusic" loop preload="auto">
-        <source src="musik-background.mp3" type="audio/mpeg">
-    </audio>
-
-    <!-- FLOATING CONTROLS -->
-    <div class="top-controls">
-        <div id="pwaInstallBtn" class="control-btn" style="display: none; background: #10b981; color: white;">
-            <span>📲</span> Install App
-        </div>
-        <div id="musicToggleBtn" class="control-btn">
-            <span id="musicIcon">🎵</span>
-            <span id="musicStatusText">Musik: Off</span>
-        </div>
-    </div>
-
-    <!-- Page Loader -->
-    <div id="pageLoader">
-        <div class="spinner"></div>
-        <p class="loader-text" id="loaderTitle">Memuat Database Master...</p>
-        <p class="loader-subtext" id="loaderSubtext">Harap tunggu sebentar, menyiapkan sistem</p>
-    </div>
-
-    <!-- Custom Modal Structure -->
-    <div id="customAlertModal" class="custom-modal-overlay">
-        <div class="custom-modal">
-            <div id="modalIcon" class="modal-icon">✔</div>
-            <div id="modalTitle" class="modal-title">Notifikasi</div>
-            <div id="modalMessage" class="modal-message">Pesan notifikasi di sini.</div>
-            
-            <div id="modalActions" style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
-                <button id="modalCancelBtn" class="modal-btn" style="background: #94a3b8; color: white; display: none;">Batal</button>
-                <button id="modalCloseBtn" class="modal-btn" style="background: #2563eb; color: white;">Oke</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Container Card -->
-    <div class="container" id="mainContainer">
-        <div style="text-align: center;">
-            <span class="badge-system">⚙️ Internal Engineering System</span>
-        </div>
-        <h2>SISTEM REQUEST PP ENGINEERING</h2>
-        <div class="subtitle">Aplikasi Permintaan & Riwayat PP Sparepart</div>
-
-        <!-- TAB NAVIGATION -->
-        <div class="tab-navigation">
-            <button class="tab-btn active" id="tabFormBtn" onclick="switchTab('formTab')">📝 Form Request</button>
-            <button class="tab-btn" id="tabHistoryBtn" onclick="switchTab('historyTab')">📋 Riwayat Request</button>
-        </div>
-
-        <!-- TAB 1: FORM INPUT -->
-        <div id="formTab" class="tab-content active">
-            <form id="prForm">
-                <!-- Data Identitas Pemohon -->
-                <div class="form-group">
-                    <label for="namaInput">Nama Karyawan</label>
-                    <input type="text" id="namaInput" name="nama" placeholder="Masukkan nama Anda..." required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="grupSelect">Grup / Nonshift</label>
-                    <select id="grupSelect" name="grup" required>
-                        <option value="" disabled selected>-- Pilih Group Kerja --</option>
-                        <option value="Group A">Group A</option> 
-                        <option value="Group B">Group B</option> 
-                        <option value="Group C">Group C</option> 
-                        <option value="Group D">Group D</option> 
-                        <option value="Nonshift">Nonshift</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="deptInput">Departemen</label>
-                    <input type="text" id="deptInput" name="departemen" value="Engineering" readonly>
-                </div>
-                
-                <hr style="border: none; border-top: 1.5px dashed #cbd5e1; margin: 24px 0;">
-
-                <!-- AREA INPUT BARANG -->
-                <div style="background: rgba(248, 250, 252, 0.8); padding: 18px; border-radius: 14px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-                    <strong style="font-size: 13px; display:block; margin-bottom: 12px; color: #0f172a;" id="inputAreaTitle">📍 Input Detail Barang:</strong>
-                    
-                    <div class="form-group">
-                        <label for="barangInput">Nama Barang / Sparepart</label>
-                        <input type="text" id="barangInput" autocomplete="off" placeholder="Ketik atau tempel nama/kode barang...">
-                        <div id="suggestions" class="suggestions-box"></div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="kodeInput">Kode Barang</label>
-                        <input type="text" id="kodeInput" readonly placeholder="Otomatis terisi dari sistem">
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="jumlahInput">Jumlah</label>
-                            <input type="number" id="jumlahInput" min="1" step="1" oninput="this.value = !!this.value && Math.abs(this.value) >= 1 ? Math.abs(this.value) : ''" placeholder="Contoh: 2">
-                        </div>
-                        <div class="form-group">
-                            <label for="satuanSelect">Satuan</label>
-                            <select id="satuanSelect">
-                                <option value="Pcs">Pcs</option>
-                                <option value="Btg">Btg</option>
-                                <option value="Box">Box</option>
-                                <option value="Set">Set</option>
-                                <option value="Unit">Unit</option>
-                                <option value="Roll">Roll</option>
-                                <option value="Meter">Meter</option>
-                                <option value="Kg">Kg</option>
-                                <option value="Liter">Liter</option>
-                                <option value="Pail">Pail</option>
-                                <option value="Pack">Pack</option>
-                                <option value="Can">Can</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="mesinInput">Untuk Mesin</label>
-                            <input type="text" id="mesinInput" placeholder="Nama / Kode mesin...">
-                        </div>
-                        <div class="form-group">
-                            <label for="urgensiSelect">Tingkat Urgensi</label>
-                            <select id="urgensiSelect">
-                                <option value="Normal">🔵 Normal</option>
-                                <option value="Urgent">🔴 Urgent (Darurat)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="keteranganInput">Keterangan Kebutuhan</label>
-                        <textarea id="keteranganInput" rows="2" placeholder="Detail spesifikasi / alasan permintaan..."></textarea>
-                    </div>
-                    
-                    <div style="display: flex; gap: 8px;">
-                        <button type="button" id="addBarangBtn" class="btn" style="background: #059669; margin-top: 5px;">➕ Tambah ke Daftar</button>
-                        <button type="button" id="cancelEditBtn" class="btn" style="background: #64748b; margin-top: 5px; display: none;">Batal</button>
-                    </div>
-                </div>
-
-                <!-- TABEL KERANJANG DAFTAR BARANG -->
-                <div class="form-group">
-                    <label>Daftar Permintaan Barang Saat Ini: <span id="itemCount" style="color:#2563eb; font-weight:bold;">(0/15)</span></label>
-                    <div class="table-responsive">
-                        <table id="barangTable">
-                            <thead>
-                                <tr>
-                                    <th>Barang</th>
-                                    <th>Kode</th>
-                                    <th>Qty</th>
-                                    <th>Status</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr id="emptyRow"><td colspan="5" style="text-align: center; padding: 18px; color: #94a3b8;">Belum ada barang di dalam daftar.</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- BUTTON SUBMIT UTAMA -->
-                <button type="submit" class="btn" id="submitBtn" disabled>Kirim Request PR</button>
-            </form>
-        </div>
-
-        <!-- TAB 2: HISTORY INPUT -->
-        <div id="historyTab" class="tab-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px;">
-                <input type="text" id="searchHistoryInput" placeholder="🔍 Cari nama/barang/mesin..." style="padding: 8px 12px; font-size: 13px;">
-                <button type="button" id="refreshHistoryBtn" onclick="loadHistoryData()" style="padding: 8px 14px; background: #0284c7; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; font-size: 12px;">🔄 Refresh</button>
-            </div>
-
-            <div class="table-responsive" style="max-height: 480px; overflow-y: auto;">
-                <table id="historyTable">
-                    <thead>
-                        <tr>
-                            <th>Waktu & Pemohon</th>
-                            <th>Barang / Mesin</th>
-                            <th>Qty</th>
-                            <th>Urgensi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="historyTableBody">
-                        <tr><td colspan="4" style="text-align: center; padding: 20px; color: #64748b;">Memuat data riwayat...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-    </div>
-
-    <footer class="footer">
-        &copy; 2026 Departemen Engineering - Sistem PR Internal
-    </footer>
-
-    <!-- JAVASCRIPT LOGIC -->
-    <script>
-    // --- Registrasi PWA Service Worker ---
-    if ('serviceWorker' in navigator) {
-        const swCode = `
-            self.addEventListener('fetch', (e) => {
-                if (e.request.method !== 'GET') return;
-                e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-            });
-        `;
-        const blob = new Blob([swCode], {type: 'application/javascript'});
-        navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
-    }
-
-    let deferredPrompt;
-    const pwaInstallBtn = document.getElementById('pwaInstallBtn');
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        if (pwaInstallBtn) pwaInstallBtn.style.display = 'flex';
-    });
-
-    if (pwaInstallBtn) {
-        pwaInstallBtn.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') pwaInstallBtn.style.display = 'none';
-                deferredPrompt = null;
-            }
-        });
-    }
-
-    // --- Switch Tab Functionality ---
-    window.switchTab = function(tabId) {
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-        
-        document.getElementById(tabId).classList.add('active');
-        if (tabId === 'formTab') {
-            document.getElementById('tabFormBtn').classList.add('active');
-        } else {
-            document.getElementById('tabHistoryBtn').classList.add('active');
-            loadHistoryData(); // Reload history saat tab diklik
-        }
-    };
-
-    // --- Core Logic Application ---
-    document.addEventListener('DOMContentLoaded', () => {
-        const bgMusic = document.getElementById('bgMusic');
-        const musicToggleBtn = document.getElementById('musicToggleBtn');
-        const musicIcon = document.getElementById('musicIcon');
-        const musicStatusText = document.getElementById('musicStatusText');
-
-        const mainContainer = document.getElementById('mainContainer');
-        const loader = document.getElementById('pageLoader');
-        const loaderTitle = document.getElementById('loaderTitle');
-        const loaderSubtext = document.getElementById('loaderSubtext');
-
-        const barangInput = document.getElementById('barangInput');
-        const kodeInput = document.getElementById('kodeInput');
-        const jumlahInput = document.getElementById('jumlahInput');
-        const satuanSelect = document.getElementById('satuanSelect');
-        const urgensiSelect = document.getElementById('urgensiSelect');
-        const keteranganInput = document.getElementById('keteranganInput');
-        const mesinInput = document.getElementById('mesinInput');
-        const namaInput = document.getElementById('namaInput');
-        const grupSelect = document.getElementById('grupSelect');
-        const deptInput = document.getElementById('deptInput');
-        
-        const suggestionsBox = document.getElementById('suggestions');
-        const form = document.getElementById('prForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const addBarangBtn = document.getElementById('addBarangBtn');
-        const cancelEditBtn = document.getElementById('cancelEditBtn');
-        const inputAreaTitle = document.getElementById('inputAreaTitle');
-        const itemCount = document.getElementById('itemCount');
-        const barangTableBody = document.querySelector('#barangTable tbody');
-
-        const alertModal = document.getElementById('customAlertModal');
-        const modalIcon = document.getElementById('modalIcon');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalMessage = document.getElementById('modalMessage');
-        const modalCloseBtn = document.getElementById('modalCloseBtn');
-        const modalCancelBtn = document.getElementById('modalCancelBtn');
-
-        const scriptURL = "https://script.google.com/macros/s/AKfycbxek8os1feQ0zocHA1e-Y-2wVKAMs8zj54gT5c88KUjsreKV3b1HHcRdLZsMKNWC25B/exec";
-
-        let databaseBarang = [];
-        let historyDataList = [];
-        let listBarangRequest = []; 
-        let selectedIndex = -1;
-        let editingIndex = -1;
-        let searchTimer;
-        let isMusicPlaying = false;
-        const MAX_ITEMS = 15;
-
-        if (bgMusic) bgMusic.volume = 0.3;
-
-        function toggleMusic() {
-            if (!bgMusic) return;
-            if (isMusicPlaying) {
-                bgMusic.pause();
-                if (musicIcon) musicIcon.textContent = '🎵';
-                if (musicStatusText) musicStatusText.textContent = 'Musik: Off';
-                isMusicPlaying = false;
-            } else {
-                bgMusic.play().then(() => {
-                    if (musicIcon) musicIcon.textContent = '🔊';
-                    if (musicStatusText) musicStatusText.textContent = 'Musik: On';
-                    isMusicPlaying = true;
-                }).catch(() => {});
-            }
-        }
-        if (musicToggleBtn) musicToggleBtn.addEventListener('click', toggleMusic);
-
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.toString()
-                .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-        }
-
-        function showAlert(type, title, message, closeText = 'Oke', showCancel = false, cancelText = 'Batal', onConfirm = null) {
-            modalIcon.className = `modal-icon ${type}`;
-            modalCloseBtn.className = `modal-btn`;
-            modalCloseBtn.style.background = type === 'error' ? '#dc2626' : (type === 'warning' ? '#d97706' : '#2563eb');
-            modalCloseBtn.textContent = closeText;
-            
-            if (showCancel) {
-                modalCancelBtn.style.display = 'block';
-                modalCancelBtn.textContent = cancelText;
-            } else {
-                modalCancelBtn.style.display = 'none';
-            }
-            
-            if (type === 'success') modalIcon.innerHTML = '✔';
-            else if (type === 'error') modalIcon.innerHTML = '✖';
-            else if (type === 'warning') modalIcon.innerHTML = '⚠';
-
-            modalTitle.textContent = title;
-            modalMessage.innerHTML = message;
-
-            modalCloseBtn.onclick = () => {
-                closeModal();
-                if (onConfirm) onConfirm();
-            };
-
-            alertModal.style.display = 'flex';
-            setTimeout(() => { alertModal.style.opacity = '1'; }, 10);
-        }
-
-        function closeModal() {
-            alertModal.style.opacity = '0';
-            setTimeout(() => { alertModal.style.display = 'none'; }, 200);
-        }
-
-        modalCancelBtn.addEventListener('click', closeModal);
-
-        function saveDraft() {
-            const draftData = { nama: namaInput.value, grup: grupSelect.value, items: listBarangRequest };
-            localStorage.setItem('pr_form_draft', JSON.stringify(draftData));
-        }
-
-        function loadDraft() {
-            const savedDraft = localStorage.getItem('pr_form_draft');
-            if (savedDraft) {
-                try {
-                    const draft = JSON.parse(savedDraft);
-                    if (draft.nama) namaInput.value = draft.nama;
-                    if (draft.grup) grupSelect.value = draft.grup;
-                    if (Array.isArray(draft.items) && draft.items.length > 0) {
-                        listBarangRequest = draft.items;
-                        renderTable();
-                    }
-                } catch (e) {}
-            }
-        }
-
-        namaInput.addEventListener('input', saveDraft);
-        grupSelect.addEventListener('change', saveDraft);
-
-        function loadBarang() {
-            loader.style.display = "flex";
-            loader.style.opacity = "1";
-            mainContainer.style.display = "none";
-            mainContainer.style.opacity = "0";
-
-            fetch(`${scriptURL}?action=getBarang`)
-                .then(res => res.json())
-                .then(data => {
-                    if (Array.isArray(data)) databaseBarang = data;
-                    showFormView();
-                })
-                .catch(error => {
-                    console.warn("Gagal memuat database master:", error);
-                    showFormView();
-                });
-        }
-
-        // --- LOAD HISTORY DATA FROM GOOGLE SHEETS ---
-        window.loadHistoryData = function() {
-            const historyBody = document.getElementById('historyTableBody');
-            historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #64748b;">🔄 Mengambil data dari server...</td></tr>';
-
-            fetch(`${scriptURL}?action=getHistory`)
-                .then(res => res.json())
-                .then(data => {
-                    if (Array.isArray(data) && data.length > 0) {
-                        historyDataList = data;
-                        renderHistoryTable(historyDataList);
-                    } else {
-                        historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #94a3b8;">Belum ada riwayat permintaan.</td></tr>';
-                    }
-                })
-                .catch(err => {
-                    console.error("Gagal load history:", err);
-                    historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #dc2626;">❌ Gagal memuat data riwayat. Periksa koneksi internet/Apps Script Anda.</td></tr>';
-                });
-        };
-
-        function renderHistoryTable(data) {
-            const historyBody = document.getElementById('historyTableBody');
-            historyBody.innerHTML = '';
-
-            if (data.length === 0) {
-                historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #94a3b8;">Tidak ada data ditemukan.</td></tr>';
-                return;
-            }
-
-            data.forEach(item => {
-                const tr = document.createElement('tr');
-                const isUrgent = item.urgensi === 'Urgent';
-
-                tr.innerHTML = `
-                    <td>
-                        <strong style="color:#0f172a; display:block;">${escapeHtml(item.nama)}</strong>
-                        <span style="font-size:10px; color:#64748b;">${escapeHtml(item.grup)} • ${escapeHtml(item.timestamp)}</span>
-                    </td>
-                    <td>
-                        <strong style="color:#2563eb; display:block;">${escapeHtml(item.barang)}</strong>
-                        <span style="font-size:10px; color:#64748b;">Kode: ${escapeHtml(item.kode)} | Mesin: ${escapeHtml(item.mesin)}</span>
-                    </td>
-                    <td><strong>${escapeHtml(item.qty.toString())}</strong> <span style="font-size:10px; color:#64748b;">${escapeHtml(item.satuan)}</span></td>
-                    <td><span class="urgency-badge ${isUrgent ? 'urgency-urgent' : 'urgency-normal'}">${escapeHtml(item.urgensi)}</span></td>
-                `;
-                historyBody.appendChild(tr);
-            });
-        }
-
-        // Search Filter di Halaman History
-        document.getElementById('searchHistoryInput').addEventListener('input', function() {
-            const query = this.value.toLowerCase().trim();
-            const filtered = historyDataList.filter(item => {
-                return item.nama.toLowerCase().includes(query) ||
-                       item.barang.toLowerCase().includes(query) ||
-                       item.kode.toLowerCase().includes(query) ||
-                       item.mesin.toLowerCase().includes(query);
-            });
-            renderHistoryTable(filtered);
-        });
-
-        function showFormView() {
-            loader.style.opacity = "0";
-            setTimeout(() => {
-                loader.style.display = "none";
-                mainContainer.style.display = "block";
-                setTimeout(() => {
-                    mainContainer.style.opacity = "1";
-                }, 50);
-            }, 300);
-        }
-
-        loadBarang();
-        loadDraft();
-
-        function searchBarang(keyword) {
-            const terms = keyword.toLowerCase().trim().split(/\s+/);
-            return databaseBarang.filter(item => {
-                const nama = (item.nama || '').toLowerCase();
-                const kode = (item.kode || '').toLowerCase();
-                const fullText = `${nama} ${kode}`;
-                return terms.every(term => fullText.includes(term));
-            });
-        }
-
-        barangInput.addEventListener('input', function () {
-            clearTimeout(searchTimer);
-            const keyword = this.value.trim();
-            kodeInput.value = '';
-            selectedIndex = -1;
-
-            if (!keyword) {
-                suggestionsBox.style.display = 'none';
-                return;
-            }
-
-            searchTimer = setTimeout(() => {
-                const results = searchBarang(keyword);
-                renderSuggestions(results, keyword);
-            }, 200);
-        });
-
-        barangInput.addEventListener('paste', function () {
-            setTimeout(() => {
-                const keyword = this.value.trim();
-                kodeInput.value = '';
-                selectedIndex = -1;
-
-                if (keyword) {
-                    clearTimeout(searchTimer);
-                    const results = searchBarang(keyword);
-                    renderSuggestions(results, keyword);
-                }
-            }, 50);
-        });
-
-        function renderSuggestions(results, keyword) {
-            suggestionsBox.innerHTML = '';
-            selectedIndex = -1;
-
-            if (results.length > 0) {
-                results.slice(0, 30).forEach((item) => {
-                    const div = document.createElement('div');
-                    div.className = 'suggestion-item';
-                    div.innerHTML = `
-                        <div class="suggestion-name">${escapeHtml(item.nama)}</div>
-                        <div class="suggestion-code">${escapeHtml(item.kode)}</div>
-                    `;
-                    div.addEventListener('click', () => {
-                        barangInput.value = item.nama;
-                        kodeInput.value = item.kode;
-                        kodeInput.readOnly = true;
-                        suggestionsBox.style.display = 'none';
-                        jumlahInput.focus();
-                    });
-                    suggestionsBox.appendChild(div);
-                });
-            }
-
-            const newBarangDiv = document.createElement('div');
-            newBarangDiv.className = 'suggestion-item';
-            newBarangDiv.style.cssText = "background: #fffbeb; border-top: 1px dashed #fcd34d;"; 
-            newBarangDiv.innerHTML = `
-                <div class="suggestion-name" style="color: #b45309;">✨ Gunakan "${escapeHtml(keyword)}" (Barang Baru)</div>
-                <div class="suggestion-code" style="color: #d97706;">Klik untuk isi manual kode barang</div>
-            `;
-            newBarangDiv.addEventListener('click', () => {
-                barangInput.value = keyword;
-                kodeInput.value = ''; 
-                kodeInput.placeholder = "Isi kode manual / BARANG BARU";
-                kodeInput.readOnly = false;
-                kodeInput.focus();
-                suggestionsBox.style.display = 'none';
-            });
-
-            suggestionsBox.appendChild(newBarangDiv);
-            suggestionsBox.style.display = 'block';
-        }
-
-        function resetItemForm() {
-            barangInput.value = '';
-            kodeInput.value = '';
-            kodeInput.placeholder = 'Otomatis terisi dari sistem';
-            kodeInput.readOnly = true;
-            jumlahInput.value = '';
-            satuanSelect.value = 'Pcs';
-            urgensiSelect.value = 'Normal';
-            keteranganInput.value = '';
-            mesinInput.value = '';
-            
-            editingIndex = -1;
-            selectedIndex = -1;
-            addBarangBtn.textContent = '➕ Tambah ke Daftar';
-            addBarangBtn.style.background = '#059669';
-            cancelEditBtn.style.display = 'none';
-            inputAreaTitle.textContent = '📍 Input Detail Barang:';
-        }
-
-        addBarangBtn.addEventListener('click', () => {
-            const namaBarang = barangInput.value.trim();
-            let kodeBarang = kodeInput.value.trim();
-            const jumlah = parseInt(jumlahInput.value, 10);
-            const satuan = satuanSelect.value;
-            const urgensi = urgensiSelect.value;
-            const keterangan = keteranganInput.value.trim();
-            const mesin = mesinInput.value.trim();
-
-            if (!namaBarang || !jumlah || isNaN(jumlah) || jumlah <= 0 || !keterangan || !mesin) {
-                showAlert('warning', 'Data Belum Lengkap', 'Mohon isi nama barang, jumlah (minimal 1), mesin, dan keterangan!');
-                return;
-            }
-
-            if (editingIndex === -1 && listBarangRequest.length >= MAX_ITEMS) {
-                showAlert('warning', 'Batas Maksimal', `Maksimal permintaan per PR adalah ${MAX_ITEMS} barang.`);
-                return;
-            }
-
-            if (!kodeBarang) kodeBarang = "BARANG BARU";
-            const itemData = { namaBarang, kodeBarang, jumlah, satuan, urgensi, keterangan, mesin };
-
-            if (editingIndex >= 0) {
-                listBarangRequest[editingIndex] = itemData;
-            } else {
-                listBarangRequest.push(itemData);
-            }
-
-            renderTable();
-            saveDraft();
-            resetItemForm();
-            barangInput.focus();
-        });
-
-        cancelEditBtn.addEventListener('click', resetItemForm);
-
-        function renderTable() {
-            barangTableBody.innerHTML = '';
-            itemCount.textContent = `(${listBarangRequest.length}/${MAX_ITEMS})`;
-            
-            if (listBarangRequest.length === 0) {
-                barangTableBody.innerHTML = '<tr id="emptyRow"><td colspan="5" style="text-align: center; padding: 18px; color: #94a3b8;">Belum ada barang di dalam daftar.</td></tr>';
-                submitBtn.disabled = true;
-                return;
-            }
-
-            submitBtn.disabled = false;
-
-            listBarangRequest.forEach((item, index) => {
-                const tr = document.createElement('tr');
-                const isUrgent = item.urgensi === 'Urgent';
-
-                tr.innerHTML = `
-                    <td style="font-weight:600; color:#0f172a;">
-                        ${escapeHtml(item.namaBarang)}
-                        <div style="font-weight:normal; font-size:11px; color:#64748b; margin-top:2px;">Mesin: ${escapeHtml(item.mesin)}</div>
-                    </td>
-                    <td><span class="code-badge">${escapeHtml(item.kodeBarang)}</span></td>
-                    <td><strong style="color:#2563eb;">${item.jumlah}</strong> <span style="font-size:11px; color:#64748b;">${escapeHtml(item.satuan)}</span></td>
-                    <td><span class="urgency-badge ${isUrgent ? 'urgency-urgent' : 'urgency-normal'}">${escapeHtml(item.urgensi)}</span></td>
-                    <td>
-                        <div class="action-btns">
-                            <button type="button" class="btn-action btn-edit" onclick="editBarang(${index})">✏️</button>
-                            <button type="button" class="btn-action btn-delete" onclick="hapusBarang(${index})">❌</button>
-                        </div>
-                    </td>
-                `;
-                barangTableBody.appendChild(tr);
-            });
-        }
-
-        window.editBarang = function(index) {
-            const item = listBarangRequest[index];
-            barangInput.value = item.namaBarang;
-            kodeInput.value = item.kodeBarang;
-            jumlahInput.value = item.jumlah;
-            satuanSelect.value = item.satuan || 'Pcs';
-            urgensiSelect.value = item.urgensi || 'Normal';
-            keteranganInput.value = item.keterangan;
-            mesinInput.value = item.mesin;
-
-            editingIndex = index;
-            addBarangBtn.textContent = '💾 Simpan Perubahan';
-            addBarangBtn.style.background = '#f59e0b';
-            cancelEditBtn.style.display = 'block';
-            inputAreaTitle.textContent = `✏️ Edit Barang #${index + 1}:`;
-            barangInput.focus();
-        };
-
-        window.hapusBarang = function(index) {
-            const item = listBarangRequest[index];
-
-            showAlert(
-                'warning',
-                'Lepas Barang Ini?',
-                `Hapus <strong>"${escapeHtml(item.namaBarang)}"</strong> dari list PR kamu?`,
-                'Hapus Aja ❌',
-                true,
-                'Batal',
-                () => {
-                    if (editingIndex === index) resetItemForm();
-                    listBarangRequest.splice(index, 1);
-                    renderTable();
-                    saveDraft();
-                }
-            );
-        };
-
-        // --- SUBMIT FORM ---
-        form.addEventListener('submit', async function (e) {
-            e.preventDefault();
-
-            if (listBarangRequest.length === 0) {
-                showAlert('warning', 'Daftar Kosong', 'Daftar barang belanja masih kosong!');
-                return;
-            }
-
-            submitBtn.disabled = true;
-            submitBtn.textContent = "Mengirim...";
-
-            const payload = {
-                nama: namaInput.value.trim(),
-                grup: grupSelect.value,
-                departemen: deptInput.value,
-                items: listBarangRequest
-            };
-
-            try {
-                const response = await fetch(scriptURL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify(payload)
-                });
-
-                const rawText = await response.text();
-                let result = JSON.parse(rawText);
-
-                if (result.result !== "success") throw new Error(result.message || "Gagal menyimpan data.");
-
-                showAlert('success', 'Berhasil Dikirim', 'Semua data Request PR Anda telah sukses tersimpan!');
-                
-                listBarangRequest = [];
-                localStorage.removeItem('pr_form_draft');
-                form.reset();
-                deptInput.value = "Engineering"; 
-                renderTable();
-                resetItemForm();
-
-            } catch (error) {
-                console.error("SUBMIT ERROR:", error);
-                showAlert('error', 'Gagal Mengirim', error.message || 'Terjadi masalah teknis.');
-            } finally {
-                submitBtn.disabled = listBarangRequest.length === 0;
-                submitBtn.textContent = "Kirim Request PR";
-            }
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!barangInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
-                suggestionsBox.style.display = 'none';
-            }
-        });
-    });
+    <!-- BACKGROUND MUSIC -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="musik-background.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- FLOATING CONTROLS -->
+    <div class="top-controls">
+        <div id="pwaInstallBtn" class="control-btn" style="display: none; background: #10b981; color: white;">
+            <span>📲</span> Install App
+        </div>
+        <div id="musicToggleBtn" class="control-btn">
+            <span id="musicIcon">🎵</span>
+            <span id="musicStatusText">Musik: Off</span>
+        </div>
+    </div>
+
+    <!-- Page Loader -->
+    <div id="pageLoader">
+        <div class="spinner"></div>
+        <p class="loader-text" id="loaderTitle">Memuat Database Master...</p>
+        <p class="loader-subtext" id="loaderSubtext">Harap tunggu sebentar, menyiapkan sistem</p>
+    </div>
+
+    <!-- Custom Modal Structure -->
+    <div id="customAlertModal" class="custom-modal-overlay">
+        <div class="custom-modal">
+            <div id="modalIcon" class="modal-icon">✔</div>
+            <div id="modalTitle" class="modal-title">Notifikasi</div>
+            <div id="modalMessage" class="modal-message">Pesan notifikasi di sini.</div>
+            
+            <div id="modalActions" style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                <button id="modalCancelBtn" class="modal-btn" style="background: #94a3b8; color: white; display: none;">Batal</button>
+                <button id="modalCloseBtn" class="modal-btn" style="background: #2563eb; color: white;">Oke</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container Card -->
+    <div class="container" id="mainContainer">
+        <div style="text-align: center;">
+            <span class="badge-system">⚙️ Internal Engineering System</span>
+        </div>
+        <h2>SISTEM REQUEST PP ENGINEERING</h2>
+        <div class="subtitle">Aplikasi Permintaan & Riwayat PP Sparepart</div>
+
+        <!-- TAB NAVIGATION -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" id="tabFormBtn" onclick="switchTab('formTab')">📝 Form Request</button>
+            <button class="tab-btn" id="tabHistoryBtn" onclick="switchTab('historyTab')">📋 Riwayat Request</button>
+        </div>
+
+        <!-- TAB 1: FORM INPUT -->
+        <div id="formTab" class="tab-content active">
+            <form id="prForm">
+                <!-- Data Identitas Pemohon -->
+                <div class="form-group">
+                    <label for="namaInput">Nama Karyawan</label>
+                    <input type="text" id="namaInput" name="nama" placeholder="Masukkan nama Anda..." required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="grupSelect">Grup / Nonshift</label>
+                    <select id="grupSelect" name="grup" required>
+                        <option value="" disabled selected>-- Pilih Group Kerja --</option>
+                        <option value="Group A">Group A</option> 
+                        <option value="Group B">Group B</option> 
+                        <option value="Group C">Group C</option> 
+                        <option value="Group D">Group D</option> 
+                        <option value="Nonshift">Nonshift</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="deptInput">Departemen</label>
+                    <input type="text" id="deptInput" name="departemen" value="Engineering" readonly>
+                </div>
+                
+                <hr style="border: none; border-top: 1.5px dashed #cbd5e1; margin: 24px 0;">
+
+                <!-- AREA INPUT BARANG -->
+                <div style="background: rgba(248, 250, 252, 0.8); padding: 18px; border-radius: 14px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                    <strong style="font-size: 13px; display:block; margin-bottom: 12px; color: #0f172a;" id="inputAreaTitle">📍 Input Detail Barang:</strong>
+                    
+                    <div class="form-group">
+                        <label for="barangInput">Nama Barang / Sparepart</label>
+                        <input type="text" id="barangInput" autocomplete="off" placeholder="Ketik atau tempel nama/kode barang...">
+                        <div id="suggestions" class="suggestions-box"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="kodeInput">Kode Barang</label>
+                        <input type="text" id="kodeInput" readonly placeholder="Otomatis terisi dari sistem">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="jumlahInput">Jumlah</label>
+                            <input type="number" id="jumlahInput" min="1" step="1" oninput="this.value = !!this.value && Math.abs(this.value) >= 1 ? Math.abs(this.value) : ''" placeholder="Contoh: 2">
+                        </div>
+                        <div class="form-group">
+                            <label for="satuanSelect">Satuan</label>
+                            <select id="satuanSelect">
+                                <option value="Pcs">Pcs</option>
+                                <option value="Btg">Btg</option>
+                                <option value="Box">Box</option>
+                                <option value="Set">Set</option>
+                                <option value="Unit">Unit</option>
+                                <option value="Roll">Roll</option>
+                                <option value="Meter">Meter</option>
+                                <option value="Kg">Kg</option>
+                                <option value="Liter">Liter</option>
+                                <option value="Pail">Pail</option>
+                                <option value="Pack">Pack</option>
+                                <option value="Can">Can</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="mesinInput">Untuk Mesin</label>
+                            <input type="text" id="mesinInput" placeholder="Nama / Kode mesin...">
+                        </div>
+                        <div class="form-group">
+                            <label for="urgensiSelect">Tingkat Urgensi</label>
+                            <select id="urgensiSelect">
+                                <option value="Normal">🔵 Normal</option>
+                                <option value="Urgent">🔴 Urgent (Darurat)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="keteranganInput">Keterangan Kebutuhan</label>
+                        <textarea id="keteranganInput" rows="2" placeholder="Detail spesifikasi / alasan permintaan..."></textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" id="addBarangBtn" class="btn" style="background: #059669; margin-top: 5px;">➕ Tambah ke Daftar</button>
+                        <button type="button" id="cancelEditBtn" class="btn" style="background: #64748b; margin-top: 5px; display: none;">Batal</button>
+                    </div>
+                </div>
+
+                <!-- TABEL KERANJANG DAFTAR BARANG -->
+                <div class="form-group">
+                    <label>Daftar Permintaan Barang Saat Ini: <span id="itemCount" style="color:#2563eb; font-weight:bold;">(0/15)</span></label>
+                    <div class="table-responsive">
+                        <table id="barangTable">
+                            <thead>
+                                <tr>
+                                    <th>Barang</th>
+                                    <th>Kode</th>
+                                    <th>Qty</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr id="emptyRow"><td colspan="5" style="text-align: center; padding: 18px; color: #94a3b8;">Belum ada barang di dalam daftar.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- BUTTON SUBMIT UTAMA -->
+                <button type="submit" class="btn" id="submitBtn" disabled>Kirim Request PR</button>
+            </form>
+        </div>
+
+        <!-- TAB 2: HISTORY INPUT -->
+        <div id="historyTab" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px;">
+                <input type="text" id="searchHistoryInput" placeholder="🔍 Cari nama/barang/mesin..." style="padding: 8px 12px; font-size: 13px;">
+                <button type="button" id="refreshHistoryBtn" onclick="loadHistoryData()" style="padding: 8px 14px; background: #0284c7; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; font-size: 12px;">🔄 Refresh</button>
+            </div>
+
+            <div class="table-responsive" style="max-height: 480px; overflow-y: auto;">
+                <table id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>Waktu & Pemohon</th>
+                            <th>Barang / Mesin</th>
+                            <th>Qty</th>
+                            <th>Urgensi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr><td colspan="4" style="text-align: center; padding: 20px; color: #64748b;">Memuat data riwayat...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="footer">
+        &copy; 2026 Departemen Engineering - Sistem PR Internal
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+    // Manifest PWA
+    const manifestData = {
+        "name": "PR Engineering App",
+        "short_name": "PR Eng",
+        "start_url": "./",
+        "display": "standalone",
+        "background_color": "#0f172a",
+        "theme_color": "#2563eb"
+    };
+    const stringManifest = JSON.stringify(manifestData);
+    const blob = new Blob([stringManifest], {type: 'application/json'});
+    const link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = URL.createObjectURL(blob);
+    document.head.appendChild(link);
+
+    // Registrasi Service Worker
+    if ('serviceWorker' in navigator) {
+        const swCode = `
+            self.addEventListener('fetch', (e) => {
+                if (e.request.method !== 'GET') return;
+                e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+            });
+        `;
+        const blobSw = new Blob([swCode], {type: 'application/javascript'});
+        navigator.serviceWorker.register(URL.createObjectURL(blobSw)).catch(() => {});
+    }
+
+    let deferredPrompt;
+    const pwaInstallBtn = document.getElementById('pwaInstallBtn');
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (pwaInstallBtn) pwaInstallBtn.style.display = 'flex';
+    });
+
+    if (pwaInstallBtn) {
+        pwaInstallBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') pwaInstallBtn.style.display = 'none';
+                deferredPrompt = null;
+            }
+        });
+    }
+
+    // Switch Tab Functionality
+    window.switchTab = function(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        if (tabId === 'formTab') {
+            document.getElementById('tabFormBtn').classList.add('active');
+        } else {
+            document.getElementById('tabHistoryBtn').classList.add('active');
+            loadHistoryData();
+        }
+    };
+
+    // Core Logic
+    document.addEventListener('DOMContentLoaded', () => {
+        const bgMusic = document.getElementById('bgMusic');
+        const musicToggleBtn = document.getElementById('musicToggleBtn');
+        const musicIcon = document.getElementById('musicIcon');
+        const musicStatusText = document.getElementById('musicStatusText');
+
+        const mainContainer = document.getElementById('mainContainer');
+        const loader = document.getElementById('pageLoader');
+
+        const barangInput = document.getElementById('barangInput');
+        const kodeInput = document.getElementById('kodeInput');
+        const jumlahInput = document.getElementById('jumlahInput');
+        const satuanSelect = document.getElementById('satuanSelect');
+        const urgensiSelect = document.getElementById('urgensiSelect');
+        const keteranganInput = document.getElementById('keteranganInput');
+        const mesinInput = document.getElementById('mesinInput');
+        const namaInput = document.getElementById('namaInput');
+        const grupSelect = document.getElementById('grupSelect');
+        const deptInput = document.getElementById('deptInput');
+        
+        const suggestionsBox = document.getElementById('suggestions');
+        const form = document.getElementById('prForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const addBarangBtn = document.getElementById('addBarangBtn');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const inputAreaTitle = document.getElementById('inputAreaTitle');
+        const itemCount = document.getElementById('itemCount');
+        const barangTableBody = document.querySelector('#barangTable tbody');
+
+        const alertModal = document.getElementById('customAlertModal');
+        const modalIcon = document.getElementById('modalIcon');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+        const modalCancelBtn = document.getElementById('modalCancelBtn');
+
+        const scriptURL = "https://script.google.com/macros/s/AKfycbxek8os1feQ0zocHA1e-Y-2wVKAMs8zj54gT5c88KUjsreKV3b1HHcRdLZsMKNWC25B/exec";
+
+        let databaseBarang = [];
+        let historyDataList = [];
+        let listBarangRequest = []; 
+        let selectedIndex = -1;
+        let editingIndex = -1;
+        let searchTimer;
+        let isMusicPlaying = false;
+        const MAX_ITEMS = 15;
+
+        if (bgMusic) bgMusic.volume = 0.3;
+
+        function toggleMusic() {
+            if (!bgMusic) return;
+            if (isMusicPlaying) {
+                bgMusic.pause();
+                if (musicIcon) musicIcon.textContent = '🎵';
+                if (musicStatusText) musicStatusText.textContent = 'Musik: Off';
+                isMusicPlaying = false;
+            } else {
+                bgMusic.play().then(() => {
+                    if (musicIcon) musicIcon.textContent = '🔊';
+                    if (musicStatusText) musicStatusText.textContent = 'Musik: On';
+                    isMusicPlaying = true;
+                }).catch(() => {});
+            }
+        }
+        if (musicToggleBtn) musicToggleBtn.addEventListener('click', toggleMusic);
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.toString()
+                .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        function showAlert(type, title, message, closeText = 'Oke', showCancel = false, cancelText = 'Batal', onConfirm = null) {
+            modalIcon.className = `modal-icon ${type}`;
+            modalCloseBtn.className = `modal-btn`;
+            modalCloseBtn.style.background = type === 'error' ? '#dc2626' : (type === 'warning' ? '#d97706' : '#2563eb');
+            modalCloseBtn.textContent = closeText;
+            
+            if (showCancel) {
+                modalCancelBtn.style.display = 'block';
+                modalCancelBtn.textContent = cancelText;
+            } else {
+                modalCancelBtn.style.display = 'none';
+            }
+            
+            if (type === 'success') modalIcon.innerHTML = '✔';
+            else if (type === 'error') modalIcon.innerHTML = '✖';
+            else if (type === 'warning') modalIcon.innerHTML = '⚠';
+
+            modalTitle.textContent = title;
+            modalMessage.innerHTML = message;
+
+            modalCloseBtn.onclick = () => {
+                closeModal();
+                if (onConfirm) onConfirm();
+            };
+
+            alertModal.style.display = 'flex';
+            setTimeout(() => { alertModal.style.opacity = '1'; }, 10);
+        }
+
+        function closeModal() {
+            alertModal.style.opacity = '0';
+            setTimeout(() => { alertModal.style.display = 'none'; }, 200);
+        }
+
+        modalCancelBtn.addEventListener('click', closeModal);
+
+        function saveDraft() {
+            const draftData = { nama: namaInput.value, grup: grupSelect.value, items: listBarangRequest };
+            localStorage.setItem('pr_form_draft', JSON.stringify(draftData));
+        }
+
+        function loadDraft() {
+            const savedDraft = localStorage.getItem('pr_form_draft');
+            if (savedDraft) {
+                try {
+                    const draft = JSON.parse(savedDraft);
+                    if (draft.nama) namaInput.value = draft.nama;
+                    if (draft.grup) grupSelect.value = draft.grup;
+                    if (Array.isArray(draft.items) && draft.items.length > 0) {
+                        listBarangRequest = draft.items;
+                        renderTable();
+                    }
+                } catch (e) {}
+            }
+        }
+
+        namaInput.addEventListener('input', saveDraft);
+        grupSelect.addEventListener('change', saveDraft);
+
+        function loadBarang() {
+            fetch(`${scriptURL}?action=getBarang`)
+                .then(res => res.json())
+                .then(data => {
+                    if (Array.isArray(data)) databaseBarang = data;
+                    showFormView();
+                })
+                .catch(error => {
+                    console.warn("Gagal memuat database master:", error);
+                    showFormView();
+                });
+        }
+
+        window.loadHistoryData = function() {
+            const historyBody = document.getElementById('historyTableBody');
+            historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #64748b;">🔄 Mengambil data dari server...</td></tr>';
+
+            fetch(`${scriptURL}?action=getHistory`)
+                .then(res => res.json())
+                .then(data => {
+                    if (Array.isArray(data) && data.length > 0) {
+                        historyDataList = data;
+                        renderHistoryTable(historyDataList);
+                    } else {
+                        historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #94a3b8;">Belum ada riwayat permintaan.</td></tr>';
+                    }
+                })
+                .catch(err => {
+                    console.error("Gagal load history:", err);
+                    historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #dc2626;">❌ Gagal memuat data riwayat. Periksa koneksi internet/Apps Script Anda.</td></tr>';
+                });
+        };
+
+        function renderHistoryTable(data) {
+            const historyBody = document.getElementById('historyTableBody');
+            historyBody.innerHTML = '';
+
+            if (data.length === 0) {
+                historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #94a3b8;">Tidak ada data ditemukan.</td></tr>';
+                return;
+            }
+
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                const isUrgent = item.urgensi === 'Urgent';
+
+                tr.innerHTML = `
+                    <td>
+                        <strong style="color:#0f172a; display:block;">${escapeHtml(item.nama)}</strong>
+                        <span style="font-size:10px; color:#64748b;">${escapeHtml(item.grup)} • ${escapeHtml(item.timestamp)}</span>
+                    </td>
+                    <td>
+                        <strong style="color:#2563eb; display:block;">${escapeHtml(item.barang)}</strong>
+                        <span style="font-size:10px; color:#64748b;">Kode: ${escapeHtml(item.kode)} | Mesin: ${escapeHtml(item.mesin)}</span>
+                    </td>
+                    <td><strong>${escapeHtml(item.qty.toString())}</strong> <span style="font-size:10px; color:#64748b;">${escapeHtml(item.satuan)}</span></td>
+                    <td><span class="urgency-badge ${isUrgent ? 'urgency-urgent' : 'urgency-normal'}">${escapeHtml(item.urgensi)}</span></td>
+                `;
+                historyBody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('searchHistoryInput').addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            const filtered = historyDataList.filter(item => {
+                return item.nama.toLowerCase().includes(query) ||
+                       item.barang.toLowerCase().includes(query) ||
+                       item.kode.toLowerCase().includes(query) ||
+                       item.mesin.toLowerCase().includes(query);
+            });
+            renderHistoryTable(filtered);
+        });
+
+        function showFormView() {
+            if (loader) {
+                loader.style.opacity = "0";
+                setTimeout(() => { loader.style.display = "none"; }, 300);
+            }
+        }
+
+        loadBarang();
+        loadDraft();
+
+        function searchBarang(keyword) {
+            const terms = keyword.toLowerCase().trim().split(/\s+/);
+            return databaseBarang.filter(item => {
+                const nama = (item.nama || '').toLowerCase();
+                const kode = (item.kode || '').toLowerCase();
+                const fullText = `${nama} ${kode}`;
+                return terms.every(term => fullText.includes(term));
+            });
+        }
+
+        barangInput.addEventListener('input', function () {
+            clearTimeout(searchTimer);
+            const keyword = this.value.trim();
+            kodeInput.value = '';
+            selectedIndex = -1;
+
+            if (!keyword) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+
+            searchTimer = setTimeout(() => {
+                const results = searchBarang(keyword);
+                renderSuggestions(results, keyword);
+            }, 200);
+        });
+
+        function renderSuggestions(results, keyword) {
+            suggestionsBox.innerHTML = '';
+            selectedIndex = -1;
+
+            if (results.length > 0) {
+                results.slice(0, 30).forEach((item) => {
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item';
+                    div.innerHTML = `
+                        <div class="suggestion-name">${escapeHtml(item.nama)}</div>
+                        <div class="suggestion-code">${escapeHtml(item.kode)}</div>
+                    `;
+                    div.addEventListener('click', () => {
+                        barangInput.value = item.nama;
+                        kodeInput.value = item.kode;
+                        kodeInput.readOnly = true;
+                        suggestionsBox.style.display = 'none';
+                        jumlahInput.focus();
+                    });
+                    suggestionsBox.appendChild(div);
+                });
+            }
+
+            const newBarangDiv = document.createElement('div');
+            newBarangDiv.className = 'suggestion-item';
+            newBarangDiv.style.cssText = "background: #fffbeb; border-top: 1px dashed #fcd34d;"; 
+            newBarangDiv.innerHTML = `
+                <div class="suggestion-name" style="color: #b45309;">✨ Gunakan "${escapeHtml(keyword)}" (Barang Baru)</div>
+                <div class="suggestion-code" style="color: #d97706;">Klik untuk isi manual kode barang</div>
+            `;
+            newBarangDiv.addEventListener('click', () => {
+                barangInput.value = keyword;
+                kodeInput.value = ''; 
+                kodeInput.placeholder = "Isi kode manual / BARANG BARU";
+                kodeInput.readOnly = false;
+                kodeInput.focus();
+                suggestionsBox.style.display = 'none';
+            });
+
+            suggestionsBox.appendChild(newBarangDiv);
+            suggestionsBox.style.display = 'block';
+        }
+
+        function resetItemForm() {
+            barangInput.value = '';
+            kodeInput.value = '';
+            kodeInput.placeholder = 'Otomatis terisi dari sistem';
+            kodeInput.readOnly = true;
+            jumlahInput.value = '';
+            satuanSelect.value = 'Pcs';
+            urgensiSelect.value = 'Normal';
+            keteranganInput.value = '';
+            mesinInput.value = '';
+            
+            editingIndex = -1;
+            selectedIndex = -1;
+            addBarangBtn.textContent = '➕ Tambah ke Daftar';
+            addBarangBtn.style.background = '#059669';
+            cancelEditBtn.style.display = 'none';
+            inputAreaTitle.textContent = '📍 Input Detail Barang:';
+        }
+
+        addBarangBtn.addEventListener('click', () => {
+            const namaBarang = barangInput.value.trim();
+            let kodeBarang = kodeInput.value.trim();
+            const jumlah = parseInt(jumlahInput.value, 10);
+            const satuan = satuanSelect.value;
+            const urgensi = urgensiSelect.value;
+            const keterangan = keteranganInput.value.trim();
+            const mesin = mesinInput.value.trim();
+
+            if (!namaBarang || !jumlah || isNaN(jumlah) || jumlah <= 0 || !keterangan || !mesin) {
+                showAlert('warning', 'Data Belum Lengkap', 'Mohon isi nama barang, jumlah (minimal 1), mesin, dan keterangan!');
+                return;
+            }
+
+            if (editingIndex === -1 && listBarangRequest.length >= MAX_ITEMS) {
+                showAlert('warning', 'Batas Maksimal', `Maksimal permintaan per PR adalah ${MAX_ITEMS} barang.`);
+                return;
+            }
+
+            if (!kodeBarang) kodeBarang = "BARANG BARU";
+            const itemData = { namaBarang, kodeBarang, jumlah, satuan, urgensi, keterangan, mesin };
+
+            if (editingIndex >= 0) {
+                listBarangRequest[editingIndex] = itemData;
+            } else {
+                listBarangRequest.push(itemData);
+            }
+
+            renderTable();
+            saveDraft();
+            resetItemForm();
+            barangInput.focus();
+        });
+
+        cancelEditBtn.addEventListener('click', resetItemForm);
+
+        function renderTable() {
+            barangTableBody.innerHTML = '';
+            itemCount.textContent = `(${listBarangRequest.length}/${MAX_ITEMS})`;
+            
+            if (listBarangRequest.length === 0) {
+                barangTableBody.innerHTML = '<tr id="emptyRow"><td colspan="5" style="text-align: center; padding: 18px; color: #94a3b8;">Belum ada barang di dalam daftar.</td></tr>';
+                submitBtn.disabled = true;
+                return;
+            }
+
+            submitBtn.disabled = false;
+
+            listBarangRequest.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                const isUrgent = item.urgensi === 'Urgent';
+
+                tr.innerHTML = `
+                    <td style="font-weight:600; color:#0f172a;">
+                        ${escapeHtml(item.namaBarang)}
+                        <div style="font-weight:normal; font-size:11px; color:#64748b; margin-top:2px;">Mesin: ${escapeHtml(item.mesin)}</div>
+                    </td>
+                    <td><span class="code-badge">${escapeHtml(item.kodeBarang)}</span></td>
+                    <td><strong style="color:#2563eb;">${item.jumlah}</strong> <span style="font-size:11px; color:#64748b;">${escapeHtml(item.satuan)}</span></td>
+                    <td><span class="urgency-badge ${isUrgent ? 'urgency-urgent' : 'urgency-normal'}">${escapeHtml(item.urgensi)}</span></td>
+                    <td>
+                        <div class="action-btns">
+                            <button type="button" class="btn-action btn-edit" onclick="editBarang(${index})">✏️</button>
+                            <button type="button" class="btn-action btn-delete" onclick="hapusBarang(${index})">❌</button>
+                        </div>
+                    </td>
+                `;
+                barangTableBody.appendChild(tr);
+            });
+        }
+
+        window.editBarang = function(index) {
+            const item = listBarangRequest[index];
+            barangInput.value = item.namaBarang;
+            kodeInput.value = item.kodeBarang;
+            jumlahInput.value = item.jumlah;
+            satuanSelect.value = item.satuan || 'Pcs';
+            urgensiSelect.value = item.urgensi || 'Normal';
+            keteranganInput.value = item.keterangan;
+            mesinInput.value = item.mesin;
+
+            editingIndex = index;
+            addBarangBtn.textContent = '💾 Simpan Perubahan';
+            addBarangBtn.style.background = '#f59e0b';
+            cancelEditBtn.style.display = 'block';
+            inputAreaTitle.textContent = `✏️ Edit Barang #${index + 1}:`;
+            barangInput.focus();
+        };
+
+        window.hapusBarang = function(index) {
+            const item = listBarangRequest[index];
+
+            showAlert(
+                'warning',
+                'Lepas Barang Ini?',
+                `Hapus <strong>"${escapeHtml(item.namaBarang)}"</strong> dari list PR kamu?`,
+                'Hapus Aja ❌',
+                true,
+                'Batal',
+                () => {
+                    if (editingIndex === index) resetItemForm();
+                    listBarangRequest.splice(index, 1);
+                    renderTable();
+                    saveDraft();
+                }
+            );
+        };
+
+        // Form Submission
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            if (listBarangRequest.length === 0) {
+                showAlert('warning', 'Daftar Kosong', 'Daftar barang belanja masih kosong!');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Mengirim...";
+
+            const payload = {
+                nama: namaInput.value.trim(),
+                grup: grupSelect.value,
+                departemen: deptInput.value,
+                items: listBarangRequest
+            };
+
+            try {
+                const response = await fetch(scriptURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(payload)
+                });
+
+                const rawText = await response.text();
+                let result = JSON.parse(rawText);
+
+                if (result.result !== "success") throw new Error(result.message || "Gagal menyimpan data.");
+
+                showAlert('success', 'Berhasil Dikirim', 'Semua data Request PR Anda telah sukses tersimpan!');
+                
+                listBarangRequest = [];
+                localStorage.removeItem('pr_form_draft');
+                form.reset();
+                deptInput.value = "Engineering"; 
+                renderTable();
+                resetItemForm();
+
+            } catch (error) {
+                console.error("SUBMIT ERROR:", error);
+                showAlert('error', 'Gagal Mengirim', error.message || 'Terjadi masalah teknis.');
+            } finally {
+                submitBtn.disabled = listBarangRequest.length === 0;
+                submitBtn.textContent = "Kirim Request PR";
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!barangInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+    });
 </script>
 </body>
-</html>
+</html>  
