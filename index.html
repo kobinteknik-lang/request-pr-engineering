@@ -111,6 +111,23 @@
             letter-spacing: 0.5px;
             margin-bottom: 8px;
         }
+
+        /* Status DB Indicator Badge (Sangat Ramah Awam) */
+        .db-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-left: 8px;
+            vertical-align: middle;
+            transition: all 0.3s ease;
+        }
+
+        .db-loading { background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; }
+        .db-ready { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
         
         h2 { text-align: center; color: #0f172a; margin-bottom: 4px; font-size: 22px; font-weight: 700; }
         .subtitle { text-align: center; color: #64748b; font-size: 13px; margin-bottom: 20px; font-weight: 500; }
@@ -213,7 +230,7 @@
         .suggestion-name { font-weight: 600; font-size: 13px; color: #0f172a; }
         .suggestion-code { font-size: 11px; color: #64748b; margin-top: 2px; }
 
-        /* Page Loader Overlay */
+        /* Page Loader Overlay (Khusus Saat Mengirim Request Form) */
         #pageLoader {
             position: fixed; 
             top: 0; left: 0; width: 100%; height: 100%; 
@@ -409,11 +426,17 @@
 
                 <!-- AREA INPUT BARANG -->
                 <div style="background: rgba(248, 250, 252, 0.8); padding: 18px; border-radius: 14px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-                    <strong style="font-size: 13px; display:block; margin-bottom: 12px; color: #0f172a;" id="inputAreaTitle">📍 Input Detail Barang:</strong>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                        <strong style="font-size: 13px; color: #0f172a;" id="inputAreaTitle">📍 Input Detail Barang:</strong>
+                        <!-- Indikator Status Memuat Database di Background -->
+                        <span id="dbStatusBadge" class="db-status-badge db-loading">
+                            <span>🔄</span> Sync Data...
+                        </span>
+                    </div>
                     
                     <div class="form-group">
                         <label for="barangInput">Nama Barang / Sparepart</label>
-                        <input type="text" id="barangInput" autocomplete="off" placeholder="Ketik min. 2 Karakter nama/kode barang...">
+                        <input type="text" id="barangInput" autocomplete="off" placeholder="Ketik nama/kode barang...">
                         <div id="suggestions" class="suggestions-box"></div>
                     </div>
                     
@@ -586,6 +609,7 @@
         const loader = document.getElementById('pageLoader');
         const loaderTitle = document.getElementById('loaderTitle');
         const loaderSubtext = document.getElementById('loaderSubtext');
+        const dbStatusBadge = document.getElementById('dbStatusBadge');
 
         const barangInput = document.getElementById('barangInput');
         const kodeInput = document.getElementById('kodeInput');
@@ -616,18 +640,18 @@
 
         const scriptURL = "https://script.google.com/macros/s/AKfycbxek8os1feQ0zocHA1e-Y-2wVKAMs8zj54gT5c88KUjsreKV3b1HHcRdLZsMKNWC25B/exec";
 
+        let masterBarangMemory = []; // Memori penampung database barang
         let historyDataList = [];
         let listBarangRequest = []; 
         let selectedIndex = -1;
         let editingIndex = -1;
-        let searchTimer = null;
         let historySearchTimer = null;
         let isMusicPlaying = false;
         const MAX_ITEMS = 15;
 
         if (bgMusic) bgMusic.volume = 0.3;
 
-        // Fungsi Tampil/Sembunyi Loader
+        // Kontrol Tampilan Loading Overlay (Khusus Submit Form)
         function showLoader(title = "Memuat Data...", subtext = "Harap tunggu sebentar...") {
             if (loaderTitle) loaderTitle.textContent = title;
             if (loaderSubtext) loaderSubtext.textContent = subtext;
@@ -639,6 +663,36 @@
             loader.style.opacity = "0";
             setTimeout(() => { loader.style.display = "none"; }, 300);
         }
+
+        // AUTO PRE-LOAD DATABASE BARANG PADA AWAL MASUK APLIKASI
+        function preloadMasterBarang() {
+            fetch(`${scriptURL}?action=getBarang`)
+                .then(res => res.json())
+                .then(data => {
+                    if (Array.isArray(data) && data.length > 0) {
+                        masterBarangMemory = data;
+                        if (dbStatusBadge) {
+                            dbStatusBadge.className = 'db-status-badge db-ready';
+                            dbStatusBadge.innerHTML = '<span>🟢</span> Database Siap';
+                        }
+                    } else {
+                        if (dbStatusBadge) {
+                            dbStatusBadge.className = 'db-status-badge db-loading';
+                            dbStatusBadge.innerHTML = '<span>🟡</span> Mode Manual';
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error("Gagal Preload Master Barang:", err);
+                    if (dbStatusBadge) {
+                        dbStatusBadge.className = 'db-status-badge db-loading';
+                        dbStatusBadge.innerHTML = '<span>🟡</span> Mode Offline';
+                    }
+                });
+        }
+
+        // Jalankan Preload Otomatis saat Pertama Buka Aplikasi
+        preloadMasterBarang();
 
         jumlahInput.addEventListener('input', function() {
             if (this.value && parseFloat(this.value) < 1) {
@@ -729,7 +783,7 @@
         namaInput.addEventListener('input', saveDraft);
         grupSelect.addEventListener('change', saveDraft);
 
-        // Load History Data dari Apps Script
+        // Load History Data
         window.loadHistoryData = function() {
             const historyBody = document.getElementById('historyTableBody');
             historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #64748b;">🔄 Mengambil data dari server...</td></tr>';
@@ -798,48 +852,45 @@
 
         loadDraft();
 
-        // Pencarian Server Autocomplete + Tampilan Loading Screen
-        function triggerSearch(keyword) {
+        // LOGIKA AUTOCOMPLETE LOKAL MEMORI (INSTAN & TANPA LOADING OVERLAY)
+        function filterLocalBarang(keyword) {
             if (keyword.length < 2) {
                 suggestionsBox.style.display = 'none';
                 return;
             }
 
-            clearTimeout(searchTimer);
-            searchTimer = setTimeout(() => {
-                // Tampilkan Animasi Loading Saat Mencari Data
-                showLoader("Mencari Nama Barang...", `Menghubungkan ke 20.000+ database master untuk "${keyword}"`);
+            const searchTerms = keyword.toLowerCase().split(/\s+/);
+            const matches = [];
 
-                fetch(`${scriptURL}?action=searchBarang&q=${encodeURIComponent(keyword)}`)
-                    .then(res => res.json())
-                    .then(results => {
-                        renderSuggestions(results, keyword);
-                    })
-                    .catch(err => {
-                        console.error("Gagal melakukan pencarian:", err);
-                    })
-                    .finally(() => {
-                        // Sembunyikan Loading Screen Setelah Respons Selesai
-                        hideLoader();
-                    });
-            }, 300);
+            for (let i = 0; i < masterBarangMemory.length; i++) {
+                const item = masterBarangMemory[i];
+                const fullText = (item.nama + ' ' + item.kode).toLowerCase();
+
+                const isMatch = searchTerms.every(term => fullText.includes(term));
+                if (isMatch) {
+                    matches.push(item);
+                    if (matches.length >= 25) break; // Ambil maksimal 25 opsi teratas
+                }
+            }
+
+            renderSuggestions(matches, keyword);
         }
 
         barangInput.addEventListener('input', function () {
             kodeInput.value = '';
             selectedIndex = -1;
-            triggerSearch(this.value.trim());
+            filterLocalBarang(this.value.trim());
         });
 
         barangInput.addEventListener('paste', function () {
             setTimeout(() => {
                 kodeInput.value = '';
                 selectedIndex = -1;
-                triggerSearch(this.value.trim());
+                filterLocalBarang(this.value.trim());
             }, 50);
         });
 
-        // Navigasi Keyboard Autocomplete
+        // Keyboard Navigation Autocomplete
         barangInput.addEventListener('keydown', function(e) {
             const items = suggestionsBox.querySelectorAll('.suggestion-item');
             if (!items.length || suggestionsBox.style.display === 'none') return;
@@ -896,6 +947,7 @@
                 });
             }
 
+            // Opsi Barang Baru
             const newBarangDiv = document.createElement('div');
             newBarangDiv.className = 'suggestion-item';
             newBarangDiv.style.cssText = "background: #fffbeb; border-top: 1px dashed #fcd34d;"; 
