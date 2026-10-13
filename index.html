@@ -112,7 +112,7 @@
         h2 { text-align: center; color: #0f172a; margin-bottom: 6px; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
         .subtitle { text-align: center; color: #64748b; font-size: 13px; margin-bottom: 24px; font-weight: 500; }
 
-        /* TAB NAVIGATION MODERN DENGAN TRANSISI HALUS */
+        /* TAB NAVIGATION MODERN */
         .tab-navigation {
             display: flex;
             gap: 6px;
@@ -231,20 +231,22 @@
 
         .image-preview-container {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
             margin-top: 12px;
         }
 
+        /* PREVIEW CARD DENGAN TOMBOL HAPUS INDIVIDUAL */
         .img-preview-card {
             position: relative;
-            width: 72px;
-            height: 72px;
+            width: 76px;
+            height: 76px;
             border-radius: 12px;
-            overflow: hidden;
+            overflow: visible;
             border: 2px solid #e2e8f0;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: #fff;
         }
 
         @keyframes popIn {
@@ -256,9 +258,40 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: 10px;
         }
 
-        /* Buttons Upgrade DENGAN TRANSISI HALUS */
+        .btn-delete-img {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #ef4444;
+            color: #ffffff;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 11px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .btn-delete-img:hover {
+            transform: scale(1.2);
+            background: #dc2626;
+        }
+
+        .btn-delete-img:active {
+            transform: scale(0.9);
+        }
+
+        /* Buttons Upgrade */
         .btn { 
             width: 100%; 
             padding: 14px; 
@@ -424,6 +457,27 @@
             h2 { font-size: 20px; }
             .form-row { flex-direction: column; gap: 0; }
         }
+
+        .draft-status {
+            position: fixed; top: 14px; right: 14px; z-index: 10000;
+            padding: 9px 13px; border-radius: 12px; background: #fff;
+            color: #334155; border: 1px solid #e2e8f0;
+            box-shadow: 0 5px 18px #0f172a18; font-size: 12px; font-weight: 700;
+            display: flex; align-items: center; gap: 7px; max-width: calc(100vw - 28px);
+        }
+        .draft-status .dot { width: 8px; height: 8px; border-radius: 50%; background: #94a3b8; flex-shrink: 0; }
+        .draft-status.saved .dot { background: #10b981; }
+        .draft-status.saving .dot { background: #f59e0b; }
+        .draft-status.error .dot { background: #ef4444; }
+        
+        button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+            outline: 3px solid #60a5fa; outline-offset: 2px;
+        }
+        @media(max-width:600px) {
+            body { padding: 18px 10px 90px; }
+            .top-controls { right: 12px; bottom: 12px; gap: 8px; }
+            .control-btn { padding: 10px 13px; font-size: 12px; }
+        }
     </style>
 </head>
 
@@ -572,7 +626,7 @@
                         <div class="file-upload-zone">
                             <input type="file" id="fotoBarangInput" accept="image/*" multiple>
                             <span class="upload-icon">📷</span>
-                            <span class="upload-hint">Klik/drag untuk upload <strong>tepat 3 foto</strong> barang</span>
+                            <span class="upload-hint">Klik/drag untuk upload foto barang (Bisa satu2, total <strong>3 foto</strong>)</span>
                         </div>
                         <div id="previewFotoBarang" class="image-preview-container"></div>
                     </div>
@@ -583,7 +637,7 @@
                         <div class="file-upload-zone">
                             <input type="file" id="fotoAreaInput" accept="image/*" multiple>
                             <span class="upload-icon">🖼️</span>
-                            <span class="upload-hint">Klik/drag untuk upload <strong>1 hingga 5 foto</strong> area</span>
+                            <span class="upload-hint">Klik/drag untuk upload foto area (Bisa satu2, total <strong>1-5 foto</strong>)</span>
                         </div>
                         <div id="previewFotoArea" class="image-preview-container"></div>
                     </div>
@@ -660,7 +714,7 @@
             try {
                 navigator.vibrate(duration);
             } catch (e) {
-                // Abaikan jika ditolak oleh browser
+                // Abaikan jika ditolak browser
             }
         }
     }
@@ -679,17 +733,6 @@
     link.rel = 'manifest';
     link.href = URL.createObjectURL(blob);
     document.head.appendChild(link);
-
-    if ('serviceWorker' in navigator) {
-        const swCode = `
-            self.addEventListener('fetch', (e) => {
-                if (e.request.method !== 'GET') return;
-                e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-            });
-        `;
-        const blobSw = new Blob([swCode], {type: 'application/javascript'});
-        navigator.serviceWorker.register(URL.createObjectURL(blobSw)).catch(() => {});
-    }
 
     let deferredPrompt;
     const pwaInstallBtn = document.getElementById('pwaInstallBtn');
@@ -767,8 +810,70 @@
         const modalCloseBtn = document.getElementById('modalCloseBtn');
         const modalCancelBtn = document.getElementById('modalCancelBtn');
 
-        // URL Google Apps Script Terbaru
+        // URL Google Apps Script
         const scriptURL = "https://script.google.com/macros/s/AKfycbwCmHgPxWEUP8iPvT3x5gEql8NUz16WkmxpdhNLWT7GcdSCMOvL2OOe0_G7YIoTFUDPTw/exec";
+
+        // Indikator status draft
+        const draftStatus = document.createElement('div');
+        draftStatus.className = 'draft-status';
+        draftStatus.innerHTML = '<span class="dot"></span><span class="label">Draft siap</span>';
+        draftStatus.setAttribute('role', 'status');
+        draftStatus.setAttribute('aria-live', 'polite');
+        document.body.appendChild(draftStatus);
+
+        function setDraftStatus(state, message) {
+            draftStatus.className = 'draft-status ' + state;
+            draftStatus.querySelector('.label').textContent = message;
+        }
+
+        let draftSaveTimer = null;
+        let isSubmitting = false;
+        const DRAFT_DB = 'pr_engineering_drafts';
+        const DRAFT_KEY = 'current_pr_draft';
+
+        function openDraftDB() {
+            return new Promise((resolve, reject) => {
+                if (!('indexedDB' in window)) return reject(new Error('IndexedDB tidak tersedia'));
+                const req = indexedDB.open(DRAFT_DB, 1);
+                req.onupgradeneeded = () => req.result.createObjectStore('drafts');
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error || new Error('Gagal membuka penyimpanan draft'));
+            });
+        }
+
+        async function writeDraftDB(data) {
+            const db = await openDraftDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('drafts', 'readwrite');
+                tx.objectStore('drafts').put(data, DRAFT_KEY);
+                tx.oncomplete = () => { db.close(); resolve(); };
+                tx.onerror = tx.onabort = () => { db.close(); reject(tx.error || new Error('Gagal menyimpan draft')); };
+            });
+        }
+
+        async function readDraftDB() {
+            const db = await openDraftDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('drafts', 'readonly');
+                const req = tx.objectStore('drafts').get(DRAFT_KEY);
+                req.onsuccess = () => resolve(req.result || null);
+                req.onerror = () => reject(req.error || new Error('Gagal membaca draft'));
+                tx.oncomplete = () => db.close();
+            });
+        }
+
+        async function deleteDraftDB() {
+            try {
+                const db = await openDraftDB();
+                await new Promise((resolve, reject) => {
+                    const tx = db.transaction('drafts', 'readwrite');
+                    tx.objectStore('drafts').delete(DRAFT_KEY);
+                    tx.oncomplete = resolve;
+                    tx.onerror = tx.onabort = () => reject(tx.error);
+                });
+                db.close();
+            } catch (e) { console.warn('Draft lokal tidak dapat dihapus:', e); }
+        }
 
         let databaseBarang = [];
         let historyDataList = [];
@@ -810,7 +915,6 @@
         }
 
         function showAlert(type, title, message, closeText = 'Oke', showCancel = false, cancelText = 'Batal', onConfirm = null) {
-            // Getar Peringatan/Eror
             if (type === 'error' || type === 'warning') {
                 triggerVibration([50, 40, 50]);
             } else {
@@ -891,85 +995,154 @@
             });
         }
 
+        // AKUMULASI UPLOAD FOTO BARANG (EXACT 3 FOTO)
         fotoBarangInput.addEventListener('change', async (e) => {
             triggerVibration(20);
             const files = Array.from(e.target.files);
-            if (files.length !== 3) {
-                showAlert('warning', 'Jumlah Foto Salah', 'Foto Barang WAJIB tepat 3 foto!');
+            if (files.length === 0) return;
+
+            if (currentFotoBarang.length + files.length > 3) {
+                showAlert('warning', 'Batas Foto Barang', `Maksimal foto barang adalah 3 foto. Saat ini sudah ada ${currentFotoBarang.length} foto.`);
                 e.target.value = '';
-                currentFotoBarang = [];
-                previewFotoBarang.innerHTML = '';
                 return;
             }
+
             try {
-                currentFotoBarang = await Promise.all(files.map(f => compressAndConvertFile(f)));
-                renderPreviews(currentFotoBarang, previewFotoBarang);
+                const newConverted = await Promise.all(files.map(f => compressAndConvertFile(f)));
+                currentFotoBarang = [...currentFotoBarang, ...newConverted];
+                renderPreviews(currentFotoBarang, previewFotoBarang, 'barang');
+                saveDraft();
+                e.target.value = '';
             } catch (err) {
                 showAlert('error', 'Gagal Memproses File', 'Terjadi kesalahan saat memproses foto.');
             }
         });
 
+        // AKUMULASI UPLOAD FOTO AREA (1 - 5 FOTO)
         fotoAreaInput.addEventListener('change', async (e) => {
             triggerVibration(20);
             const files = Array.from(e.target.files);
-            if (files.length < 1 || files.length > 5) {
-                showAlert('warning', 'Batas Foto Area', 'Foto Area Pemasangan WAJIB antara 1 sampai 5 foto.');
+            if (files.length === 0) return;
+
+            if (currentFotoArea.length + files.length > 5) {
+                showAlert('warning', 'Batas Foto Area', `Maksimal foto area adalah 5 foto. Saat ini sudah ada ${currentFotoArea.length} foto.`);
                 e.target.value = '';
-                currentFotoArea = [];
-                previewFotoArea.innerHTML = '';
                 return;
             }
+
             try {
-                currentFotoArea = await Promise.all(files.map(f => compressAndConvertFile(f)));
-                renderPreviews(currentFotoArea, previewFotoArea);
+                const newConverted = await Promise.all(files.map(f => compressAndConvertFile(f)));
+                currentFotoArea = [...currentFotoArea, ...newConverted];
+                renderPreviews(currentFotoArea, previewFotoArea, 'area');
+                saveDraft();
+                e.target.value = '';
             } catch (err) {
                 showAlert('error', 'Gagal Memproses File', 'Terjadi kesalahan saat memproses foto.');
             }
         });
 
-        function renderPreviews(base64Arr, container) {
+        // RENDER PREVIEW FOTO DENGAN TOMBOL HAPUS (✕) INDIVIDUAL
+        function renderPreviews(base64Arr, container, type) {
             container.innerHTML = '';
-            base64Arr.forEach(item => {
+            base64Arr.forEach((item, index) => {
                 const card = document.createElement('div');
                 card.className = 'img-preview-card';
-                card.innerHTML = `<img src="data:${item.mimeType};base64,${item.data}" alt="preview">`;
+                card.innerHTML = `
+                    <img src="data:${item.mimeType};base64,${item.data}" alt="preview">
+                    <button type="button" class="btn-delete-img" onclick="removePhoto('${type}', ${index})" title="Hapus foto ini">✕</button>
+                `;
                 container.appendChild(card);
             });
         }
 
-        function saveDraft() {
-            try {
-                const itemsLight = listBarangRequest.map(item => ({
-                    ...item,
-                    fotoBarang: [],
-                    fotoArea: []
-                }));
-                const draftData = { nama: namaInput.value, grup: grupSelect.value, items: itemsLight };
-                localStorage.setItem('pr_form_draft', JSON.stringify(draftData));
-            } catch (e) {
-                console.warn("Storage penuh, draft gagal disimpan:", e);
+        // FUNGSI HAPUS FOTO INDIVIDUAL
+        window.removePhoto = function(type, index) {
+            triggerVibration(20);
+            if (type === 'barang') {
+                currentFotoBarang.splice(index, 1);
+                renderPreviews(currentFotoBarang, previewFotoBarang, 'barang');
+                saveDraft();
+            } else if (type === 'area') {
+                currentFotoArea.splice(index, 1);
+                renderPreviews(currentFotoArea, previewFotoArea, 'area');
+                saveDraft();
             }
-        }
+        };
 
-        function loadDraft() {
-            const savedDraft = localStorage.getItem('pr_form_draft');
-            if (savedDraft) {
-                try {
-                    const draft = JSON.parse(savedDraft);
-                    if (draft.nama) namaInput.value = draft.nama;
-                    if (draft.grup) grupSelect.value = draft.grup;
-                    if (Array.isArray(draft.items) && draft.items.length > 0) {
-                        listBarangRequest = draft.items;
-                        renderTable();
-                    }
-                } catch (e) {
-                    localStorage.removeItem('pr_form_draft');
+        function collectDraft() {
+            return {
+                version: 2, savedAt: new Date().toISOString(),
+                nama: namaInput.value, grup: grupSelect.value, dept: deptInput.value,
+                items: listBarangRequest,
+                current: {
+                    namaBarang: barangInput.value, kodeBarang: kodeInput.value,
+                    jumlah: jumlahInput.value, satuan: satuanSelect.value,
+                    urgensi: urgensiSelect.value, keterangan: keteranganInput.value,
+                    mesin: mesinInput.value, fotoBarang: currentFotoBarang, fotoArea: currentFotoArea,
+                    editingIndex
                 }
-            }
+            };
         }
 
-        namaInput.addEventListener('input', saveDraft);
-        grupSelect.addEventListener('change', saveDraft);
+        function saveDraft() {
+            setDraftStatus('saving', 'Menyimpan draft…');
+            clearTimeout(draftSaveTimer);
+            draftSaveTimer = setTimeout(async () => {
+                try {
+                    await writeDraftDB(collectDraft());
+                    setDraftStatus('saved', 'Draft tersimpan otomatis');
+                } catch (e) {
+                    try {
+                        const d = collectDraft();
+                        d.items = d.items.map(item => ({...item, fotoBarang: [], fotoArea: []}));
+                        d.current.fotoBarang = []; d.current.fotoArea = [];
+                        localStorage.setItem('pr_form_draft', JSON.stringify(d));
+                        setDraftStatus('saved', 'Draft tersimpan (tanpa foto)');
+                    } catch (fallbackError) {
+                        setDraftStatus('error', 'Draft gagal disimpan');
+                        console.warn('Draft gagal disimpan:', e, fallbackError);
+                    }
+                }
+            }, 350);
+        }
+
+        async function loadDraft() {
+            let draft = null;
+            try { draft = await readDraftDB(); } catch (e) { console.warn('IndexedDB tidak tersedia:', e); }
+            if (!draft) {
+                try { const legacy = localStorage.getItem('pr_form_draft'); draft = legacy ? JSON.parse(legacy) : null; }
+                catch (e) { localStorage.removeItem('pr_form_draft'); }
+            }
+            if (!draft) return;
+            try {
+                if (draft.nama) namaInput.value = draft.nama;
+                if (draft.grup) grupSelect.value = draft.grup;
+                if (draft.dept) deptInput.value = draft.dept;
+                if (Array.isArray(draft.items)) listBarangRequest = draft.items;
+                if (draft.current) {
+                    const c = draft.current;
+                    barangInput.value = c.namaBarang || '';
+                    kodeInput.value = c.kodeBarang || '';
+                    jumlahInput.value = c.jumlah || '';
+                    satuanSelect.value = c.satuan || 'Pcs';
+                    urgensiSelect.value = c.urgensi || 'Normal';
+                    keteranganInput.value = c.keterangan || '';
+                    mesinInput.value = c.mesin || '';
+                    currentFotoBarang = Array.isArray(c.fotoBarang) ? c.fotoBarang : [];
+                    currentFotoArea = Array.isArray(c.fotoArea) ? c.fotoArea : [];
+                    editingIndex = Number.isInteger(c.editingIndex) ? c.editingIndex : -1;
+                    renderPreviews(currentFotoBarang, previewFotoBarang, 'barang');
+                    renderPreviews(currentFotoArea, previewFotoArea, 'area');
+                }
+                renderTable();
+                setDraftStatus('saved', 'Draft dipulihkan');
+            } catch (e) { console.warn('Draft tidak dapat dipulihkan:', e); }
+        }
+
+        [namaInput, grupSelect, deptInput, barangInput, kodeInput, jumlahInput, satuanSelect, urgensiSelect, keteranganInput, mesinInput].forEach(el => {
+            el.addEventListener('input', saveDraft);
+            el.addEventListener('change', saveDraft);
+        });
 
         function loadBarang() {
             fetch(`${scriptURL}?action=getBarang`)
@@ -1111,6 +1284,7 @@
                         kodeInput.readOnly = true;
                         suggestionsBox.style.display = 'none';
                         jumlahInput.focus();
+                        saveDraft();
                     });
                     suggestionsBox.appendChild(div);
                 });
@@ -1131,6 +1305,7 @@
                 kodeInput.readOnly = false;
                 kodeInput.focus();
                 suggestionsBox.style.display = 'none';
+                saveDraft();
             });
 
             suggestionsBox.appendChild(newBarangDiv);
@@ -1178,12 +1353,12 @@
             }
 
             if (currentFotoBarang.length !== 3) {
-                showAlert('warning', 'Foto Barang Kurang', 'Wajib melampirkan EXACT 3 FOTO untuk barang yang diminta!');
+                showAlert('warning', 'Foto Barang Kurang', `Wajib melampirkan EXACT 3 FOTO untuk barang yang diminta! (Saat ini: ${currentFotoBarang.length} foto)`);
                 return;
             }
 
             if (currentFotoArea.length < 1 || currentFotoArea.length > 5) {
-                showAlert('warning', 'Foto Area Kurang', 'Wajib melampirkan antara 1 sampai 5 FOTO area/titik pemasangan!');
+                showAlert('warning', 'Foto Area Kurang', `Wajib melampirkan antara 1 sampai 5 FOTO area/titik pemasangan! (Saat ini: ${currentFotoArea.length} foto)`);
                 return;
             }
 
@@ -1212,14 +1387,15 @@
             }
 
             renderTable();
-            saveDraft();
             resetItemForm();
+            saveDraft();
             barangInput.focus();
         });
 
         cancelEditBtn.addEventListener('click', () => {
             triggerVibration(15);
             resetItemForm();
+            saveDraft();
         });
 
         function renderTable() {
@@ -1271,8 +1447,8 @@
 
             currentFotoBarang = [...item.fotoBarang];
             currentFotoArea = [...item.fotoArea];
-            renderPreviews(currentFotoBarang, previewFotoBarang);
-            renderPreviews(currentFotoArea, previewFotoArea);
+            renderPreviews(currentFotoBarang, previewFotoBarang, 'barang');
+            renderPreviews(currentFotoArea, previewFotoArea, 'area');
 
             editingIndex = index;
             addBarangBtn.textContent = '💾 Simpan Perubahan';
@@ -1280,6 +1456,7 @@
             cancelEditBtn.style.display = 'block';
             inputAreaTitle.textContent = `✏️ Edit Barang #${index + 1}:`;
             barangInput.focus();
+            saveDraft();
         };
 
         window.hapusBarang = function(index) {
@@ -1304,6 +1481,7 @@
 
         form.addEventListener('submit', async function (e) {
             e.preventDefault();
+            if (isSubmitting) return;
             triggerVibration(30);
 
             if (listBarangRequest.length === 0) {
@@ -1311,8 +1489,10 @@
                 return;
             }
 
+            isSubmitting = true;
             submitBtn.disabled = true;
-            submitBtn.textContent = "Mengirim & Mengupload Foto...";
+            submitBtn.textContent = "Mengirim & Mengupload Foto…";
+            setDraftStatus('saving', 'Mengirim request…');
 
             const payload = {
                 nama: namaInput.value.trim(),
@@ -1328,8 +1508,11 @@
                     body: JSON.stringify(payload)
                 });
 
+                if (!response.ok) throw new Error(`Server merespons HTTP ${response.status}. Silakan coba lagi.`);
                 const rawText = await response.text();
-                let result = JSON.parse(rawText);
+                let result;
+                try { result = JSON.parse(rawText); }
+                catch (_) { throw new Error('Respons server tidak terbaca. Periksa koneksi dan riwayat sebelum mengirim ulang.'); }
 
                 if (result.result !== "success") throw new Error(result.message || "Gagal menyimpan data.");
 
@@ -1337,6 +1520,7 @@
                 
                 listBarangRequest = [];
                 localStorage.removeItem('pr_form_draft');
+                await deleteDraftDB();
                 form.reset();
                 deptInput.value = "Engineering"; 
                 renderTable();
@@ -1346,8 +1530,10 @@
                 console.error("SUBMIT ERROR:", error);
                 showAlert('error', 'Gagal Mengirim', error.message || 'Terjadi masalah teknis.');
             } finally {
+                isSubmitting = false;
                 submitBtn.disabled = listBarangRequest.length === 0;
                 submitBtn.textContent = "Kirim Request PR";
+                if (listBarangRequest.length > 0) setDraftStatus('saved', 'Draft aman di perangkat ini');
             }
         });
 
