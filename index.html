@@ -17,6 +17,7 @@
             margin: 0; 
             padding: 0; 
             font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; 
+            -webkit-tap-highlight-color: transparent;
         }
 
         body { 
@@ -59,7 +60,11 @@
             font-weight: 700;
             color: #1e293b;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .control-btn:active {
+            transform: scale(0.92);
         }
 
         .control-btn:hover {
@@ -80,6 +85,12 @@
             box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
             margin: auto;
             display: block;
+            animation: cardAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .badge-system {
@@ -101,7 +112,7 @@
         h2 { text-align: center; color: #0f172a; margin-bottom: 6px; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
         .subtitle { text-align: center; color: #64748b; font-size: 13px; margin-bottom: 24px; font-weight: 500; }
 
-        /* TAB NAVIGATION MODERN */
+        /* TAB NAVIGATION MODERN DENGAN TRANSISI HALUS */
         .tab-navigation {
             display: flex;
             gap: 6px;
@@ -122,11 +133,15 @@
             font-weight: 700;
             color: #64748b;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+        }
+
+        .tab-btn:active {
+            transform: scale(0.96);
         }
 
         .tab-btn.active {
@@ -135,8 +150,19 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
         }
 
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        /* Tab Content Transition */
+        .tab-content { 
+            display: none; 
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .tab-content.active { 
+            display: block; 
+            opacity: 1;
+            transform: translateY(0);
+        }
 
         /* Form Controls */
         .form-group { margin-bottom: 20px; position: relative; }
@@ -155,7 +181,7 @@
             font-size: 14px; 
             color: #0f172a;
             font-weight: 500;
-            transition: all 0.2s ease;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
         }
 
         input:focus, textarea:focus, select:focus { 
@@ -163,9 +189,10 @@
             border-color: #2563eb; 
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15); 
             outline: none; 
+            transform: translateY(-1px);
         }
 
-        input[readonly] { background: #f8fafc; color: #64748b; border-color: #e2e8f0; cursor: not-allowed; }
+        input[readonly] { background: #f8fafc; color: #64748b; border-color: #e2e8f0; cursor: not-allowed; transform: none !important; }
 
         /* Custom File Upload Box */
         .file-upload-zone {
@@ -175,13 +202,18 @@
             text-align: center;
             background: #ffffff;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
             position: relative;
         }
 
         .file-upload-zone:hover {
             border-color: #2563eb;
             background: #f0f6ff;
+            transform: translateY(-2px);
+        }
+
+        .file-upload-zone:active {
+            transform: scale(0.98);
         }
 
         .file-upload-zone input[type="file"] {
@@ -191,7 +223,9 @@
             cursor: pointer;
         }
 
-        .upload-icon { font-size: 24px; margin-bottom: 4px; display: block; }
+        .upload-icon { font-size: 24px; margin-bottom: 4px; display: block; transition: transform 0.2s ease; }
+        .file-upload-zone:hover .upload-icon { transform: scale(1.15) rotate(-5deg); }
+
         .upload-hint { font-size: 12px; color: #64748b; font-weight: 500; }
         .upload-hint strong { color: #2563eb; }
 
@@ -210,7 +244,12 @@
             overflow: hidden;
             border: 2px solid #e2e8f0;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            animation: fadeIn 0.3s ease;
+            animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .img-preview-card img {
@@ -219,7 +258,7 @@
             object-fit: cover;
         }
 
-        /* Buttons Upgrade */
+        /* Buttons Upgrade DENGAN TRANSISI HALUS */
         .btn { 
             width: 100%; 
             padding: 14px; 
@@ -230,7 +269,7 @@
             font-weight: 700; 
             font-size: 14px;
             cursor: pointer;
-            transition: all 0.2s ease; 
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); 
             box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
             display: inline-flex;
             align-items: center;
@@ -239,7 +278,7 @@
         }
 
         .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4); }
-        .btn:active { transform: translateY(0); }
+        .btn:active { transform: scale(0.96); }
         .btn:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; transform: none; }
 
         /* Autocomplete Suggestions */
@@ -254,10 +293,12 @@
             z-index: 999; 
             border-radius: 0 0 14px 14px; 
             box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+            animation: fadeIn 0.2s ease;
         }
 
-        .suggestion-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f1f5f9; text-align: left; transition: background 0.15s; }
+        .suggestion-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f1f5f9; text-align: left; transition: background 0.15s, transform 0.1s ease; }
         .suggestion-item:hover { background: #f0f6ff; }
+        .suggestion-item:active { transform: scale(0.98); }
         .suggestion-name { font-weight: 700; font-size: 13px; color: #0f172a; }
         .suggestion-code { font-size: 11px; color: #64748b; margin-top: 2px; }
 
@@ -288,6 +329,7 @@
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
         th { background: #f8fafc; color: #475569; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #e2e8f0; }
+        tr { transition: background 0.15s ease; }
         tr:hover { background: #f8fafc; }
 
         .code-badge {
@@ -315,7 +357,8 @@
 
         .action-btns { display: flex; gap: 6px; justify-content: center; }
         .btn-action { border: none; padding: 7px 10px; border-radius: 8px; cursor: pointer; color: white; font-size: 12px; font-weight: 700; transition: transform 0.15s ease; }
-        .btn-action:hover { transform: scale(1.08); }
+        .btn-action:hover { transform: scale(1.1); }
+        .btn-action:active { transform: scale(0.9); }
         .btn-edit { background: #f59e0b; }
         .btn-delete { background: #ef4444; }
 
@@ -341,6 +384,12 @@
             border-radius: 20px;
             text-align: center;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .custom-modal-overlay.show .custom-modal {
+            transform: scale(1);
         }
 
         .modal-icon {
@@ -368,7 +417,7 @@
         }
 
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 
         @media (max-width: 480px) {
             .container { padding: 24px 18px; border-radius: 20px; }
@@ -576,7 +625,7 @@
         <div id="historyTab" class="tab-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 10px;">
                 <input type="text" id="searchHistoryInput" placeholder="🔍 Cari nama / barang / mesin..." style="padding: 10px 14px; font-size: 13px;">
-                <button type="button" id="refreshHistoryBtn" onclick="loadHistoryData()" style="padding: 10px 16px; background: #0284c7; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; white-space: nowrap; font-size: 12px; transition: all 0.2s;">🔄 Refresh</button>
+                <button type="button" id="refreshHistoryBtn" onclick="loadHistoryData()" style="padding: 10px 16px; background: #0284c7; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; white-space: nowrap; font-size: 12px;">🔄 Refresh</button>
             </div>
 
             <div class="table-responsive" style="max-height: 480px; overflow-y: auto;">
@@ -605,6 +654,17 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
+    // Fungsi Getar Haptic Universal
+    function triggerVibration(duration = 20) {
+        if ('vibrate' in navigator) {
+            try {
+                navigator.vibrate(duration);
+            } catch (e) {
+                // Abaikan jika ditolak oleh browser
+            }
+        }
+    }
+
     const manifestData = {
         "name": "PR Engineering App",
         "short_name": "PR Eng",
@@ -641,6 +701,7 @@
 
     if (pwaInstallBtn) {
         pwaInstallBtn.addEventListener('click', async () => {
+            triggerVibration(25);
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
@@ -651,10 +712,13 @@
     }
 
     window.switchTab = function(tabId) {
+        triggerVibration(15);
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
         
-        document.getElementById(tabId).classList.add('active');
+        const targetTab = document.getElementById(tabId);
+        targetTab.classList.add('active');
+
         if (tabId === 'formTab') {
             document.getElementById('tabFormBtn').classList.add('active');
         } else {
@@ -703,7 +767,8 @@
         const modalCloseBtn = document.getElementById('modalCloseBtn');
         const modalCancelBtn = document.getElementById('modalCancelBtn');
 
-        const scriptURL = "https://script.google.com/macros/s/AKfycbxek8os1feQ0zocHA1e-Y-2wVKAMs8zj54gT5c88KUjsreKV3b1HHcRdLZsMKNWC25B/exec";
+        // URL Google Apps Script Terbaru
+        const scriptURL = "https://script.google.com/macros/s/AKfycbwCmHgPxWEUP8iPvT3x5gEql8NUz16WkmxpdhNLWT7GcdSCMOvL2OOe0_G7YIoTFUDPTw/exec";
 
         let databaseBarang = [];
         let historyDataList = [];
@@ -718,6 +783,7 @@
         if (bgMusic) bgMusic.volume = 0.3;
 
         function toggleMusic() {
+            triggerVibration(20);
             if (!bgMusic) return;
             if (isMusicPlaying) {
                 bgMusic.pause();
@@ -744,6 +810,13 @@
         }
 
         function showAlert(type, title, message, closeText = 'Oke', showCancel = false, cancelText = 'Batal', onConfirm = null) {
+            // Getar Peringatan/Eror
+            if (type === 'error' || type === 'warning') {
+                triggerVibration([50, 40, 50]);
+            } else {
+                triggerVibration(30);
+            }
+
             modalIcon.className = `modal-icon ${type}`;
             modalCloseBtn.className = `modal-btn`;
             modalCloseBtn.style.background = type === 'error' ? '#dc2626' : (type === 'warning' ? '#d97706' : '#2563eb');
@@ -764,15 +837,18 @@
             modalMessage.innerHTML = message;
 
             modalCloseBtn.onclick = () => {
+                triggerVibration(15);
                 closeModal();
                 if (onConfirm) onConfirm();
             };
 
             alertModal.style.display = 'flex';
-            setTimeout(() => { alertModal.style.opacity = '1'; }, 10);
+            setTimeout(() => { alertModal.classList.add('show'); alertModal.style.opacity = '1'; }, 10);
         }
 
         function closeModal() {
+            triggerVibration(15);
+            alertModal.classList.remove('show');
             alertModal.style.opacity = '0';
             setTimeout(() => { alertModal.style.display = 'none'; }, 200);
         }
@@ -816,6 +892,7 @@
         }
 
         fotoBarangInput.addEventListener('change', async (e) => {
+            triggerVibration(20);
             const files = Array.from(e.target.files);
             if (files.length !== 3) {
                 showAlert('warning', 'Jumlah Foto Salah', 'Foto Barang WAJIB tepat 3 foto!');
@@ -833,6 +910,7 @@
         });
 
         fotoAreaInput.addEventListener('change', async (e) => {
+            triggerVibration(20);
             const files = Array.from(e.target.files);
             if (files.length < 1 || files.length > 5) {
                 showAlert('warning', 'Batas Foto Area', 'Foto Area Pemasangan WAJIB antara 1 sampai 5 foto.');
@@ -907,6 +985,7 @@
         }
 
         window.loadHistoryData = function() {
+            triggerVibration(15);
             const historyBody = document.getElementById('historyTableBody');
             historyBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: #64748b;">🔄 Mengambil data dari server...</td></tr>';
 
@@ -1026,6 +1105,7 @@
                         <div class="suggestion-code">${escapeHtml(item.kode)}</div>
                     `;
                     div.addEventListener('click', () => {
+                        triggerVibration(15);
                         barangInput.value = item.nama;
                         kodeInput.value = item.kode;
                         kodeInput.readOnly = true;
@@ -1044,6 +1124,7 @@
                 <div class="suggestion-code" style="color: #d97706;">Klik untuk isi manual kode barang</div>
             `;
             newBarangDiv.addEventListener('click', () => {
+                triggerVibration(15);
                 barangInput.value = keyword;
                 kodeInput.value = ''; 
                 kodeInput.placeholder = "Isi kode manual / BARANG BARU";
@@ -1082,6 +1163,7 @@
         }
 
         addBarangBtn.addEventListener('click', () => {
+            triggerVibration(25);
             const namaBarang = barangInput.value.trim();
             let kodeBarang = kodeInput.value.trim();
             const jumlah = parseInt(jumlahInput.value, 10);
@@ -1135,7 +1217,10 @@
             barangInput.focus();
         });
 
-        cancelEditBtn.addEventListener('click', resetItemForm);
+        cancelEditBtn.addEventListener('click', () => {
+            triggerVibration(15);
+            resetItemForm();
+        });
 
         function renderTable() {
             barangTableBody.innerHTML = '';
@@ -1174,6 +1259,7 @@
         }
 
         window.editBarang = function(index) {
+            triggerVibration(20);
             const item = listBarangRequest[index];
             barangInput.value = item.namaBarang;
             kodeInput.value = item.kodeBarang;
@@ -1197,6 +1283,7 @@
         };
 
         window.hapusBarang = function(index) {
+            triggerVibration(25);
             const item = listBarangRequest[index];
 
             showAlert(
@@ -1217,6 +1304,7 @@
 
         form.addEventListener('submit', async function (e) {
             e.preventDefault();
+            triggerVibration(30);
 
             if (listBarangRequest.length === 0) {
                 showAlert('warning', 'Daftar Kosong', 'Daftar barang belanja masih kosong!');
