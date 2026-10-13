@@ -27,13 +27,11 @@
             min-height: 100vh; 
             padding: 24px 16px; 
             color: #1e293b;
-            /* Background Image dengan Fallback Gradient */
             background: linear-gradient(135deg, rgba(15, 23, 42, 0.55), rgba(15, 23, 42, 0.75)), url('Background-Desktop.jpg') no-repeat center center fixed;
             background-size: cover;
             position: relative;
         }
 
-        /* Floating Controls */
         .top-controls {
             position: fixed;
             bottom: 20px;
@@ -65,7 +63,6 @@
             background: #ffffff;
         }
 
-        /* Container Card */
         .container { 
             width: 100%; 
             max-width: 680px; 
@@ -96,7 +93,6 @@
         h2 { text-align: center; color: #0f172a; margin-bottom: 4px; font-size: 22px; font-weight: 700; }
         .subtitle { text-align: center; color: #64748b; font-size: 13px; margin-bottom: 20px; font-weight: 500; }
 
-        /* TAB NAVIGATION STYLING */
         .tab-navigation {
             display: flex;
             gap: 8px;
@@ -128,12 +124,12 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* Form Controls */
         .form-group { margin-bottom: 18px; position: relative; }
         .form-row { display: flex; gap: 12px; }
         .form-row .form-group { flex: 1; }
 
         label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #334155; }
+        .required-asterisk { color: #dc2626; margin-left: 2px; }
         
         input, textarea, select { 
             width: 100%; 
@@ -156,7 +152,27 @@
 
         input[readonly] { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; cursor: not-allowed; }
 
-        /* Buttons */
+        .upload-hint { font-size: 11px; color: #64748b; margin-top: -3px; margin-bottom: 6px; display: block; }
+        .image-preview-container {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .img-preview-card {
+            position: relative;
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #cbd5e1;
+        }
+        .img-preview-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         .btn { 
             width: 100%; 
             padding: 12px; 
@@ -175,7 +191,6 @@
         .btn:hover { background: #1d4ed8; transform: translateY(-1px); }
         .btn:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; transform: none; }
 
-        /* Autocomplete Suggestions */
         .suggestions-box { 
             position: absolute; 
             width: 100%; 
@@ -194,7 +209,6 @@
         .suggestion-name { font-weight: 600; font-size: 13px; color: #0f172a; }
         .suggestion-code { font-size: 11px; color: #64748b; margin-top: 2px; }
 
-        /* Loader Overlay */
         #pageLoader {
             position: fixed; 
             top: 0; left: 0; width: 100%; height: 100%; 
@@ -216,7 +230,6 @@
         .loader-text { margin-top: 16px; font-weight: 600; font-size: 15px; color: #ffffff; letter-spacing: 0.3px; }
         .loader-subtext { margin-top: 6px; font-size: 12px; color: #94a3b8; }
 
-        /* Table Design */
         .table-responsive { width: 100%; overflow-x: auto; margin-top: 6px; border-radius: 10px; border: 1px solid #e2e8f0; }
         table { width: 100%; border-collapse: collapse; font-size: 12px; background: #fff; }
         th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #f1f5f9; }
@@ -249,7 +262,6 @@
         .btn-edit { background: #f59e0b; }
         .btn-delete { background: #ef4444; }
 
-        /* Modal Overlay */
         .custom-modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -363,12 +375,12 @@
             <form id="prForm">
                 <!-- Data Identitas Pemohon -->
                 <div class="form-group">
-                    <label for="namaInput">Nama Karyawan</label>
+                    <label for="namaInput">Nama Karyawan<span class="required-asterisk">*</span></label>
                     <input type="text" id="namaInput" name="nama" placeholder="Masukkan nama Anda..." required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="grupSelect">Grup / Nonshift</label>
+                    <label for="grupSelect">Grup / Nonshift<span class="required-asterisk">*</span></label>
                     <select id="grupSelect" name="grup" required>
                         <option value="" disabled selected>-- Pilih Group Kerja --</option>
                         <option value="Group A">Group A</option> 
@@ -391,7 +403,7 @@
                     <strong style="font-size: 13px; display:block; margin-bottom: 12px; color: #0f172a;" id="inputAreaTitle">📍 Input Detail Barang:</strong>
                     
                     <div class="form-group">
-                        <label for="barangInput">Nama Barang / Sparepart</label>
+                        <label for="barangInput">Nama Barang / Sparepart<span class="required-asterisk">*</span></label>
                         <input type="text" id="barangInput" autocomplete="off" placeholder="Ketik atau tempel nama/kode barang...">
                         <div id="suggestions" class="suggestions-box"></div>
                     </div>
@@ -403,7 +415,7 @@
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="jumlahInput">Jumlah</label>
+                            <label for="jumlahInput">Jumlah<span class="required-asterisk">*</span></label>
                             <input type="number" id="jumlahInput" min="1" step="1" oninput="this.value = !!this.value && Math.abs(this.value) >= 1 ? Math.abs(this.value) : ''" placeholder="Contoh: 2">
                         </div>
                         <div class="form-group">
@@ -427,7 +439,7 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="mesinInput">Untuk Mesin</label>
+                            <label for="mesinInput">Untuk Mesin<span class="required-asterisk">*</span></label>
                             <input type="text" id="mesinInput" placeholder="Nama / Kode mesin...">
                         </div>
                         <div class="form-group">
@@ -440,8 +452,24 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="keteranganInput">Keterangan Kebutuhan</label>
+                        <label for="keteranganInput">Keterangan Kebutuhan<span class="required-asterisk">*</span></label>
                         <textarea id="keteranganInput" rows="2" placeholder="Detail spesifikasi / alasan permintaan..."></textarea>
+                    </div>
+
+                    <!-- FOTO BARANG (PAS 3 FOTO WAJIB) -->
+                    <div class="form-group">
+                        <label for="fotoBarangInput">📸 Foto Barang (Wajib 3 Foto)<span class="required-asterisk">*</span></label>
+                        <span class="upload-hint">Pilih persis 3 foto kondisi fisik/contoh barang.</span>
+                        <input type="file" id="fotoBarangInput" accept="image/*" multiple>
+                        <div id="previewFotoBarang" class="image-preview-container"></div>
+                    </div>
+
+                    <!-- FOTO AREA PEMASANGAN (1 - 5 FOTO) -->
+                    <div class="form-group">
+                        <label for="fotoAreaInput">📍 Foto Area Pemasangan (1 - 5 Foto)<span class="required-asterisk">*</span></label>
+                        <span class="upload-hint">Upload minimal 1 foto, maksimal 5 foto lokasi mesin/titik pasang.</span>
+                        <input type="file" id="fotoAreaInput" accept="image/*" multiple>
+                        <div id="previewFotoArea" class="image-preview-container"></div>
                     </div>
                     
                     <div style="display: flex; gap: 8px;">
@@ -460,12 +488,13 @@
                                     <th>Barang</th>
                                     <th>Kode</th>
                                     <th>Qty</th>
+                                    <th>Foto</th>
                                     <th>Status</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr id="emptyRow"><td colspan="5" style="text-align: center; padding: 18px; color: #94a3b8;">Belum ada barang di dalam daftar.</td></tr>
+                                <tr id="emptyRow"><td colspan="6" style="text-align: center; padding: 18px; color: #94a3b8;">Belum ada barang di dalam daftar.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -490,11 +519,12 @@
                             <th>Waktu & Pemohon</th>
                             <th>Barang / Mesin</th>
                             <th>Qty</th>
+                            <th>Foto Lampiran</th>
                             <th>Urgensi</th>
                         </tr>
                     </thead>
                     <tbody id="historyTableBody">
-                        <tr><td colspan="4" style="text-align: center; padding: 20px; color: #64748b;">Memuat data riwayat...</td></tr>
+                        <tr><td colspan="5" style="text-align: center; padding: 20px; color: #64748b;">Memuat data riwayat...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -508,7 +538,6 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-    // Manifest PWA
     const manifestData = {
         "name": "PR Engineering App",
         "short_name": "PR Eng",
@@ -524,7 +553,6 @@
     link.href = URL.createObjectURL(blob);
     document.head.appendChild(link);
 
-    // Registrasi Service Worker
     if ('serviceWorker' in navigator) {
         const swCode = `
             self.addEventListener('fetch', (e) => {
@@ -555,7 +583,6 @@
         });
     }
 
-    // Switch Tab Functionality
     window.switchTab = function(tabId) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -569,14 +596,12 @@
         }
     };
 
-    // Core Logic
     document.addEventListener('DOMContentLoaded', () => {
         const bgMusic = document.getElementById('bgMusic');
         const musicToggleBtn = document.getElementById('musicToggleBtn');
         const musicIcon = document.getElementById('musicIcon');
         const musicStatusText = document.getElementById('musicStatusText');
 
-        const mainContainer = document.getElementById('mainContainer');
         const loader = document.getElementById('pageLoader');
 
         const barangInput = document.getElementById('barangInput');
@@ -589,6 +614,11 @@
         const namaInput = document.getElementById('namaInput');
         const grupSelect = document.getElementById('grupSelect');
         const deptInput = document.getElementById('deptInput');
+
+        const fotoBarangInput = document.getElementById('fotoBarangInput');
+        const previewFotoBarang = document.getElementById('previewFotoBarang');
+        const fotoAreaInput = document.getElementById('fotoAreaInput');
+        const previewFotoArea = document.getElementById('previewFotoArea');
         
         const suggestionsBox = document.getElementById('suggestions');
         const form = document.getElementById('prForm');
@@ -611,7 +641,8 @@
         let databaseBarang = [];
         let historyDataList = [];
         let listBarangRequest = []; 
-        let selectedIndex = -1;
+        let currentFotoBarang = []; 
+        let currentFotoArea = [];   
         let editingIndex = -1;
         let searchTimer;
         let isMusicPlaying = false;
@@ -619,7 +650,6 @@
 
         if (bgMusic) bgMusic.volume = 0.3;
 
-        // Handler untuk tombol musik
         function toggleMusic() {
             if (!bgMusic) return;
             if (isMusicPlaying) {
@@ -633,7 +663,7 @@
                     if (musicStatusText) musicStatusText.textContent = 'Musik: On';
                     isMusicPlaying = true;
                 }).catch(err => {
-                    console.warn("Autoplay terhalang oleh browser:", err);
+                    console.warn("Autoplay terhalang browser:", err);
                 });
             }
         }
@@ -682,9 +712,99 @@
 
         modalCancelBtn.addEventListener('click', closeModal);
 
+        // Kompresi Gambar Mencegah App/Browser Crash Karena Memori Penuh
+        function compressAndConvertFile(file, maxWidth = 1024, quality = 0.7) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                const reader = new FileReader();
+
+                reader.onload = (e) => { img.src = e.target.result; };
+                reader.onerror = (err) => reject(err);
+
+                img.onload = () => {
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    resolve({
+                        name: file.name.replace(/\.[^/.]+$/, ".jpg"),
+                        mimeType: 'image/jpeg',
+                        data: dataUrl.split(',')[1]
+                    });
+                };
+                img.onerror = (err) => reject(err);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        fotoBarangInput.addEventListener('change', async (e) => {
+            const files = Array.from(e.target.files);
+            if (files.length !== 3) {
+                showAlert('warning', 'Jumlah Foto Salah', 'Foto Barang WAJIB tepat 3 foto!');
+                e.target.value = '';
+                currentFotoBarang = [];
+                previewFotoBarang.innerHTML = '';
+                return;
+            }
+            try {
+                currentFotoBarang = await Promise.all(files.map(f => compressAndConvertFile(f)));
+                renderPreviews(currentFotoBarang, previewFotoBarang);
+            } catch (err) {
+                showAlert('error', 'Gagal Memproses File', 'Terjadi kesalahan saat mempresisi/mengompres foto.');
+            }
+        });
+
+        fotoAreaInput.addEventListener('change', async (e) => {
+            const files = Array.from(e.target.files);
+            if (files.length < 1 || files.length > 5) {
+                showAlert('warning', 'Batas Foto Area', 'Foto Area Pemasangan WAJIB antara 1 sampai 5 foto.');
+                e.target.value = '';
+                currentFotoArea = [];
+                previewFotoArea.innerHTML = '';
+                return;
+            }
+            try {
+                currentFotoArea = await Promise.all(files.map(f => compressAndConvertFile(f)));
+                renderPreviews(currentFotoArea, previewFotoArea);
+            } catch (err) {
+                showAlert('error', 'Gagal Memproses File', 'Terjadi kesalahan saat mempresisi/mengompres foto.');
+            }
+        });
+
+        function renderPreviews(base64Arr, container) {
+            container.innerHTML = '';
+            base64Arr.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'img-preview-card';
+                card.innerHTML = `<img src="data:${item.mimeType};base64,${item.data}" alt="preview">`;
+                container.appendChild(card);
+            });
+        }
+
         function saveDraft() {
-            const draftData = { nama: namaInput.value, grup: grupSelect.value, items: listBarangRequest };
-            localStorage.setItem('pr_form_draft', JSON.stringify(draftData));
+            try {
+                // Jangan simpan Base64 foto ke LocalStorage untuk mencegah Kuota LocalStorage Penuh (Max 5MB)
+                const itemsLight = listBarangRequest.map(item => ({
+                    ...item,
+                    fotoBarang: [],
+                    fotoArea: []
+                }));
+                const draftData = { nama: namaInput.value, grup: grupSelect.value, items: itemsLight };
+                localStorage.setItem('pr_form_draft', JSON.stringify(draftData));
+            } catch (e) {
+                console.warn("Storage penuh, draft gagal disimpan:", e);
+            }
         }
 
         function loadDraft() {
@@ -698,7 +818,9 @@
                         listBarangRequest = draft.items;
                         renderTable();
                     }
-                } catch (e) {}
+                } catch (e) {
+                    localStorage.removeItem('pr_form_draft');
+                }
             }
         }
 
@@ -720,7 +842,7 @@
 
         window.loadHistoryData = function() {
             const historyBody = document.getElementById('historyTableBody');
-            historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #64748b;">🔄 Mengambil data dari server...</td></tr>';
+            historyBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #64748b;">🔄 Mengambil data dari server...</td></tr>';
 
             fetch(`${scriptURL}?action=getHistory`)
                 .then(res => res.json())
@@ -729,12 +851,12 @@
                         historyDataList = data;
                         renderHistoryTable(historyDataList);
                     } else {
-                        historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #94a3b8;">Belum ada riwayat permintaan.</td></tr>';
+                        historyBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #94a3b8;">Belum ada riwayat permintaan.</td></tr>';
                     }
                 })
                 .catch(err => {
                     console.error("Gagal load history:", err);
-                    historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #dc2626;">❌ Gagal memuat data riwayat. Periksa koneksi internet/Apps Script Anda.</td></tr>';
+                    historyBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #dc2626;">❌ Gagal memuat data riwayat. Periksa koneksi internet/Apps Script Anda.</td></tr>';
                 });
         };
 
@@ -743,13 +865,21 @@
             historyBody.innerHTML = '';
 
             if (data.length === 0) {
-                historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #94a3b8;">Tidak ada data ditemukan.</td></tr>';
+                historyBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #94a3b8;">Tidak ada data ditemukan.</td></tr>';
                 return;
             }
 
             data.forEach(item => {
                 const tr = document.createElement('tr');
                 const isUrgent = item.urgensi === 'Urgent';
+
+                let fotoBarangHtml = item.fotoBarang && item.fotoBarang.length > 0 
+                    ? item.fotoBarang.map((url, i) => `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#2563eb; text-decoration:underline; font-size:11px;">[Foto ${i+1}]</a>`).join(' ')
+                    : '<span style="color:#94a3b8; font-size:11px;">-</span>';
+
+                let fotoAreaHtml = item.fotoArea && item.fotoArea.length > 0 
+                    ? item.fotoArea.map((url, i) => `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#059669; text-decoration:underline; font-size:11px;">[Area ${i+1}]</a>`).join(' ')
+                    : '<span style="color:#94a3b8; font-size:11px;">-</span>';
 
                 tr.innerHTML = `
                     <td>
@@ -761,6 +891,10 @@
                         <span style="font-size:10px; color:#64748b;">Kode: ${escapeHtml(item.kode)} | Mesin: ${escapeHtml(item.mesin)}</span>
                     </td>
                     <td><strong>${escapeHtml(item.qty.toString())}</strong> <span style="font-size:10px; color:#64748b;">${escapeHtml(item.satuan)}</span></td>
+                    <td>
+                        <div style="margin-bottom:2px;">📸 Brg: ${fotoBarangHtml}</div>
+                        <div>📍 Area: ${fotoAreaHtml}</div>
+                    </td>
                     <td><span class="urgency-badge ${isUrgent ? 'urgency-urgent' : 'urgency-normal'}">${escapeHtml(item.urgensi)}</span></td>
                 `;
                 historyBody.appendChild(tr);
@@ -770,10 +904,10 @@
         document.getElementById('searchHistoryInput').addEventListener('input', function() {
             const query = this.value.toLowerCase().trim();
             const filtered = historyDataList.filter(item => {
-                return item.nama.toLowerCase().includes(query) ||
-                       item.barang.toLowerCase().includes(query) ||
-                       item.kode.toLowerCase().includes(query) ||
-                       item.mesin.toLowerCase().includes(query);
+                return (item.nama && item.nama.toLowerCase().includes(query)) ||
+                       (item.barang && item.barang.toLowerCase().includes(query)) ||
+                       (item.kode && item.kode.toLowerCase().includes(query)) ||
+                       (item.mesin && item.mesin.toLowerCase().includes(query));
             });
             renderHistoryTable(filtered);
         });
@@ -802,7 +936,6 @@
             clearTimeout(searchTimer);
             const keyword = this.value.trim();
             kodeInput.value = '';
-            selectedIndex = -1;
 
             if (!keyword) {
                 suggestionsBox.style.display = 'none';
@@ -817,7 +950,6 @@
 
         function renderSuggestions(results, keyword) {
             suggestionsBox.innerHTML = '';
-            selectedIndex = -1;
 
             if (results.length > 0) {
                 results.slice(0, 30).forEach((item) => {
@@ -868,9 +1000,15 @@
             urgensiSelect.value = 'Normal';
             keteranganInput.value = '';
             mesinInput.value = '';
+
+            fotoBarangInput.value = '';
+            fotoAreaInput.value = '';
+            previewFotoBarang.innerHTML = '';
+            previewFotoArea.innerHTML = '';
+            currentFotoBarang = [];
+            currentFotoArea = [];
             
             editingIndex = -1;
-            selectedIndex = -1;
             addBarangBtn.textContent = '➕ Tambah ke Daftar';
             addBarangBtn.style.background = '#059669';
             cancelEditBtn.style.display = 'none';
@@ -891,13 +1029,33 @@
                 return;
             }
 
+            if (currentFotoBarang.length !== 3) {
+                showAlert('warning', 'Foto Barang Kurang', 'Wajib melampirkan EXACT 3 FOTO untuk barang yang diminta!');
+                return;
+            }
+
+            if (currentFotoArea.length < 1 || currentFotoArea.length > 5) {
+                showAlert('warning', 'Foto Area Kurang', 'Wajib melampirkan antara 1 sampai 5 FOTO area/titik pemasangan!');
+                return;
+            }
+
             if (editingIndex === -1 && listBarangRequest.length >= MAX_ITEMS) {
                 showAlert('warning', 'Batas Maksimal', `Maksimal permintaan per PR adalah ${MAX_ITEMS} barang.`);
                 return;
             }
 
             if (!kodeBarang) kodeBarang = "BARANG BARU";
-            const itemData = { namaBarang, kodeBarang, jumlah, satuan, urgensi, keterangan, mesin };
+            const itemData = { 
+                namaBarang, 
+                kodeBarang, 
+                jumlah, 
+                satuan, 
+                urgensi, 
+                keterangan, 
+                mesin,
+                fotoBarang: [...currentFotoBarang],
+                fotoArea: [...currentFotoArea]
+            };
 
             if (editingIndex >= 0) {
                 listBarangRequest[editingIndex] = itemData;
@@ -918,7 +1076,7 @@
             itemCount.textContent = `(${listBarangRequest.length}/${MAX_ITEMS})`;
             
             if (listBarangRequest.length === 0) {
-                barangTableBody.innerHTML = '<tr id="emptyRow"><td colspan="5" style="text-align: center; padding: 18px; color: #94a3b8;">Belum ada barang di dalam daftar.</td></tr>';
+                barangTableBody.innerHTML = '<tr id="emptyRow"><td colspan="6" style="text-align: center; padding: 18px; color: #94a3b8;">Belum ada barang di dalam daftar.</td></tr>';
                 submitBtn.disabled = true;
                 return;
             }
@@ -936,6 +1094,7 @@
                     </td>
                     <td><span class="code-badge">${escapeHtml(item.kodeBarang)}</span></td>
                     <td><strong style="color:#2563eb;">${item.jumlah}</strong> <span style="font-size:11px; color:#64748b;">${escapeHtml(item.satuan)}</span></td>
+                    <td><span style="font-size:11px; font-weight:bold; color:#059669;">📸 ${item.fotoBarang.length} Brg | 📍 ${item.fotoArea.length} Area</span></td>
                     <td><span class="urgency-badge ${isUrgent ? 'urgency-urgent' : 'urgency-normal'}">${escapeHtml(item.urgensi)}</span></td>
                     <td>
                         <div class="action-btns">
@@ -958,6 +1117,11 @@
             keteranganInput.value = item.keterangan;
             mesinInput.value = item.mesin;
 
+            currentFotoBarang = [...item.fotoBarang];
+            currentFotoArea = [...item.fotoArea];
+            renderPreviews(currentFotoBarang, previewFotoBarang);
+            renderPreviews(currentFotoArea, previewFotoArea);
+
             editingIndex = index;
             addBarangBtn.textContent = '💾 Simpan Perubahan';
             addBarangBtn.style.background = '#f59e0b';
@@ -971,9 +1135,9 @@
 
             showAlert(
                 'warning',
-                'Lepas Barang Ini?',
-                `Hapus <strong>"${escapeHtml(item.namaBarang)}"</strong> dari list PR kamu?`,
-                'Hapus Aja ❌',
+                'Hapus Barang Ini?',
+                `Hapus <strong>"${escapeHtml(item.namaBarang)}"</strong> dari daftar PR?`,
+                'Hapus ❌',
                 true,
                 'Batal',
                 () => {
@@ -985,7 +1149,6 @@
             );
         };
 
-        // Form Submission
         form.addEventListener('submit', async function (e) {
             e.preventDefault();
 
@@ -995,7 +1158,7 @@
             }
 
             submitBtn.disabled = true;
-            submitBtn.textContent = "Mengirim...";
+            submitBtn.textContent = "Mengirim & Mengupload Foto...";
 
             const payload = {
                 nama: namaInput.value.trim(),
@@ -1016,7 +1179,7 @@
 
                 if (result.result !== "success") throw new Error(result.message || "Gagal menyimpan data.");
 
-                showAlert('success', 'Berhasil Dikirim', 'Semua data Request PR Anda telah sukses tersimpan!');
+                showAlert('success', 'Berhasil Dikirim', 'Semua data dan foto Request PR Anda telah sukses tersimpan di Google Drive & Sheet!');
                 
                 listBarangRequest = [];
                 localStorage.removeItem('pr_form_draft');
@@ -1040,5 +1203,6 @@
             }
         });
     });
-
+    </script>
+</body>
 </html>
