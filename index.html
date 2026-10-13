@@ -28,14 +28,14 @@
             min-height: 100vh; 
             padding: 32px 16px; 
             color: #0f172a;
-            /* Background Utama Dipertahankan */
+            /* Background Utama */
             background: linear-gradient(135deg, rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.82)), url('Background-Desktop.jpg') no-repeat center center fixed;
             background-size: cover;
             position: relative;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Floating Controls UI Upgrade */
+        /* Floating Controls UI */
         .top-controls {
             position: fixed;
             bottom: 24px;
@@ -63,17 +63,14 @@
             transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .control-btn:active {
-            transform: scale(0.92);
-        }
-
+        .control-btn:active { transform: scale(0.92); }
         .control-btn:hover {
             transform: translateY(-2px) scale(1.03);
             background: #ffffff;
             box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
         }
 
-        /* Container Card Glassmorphism Upgrade */
+        /* Container Card Glassmorphism */
         .container { 
             width: 100%; 
             max-width: 720px; 
@@ -140,17 +137,13 @@
             gap: 8px;
         }
 
-        .tab-btn:active {
-            transform: scale(0.96);
-        }
-
+        .tab-btn:active { transform: scale(0.96); }
         .tab-btn.active {
             background: #ffffff;
             color: #2563eb;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
         }
 
-        /* Tab Content Transition */
         .tab-content { 
             display: none; 
             opacity: 0;
@@ -194,40 +187,47 @@
 
         input[readonly] { background: #f8fafc; color: #64748b; border-color: #e2e8f0; cursor: not-allowed; transform: none !important; }
 
-        /* Custom File Upload Box */
-        .file-upload-zone {
-            border: 2px dashed #cbd5e1;
-            border-radius: 14px;
-            padding: 16px;
-            text-align: center;
+        /* Custom File Upload Box + Tombol Pilihan Kamera/Galeri */
+        .upload-options-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .btn-upload-option {
+            flex: 1;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1.5px dashed #cbd5e1;
             background: #ffffff;
             cursor: pointer;
-            transition: all 0.25s ease;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: #334155;
+            transition: all 0.2s ease;
             position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .file-upload-zone:hover {
+        .btn-upload-option:hover {
             border-color: #2563eb;
             background: #f0f6ff;
-            transform: translateY(-2px);
+            color: #2563eb;
         }
 
-        .file-upload-zone:active {
-            transform: scale(0.98);
-        }
+        .btn-upload-option:active { transform: scale(0.97); }
 
-        .file-upload-zone input[type="file"] {
+        .btn-upload-option input[type="file"] {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             opacity: 0;
             cursor: pointer;
         }
-
-        .upload-icon { font-size: 24px; margin-bottom: 4px; display: block; transition: transform 0.2s ease; }
-        .file-upload-zone:hover .upload-icon { transform: scale(1.15) rotate(-5deg); }
-
-        .upload-hint { font-size: 12px; color: #64748b; font-weight: 500; }
-        .upload-hint strong { color: #2563eb; }
 
         .image-preview-container {
             display: flex;
@@ -236,7 +236,7 @@
             margin-top: 12px;
         }
 
-        /* PREVIEW CARD DENGAN TOMBOL HAPUS INDIVIDUAL */
+        /* PREVIEW CARD DENGAN TOMBOL HAPUS */
         .img-preview-card {
             position: relative;
             width: 76px;
@@ -287,9 +287,7 @@
             background: #dc2626;
         }
 
-        .btn-delete-img:active {
-            transform: scale(0.9);
-        }
+        .btn-delete-img:active { transform: scale(0.9); }
 
         /* Buttons Upgrade */
         .btn { 
@@ -421,9 +419,7 @@
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .custom-modal-overlay.show .custom-modal {
-            transform: scale(1);
-        }
+        .custom-modal-overlay.show .custom-modal { transform: scale(1); }
 
         .modal-icon {
             width: 56px; height: 56px;
@@ -452,12 +448,6 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 
-        @media (max-width: 480px) {
-            .container { padding: 24px 18px; border-radius: 20px; }
-            h2 { font-size: 20px; }
-            .form-row { flex-direction: column; gap: 0; }
-        }
-
         .draft-status {
             position: fixed; top: 14px; right: 14px; z-index: 10000;
             padding: 9px 13px; border-radius: 12px; background: #fff;
@@ -469,14 +459,16 @@
         .draft-status.saved .dot { background: #10b981; }
         .draft-status.saving .dot { background: #f59e0b; }
         .draft-status.error .dot { background: #ef4444; }
-        
-        button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-            outline: 3px solid #60a5fa; outline-offset: 2px;
-        }
-        @media(max-width:600px) {
-            body { padding: 18px 10px 90px; }
+
+        @media (max-width: 520px) {
+            body { padding: 14px 10px 86px; }
+            .container { padding: 22px 14px; border-radius: 18px; }
             .top-controls { right: 12px; bottom: 12px; gap: 8px; }
-            .control-btn { padding: 10px 13px; font-size: 12px; }
+            .control-btn { padding: 10px 12px; font-size: 12px; }
+            .draft-status { max-width: calc(100vw - 24px); font-size: 11px; }
+            #barangTable { min-width: 590px; }
+            #historyTable { min-width: 680px; }
+            .upload-options-group { flex-direction: column; }
         }
     </style>
 </head>
@@ -620,24 +612,38 @@
                         <textarea id="keteranganInput" rows="2" placeholder="Detail spesifikasi / alasan permintaan..."></textarea>
                     </div>
 
-                    <!-- FOTO BARANG (EXACT 3 FOTO WAJIB) -->
+                    <!-- FOTO BARANG (EXACT 3 FOTO WAJIB) - KAMERA & GALERI -->
                     <div class="form-group">
-                        <label>📸 Foto Barang (Wajib 3 Foto)<span class="required-asterisk">*</span></label>
-                        <div class="file-upload-zone">
-                            <input type="file" id="fotoBarangInput" accept="image/*" multiple>
-                            <span class="upload-icon">📷</span>
-                            <span class="upload-hint">Klik/drag untuk upload foto barang (Bisa satu2, total <strong>3 foto</strong>)</span>
+                        <label>📸 Foto Barang (Wajib EXACT 3 Foto)<span class="required-asterisk">*</span></label>
+                        <div class="upload-options-group">
+                            <!-- Tombol Langsung Buka Kamera -->
+                            <div class="btn-upload-option" style="border-color: #2563eb; color: #2563eb; background: #eff6ff;">
+                                📷 Ambil Foto Kamera
+                                <input type="file" id="fotoBarangCam" accept="image/*" capture="environment">
+                            </div>
+                            <!-- Tombol Pilih dari Galeri/File -->
+                            <div class="btn-upload-option">
+                                🖼️ Pilih dari Galeri
+                                <input type="file" id="fotoBarangGal" accept="image/*" multiple>
+                            </div>
                         </div>
                         <div id="previewFotoBarang" class="image-preview-container"></div>
                     </div>
 
-                    <!-- FOTO AREA PEMASANGAN (1 - 5 FOTO) -->
+                    <!-- FOTO AREA PEMASANGAN (1 - 5 FOTO) - KAMERA & GALERI -->
                     <div class="form-group">
                         <label>📍 Foto Area Pemasangan (1 - 5 Foto)<span class="required-asterisk">*</span></label>
-                        <div class="file-upload-zone">
-                            <input type="file" id="fotoAreaInput" accept="image/*" multiple>
-                            <span class="upload-icon">🖼️</span>
-                            <span class="upload-hint">Klik/drag untuk upload foto area (Bisa satu2, total <strong>1-5 foto</strong>)</span>
+                        <div class="upload-options-group">
+                            <!-- Tombol Langsung Buka Kamera -->
+                            <div class="btn-upload-option" style="border-color: #059669; color: #059669; background: #ecfdf5;">
+                                📷 Ambil Foto Kamera
+                                <input type="file" id="fotoAreaCam" accept="image/*" capture="environment">
+                            </div>
+                            <!-- Tombol Pilih dari Galeri/File -->
+                            <div class="btn-upload-option">
+                                🖼️ Pilih dari Galeri
+                                <input type="file" id="fotoAreaGal" accept="image/*" multiple>
+                            </div>
                         </div>
                         <div id="previewFotoArea" class="image-preview-container"></div>
                     </div>
@@ -708,14 +714,9 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-    // Fungsi Getar Haptic Universal
     function triggerVibration(duration = 20) {
         if ('vibrate' in navigator) {
-            try {
-                navigator.vibrate(duration);
-            } catch (e) {
-                // Abaikan jika ditolak browser
-            }
+            try { navigator.vibrate(duration); } catch (e) {}
         }
     }
 
@@ -789,9 +790,12 @@
         const grupSelect = document.getElementById('grupSelect');
         const deptInput = document.getElementById('deptInput');
 
-        const fotoBarangInput = document.getElementById('fotoBarangInput');
+        const fotoBarangCam = document.getElementById('fotoBarangCam');
+        const fotoBarangGal = document.getElementById('fotoBarangGal');
         const previewFotoBarang = document.getElementById('previewFotoBarang');
-        const fotoAreaInput = document.getElementById('fotoAreaInput');
+
+        const fotoAreaCam = document.getElementById('fotoAreaCam');
+        const fotoAreaGal = document.getElementById('fotoAreaGal');
         const previewFotoArea = document.getElementById('previewFotoArea');
         
         const suggestionsBox = document.getElementById('suggestions');
@@ -813,9 +817,8 @@
         // URL Google Apps Script
         const scriptURL = "https://script.google.com/macros/s/AKfycbwCmHgPxWEUP8iPvT3x5gEql8NUz16WkmxpdhNLWT7GcdSCMOvL2OOe0_G7YIoTFUDPTw/exec";
 
-        // Indikator status draft
         const draftStatus = document.createElement('div');
-        draftStatus.className = 'draft-status';
+        draftStatus.className = 'draft-status ready';
         draftStatus.innerHTML = '<span class="dot"></span><span class="label">Draft siap</span>';
         draftStatus.setAttribute('role', 'status');
         draftStatus.setAttribute('aria-live', 'polite');
@@ -835,7 +838,10 @@
             return new Promise((resolve, reject) => {
                 if (!('indexedDB' in window)) return reject(new Error('IndexedDB tidak tersedia'));
                 const req = indexedDB.open(DRAFT_DB, 1);
-                req.onupgradeneeded = () => req.result.createObjectStore('drafts');
+                req.onupgradeneeded = () => {
+                    const db = req.result;
+                    if (!db.objectStoreNames.contains('drafts')) db.createObjectStore('drafts');
+                };
                 req.onsuccess = () => resolve(req.result);
                 req.onerror = () => reject(req.error || new Error('Gagal membuka penyimpanan draft'));
             });
@@ -995,53 +1001,55 @@
             });
         }
 
-        // AKUMULASI UPLOAD FOTO BARANG (EXACT 3 FOTO)
-        fotoBarangInput.addEventListener('change', async (e) => {
-            triggerVibration(20);
-            const files = Array.from(e.target.files);
+        // FUNGSI UMUM PROSES FILE GAMBAR (DARI KAMERA ATAU GALERI)
+        async function handleImageFiles(files, targetArray, maxLimit, previewContainer, typeName) {
             if (files.length === 0) return;
 
-            if (currentFotoBarang.length + files.length > 3) {
-                showAlert('warning', 'Batas Foto Barang', `Maksimal foto barang adalah 3 foto. Saat ini sudah ada ${currentFotoBarang.length} foto.`);
-                e.target.value = '';
+            if (targetArray.length + files.length > maxLimit) {
+                showAlert('warning', `Batas Foto ${typeName}`, `Maksimal foto ${typeName.toLowerCase()} adalah ${maxLimit} foto. Saat ini sudah ada ${targetArray.length} foto.`);
                 return;
             }
 
             try {
                 const newConverted = await Promise.all(files.map(f => compressAndConvertFile(f)));
-                currentFotoBarang = [...currentFotoBarang, ...newConverted];
-                renderPreviews(currentFotoBarang, previewFotoBarang, 'barang');
+                if (typeName === 'Barang') {
+                    currentFotoBarang = [...currentFotoBarang, ...newConverted];
+                    renderPreviews(currentFotoBarang, previewFotoBarang, 'barang');
+                } else {
+                    currentFotoArea = [...currentFotoArea, ...newConverted];
+                    renderPreviews(currentFotoArea, previewFotoArea, 'area');
+                }
                 saveDraft();
-                e.target.value = '';
             } catch (err) {
-                showAlert('error', 'Gagal Memproses File', 'Terjadi kesalahan saat memproses foto.');
+                showAlert('error', 'Gagal Memproses Foto', 'Terjadi kesalahan saat memproses gambar.');
             }
-        });
+        }
 
-        // AKUMULASI UPLOAD FOTO AREA (1 - 5 FOTO)
-        fotoAreaInput.addEventListener('change', async (e) => {
+        // Event Listener Foto Barang (Kamera & Galeri)
+        fotoBarangCam.addEventListener('change', (e) => {
             triggerVibration(20);
-            const files = Array.from(e.target.files);
-            if (files.length === 0) return;
-
-            if (currentFotoArea.length + files.length > 5) {
-                showAlert('warning', 'Batas Foto Area', `Maksimal foto area adalah 5 foto. Saat ini sudah ada ${currentFotoArea.length} foto.`);
-                e.target.value = '';
-                return;
-            }
-
-            try {
-                const newConverted = await Promise.all(files.map(f => compressAndConvertFile(f)));
-                currentFotoArea = [...currentFotoArea, ...newConverted];
-                renderPreviews(currentFotoArea, previewFotoArea, 'area');
-                saveDraft();
-                e.target.value = '';
-            } catch (err) {
-                showAlert('error', 'Gagal Memproses File', 'Terjadi kesalahan saat memproses foto.');
-            }
+            handleImageFiles(Array.from(e.target.files), currentFotoBarang, 3, previewFotoBarang, 'Barang');
+            e.target.value = '';
+        });
+        fotoBarangGal.addEventListener('change', (e) => {
+            triggerVibration(20);
+            handleImageFiles(Array.from(e.target.files), currentFotoBarang, 3, previewFotoBarang, 'Barang');
+            e.target.value = '';
         });
 
-        // RENDER PREVIEW FOTO DENGAN TOMBOL HAPUS (✕) INDIVIDUAL
+        // Event Listener Foto Area (Kamera & Galeri)
+        fotoAreaCam.addEventListener('change', (e) => {
+            triggerVibration(20);
+            handleImageFiles(Array.from(e.target.files), currentFotoArea, 5, previewFotoArea, 'Area');
+            e.target.value = '';
+        });
+        fotoAreaGal.addEventListener('change', (e) => {
+            triggerVibration(20);
+            handleImageFiles(Array.from(e.target.files), currentFotoArea, 5, previewFotoArea, 'Area');
+            e.target.value = '';
+        });
+
+        // RENDER PREVIEW FOTO DENGAN TOMBOL HAPUS (✕)
         function renderPreviews(base64Arr, container, type) {
             container.innerHTML = '';
             base64Arr.forEach((item, index) => {
@@ -1049,7 +1057,7 @@
                 card.className = 'img-preview-card';
                 card.innerHTML = `
                     <img src="data:${item.mimeType};base64,${item.data}" alt="preview">
-                    <button type="button" class="btn-delete-img" onclick="removePhoto('${type}', ${index})" title="Hapus foto ini">✕</button>
+                    <button type="button" class="btn-delete-img" onclick="removePhoto('${type}', ${index})" title="Hapus foto ini" aria-label="Hapus foto ${index + 1}">✕</button>
                 `;
                 container.appendChild(card);
             });
@@ -1100,7 +1108,6 @@
                         setDraftStatus('saved', 'Draft tersimpan (tanpa foto)');
                     } catch (fallbackError) {
                         setDraftStatus('error', 'Draft gagal disimpan');
-                        console.warn('Draft gagal disimpan:', e, fallbackError);
                     }
                 }
             }, 350);
@@ -1118,7 +1125,17 @@
                 if (draft.nama) namaInput.value = draft.nama;
                 if (draft.grup) grupSelect.value = draft.grup;
                 if (draft.dept) deptInput.value = draft.dept;
-                if (Array.isArray(draft.items)) listBarangRequest = draft.items;
+                if (Array.isArray(draft.items)) {
+                    listBarangRequest = draft.items
+                        .filter(item => item && typeof item === 'object' && item.namaBarang)
+                        .slice(0, MAX_ITEMS)
+                        .map(item => ({
+                            ...item,
+                            jumlah: Number(item.jumlah) || 1,
+                            fotoBarang: Array.isArray(item.fotoBarang) ? item.fotoBarang : [],
+                            fotoArea: Array.isArray(item.fotoArea) ? item.fotoArea : []
+                        }));
+                }
                 if (draft.current) {
                     const c = draft.current;
                     barangInput.value = c.namaBarang || '';
@@ -1146,7 +1163,10 @@
 
         function loadBarang() {
             fetch(`${scriptURL}?action=getBarang`)
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
                 .then(data => {
                     if (Array.isArray(data)) databaseBarang = data;
                     showFormView();
@@ -1163,17 +1183,22 @@
             historyBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: #64748b;">🔄 Mengambil data dari server...</td></tr>';
 
             fetch(`${scriptURL}?action=getHistory`)
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
                 .then(data => {
                     if (Array.isArray(data) && data.length > 0) {
                         historyDataList = data;
                         renderHistoryTable(historyDataList);
                     } else {
+                        historyDataList = [];
                         historyBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: #94a3b8;">Belum ada riwayat permintaan.</td></tr>';
                     }
                 })
                 .catch(err => {
                     console.error("Gagal load history:", err);
+                    historyDataList = [];
                     historyBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: #dc2626;">❌ Gagal memuat data riwayat. Periksa koneksi internet/Apps Script Anda.</td></tr>';
                 });
         };
@@ -1284,7 +1309,6 @@
                         kodeInput.readOnly = true;
                         suggestionsBox.style.display = 'none';
                         jumlahInput.focus();
-                        saveDraft();
                     });
                     suggestionsBox.appendChild(div);
                 });
@@ -1305,7 +1329,6 @@
                 kodeInput.readOnly = false;
                 kodeInput.focus();
                 suggestionsBox.style.display = 'none';
-                saveDraft();
             });
 
             suggestionsBox.appendChild(newBarangDiv);
@@ -1323,8 +1346,11 @@
             keteranganInput.value = '';
             mesinInput.value = '';
 
-            fotoBarangInput.value = '';
-            fotoAreaInput.value = '';
+            fotoBarangCam.value = '';
+            fotoBarangGal.value = '';
+            fotoAreaCam.value = '';
+            fotoAreaGal.value = '';
+
             previewFotoBarang.innerHTML = '';
             previewFotoArea.innerHTML = '';
             currentFotoBarang = [];
@@ -1395,7 +1421,6 @@
         cancelEditBtn.addEventListener('click', () => {
             triggerVibration(15);
             resetItemForm();
-            saveDraft();
         });
 
         function renderTable() {
@@ -1425,8 +1450,8 @@
                     <td><span class="urgency-badge ${isUrgent ? 'urgency-urgent' : 'urgency-normal'}">${escapeHtml(item.urgensi)}</span></td>
                     <td style="text-align: center;">
                         <div class="action-btns">
-                            <button type="button" class="btn-action btn-edit" onclick="editBarang(${index})">✏️</button>
-                            <button type="button" class="btn-action btn-delete" onclick="hapusBarang(${index})">❌</button>
+                            <button type="button" class="btn-action btn-edit" onclick="editBarang(${index})" aria-label="Edit ${escapeHtml(item.namaBarang)}" title="Edit barang">✏️</button>
+                            <button type="button" class="btn-action btn-delete" onclick="hapusBarang(${index})" aria-label="Hapus ${escapeHtml(item.namaBarang)}" title="Hapus barang">❌</button>
                         </div>
                     </td>
                 `;
@@ -1456,7 +1481,6 @@
             cancelEditBtn.style.display = 'block';
             inputAreaTitle.textContent = `✏️ Edit Barang #${index + 1}:`;
             barangInput.focus();
-            saveDraft();
         };
 
         window.hapusBarang = function(index) {
@@ -1533,7 +1557,11 @@
                 isSubmitting = false;
                 submitBtn.disabled = listBarangRequest.length === 0;
                 submitBtn.textContent = "Kirim Request PR";
-                if (listBarangRequest.length > 0) setDraftStatus('saved', 'Draft aman di perangkat ini');
+                if (listBarangRequest.length > 0) {
+                    setDraftStatus('saved', 'Draft aman di perangkat ini');
+                } else if (!isSubmitting) {
+                    setDraftStatus('ready', 'Siap membuat request baru');
+                }
             }
         });
 
