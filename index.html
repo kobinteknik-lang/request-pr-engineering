@@ -22,7 +22,7 @@
 
         body { 
             display: flex; 
-            flex-direction: column;
+            flex-direction: column; 
             justify-content: center; 
             align-items: center; 
             min-height: 100vh; 
@@ -294,8 +294,8 @@
             border: none; 
             border-radius: 12px; 
             font-weight: 700; 
-            font-size: 14px;
-            cursor: pointer;
+            font-size: 14px; 
+            cursor: pointer; 
             transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); 
             box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
             display: inline-flex;
@@ -882,7 +882,7 @@
                 .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
-        /* 🔧 PERBAIKAN MODAL NOTIFIKASI (Anti-Freeze & Clean Listener) */
+        /* 🔧 MODAL NOTIFIKASI ANTI-FREEZE */
         let modalHideTimer = null;
         let activeConfirmCallback = null;
 
@@ -944,45 +944,61 @@
                 alertModal.style.opacity = '1';
             });
         }
-/* 🔧 GENERATE SIDIK JARI UNIK FOTO (SHA-256 HASH) */
-        async function generatePhotoHash(base64Data) {
+
+        /* 🔧 GENERATE SIDIK JARI UNIK FOTO (SHA-256 DARI BUFFER / STRING) */
+        async function generateBufferHash(arrayBuffer) {
             try {
                 if (window.crypto && window.crypto.subtle) {
-                    const encoder = new TextEncoder();
-                    const data = encoder.encode(base64Data);
-                    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                    const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
                     const hashArray = Array.from(new Uint8Array(hashBuffer));
                     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
                 }
             } catch (e) {
                 console.warn('Fallback hash digunakan:', e);
             }
-            // Fallback jika dibuka lewat HTTP non-HTTPS
-            return `${base64Data.length}_${base64Data.slice(0, 64)}_${base64Data.slice(-64)}`;
+            const bytes = new Uint8Array(arrayBuffer);
+            const head = Array.from(bytes.slice(0, 64)).join(',');
+            const tail = Array.from(bytes.slice(-64)).join(',');
+            return `${bytes.length}_${head}_${tail}`;
+        }
+
+        async function generateStringHash(str) {
+            const encoder = new TextEncoder();
+            return generateBufferHash(encoder.encode(str).buffer);
         }
 
         /* 🔧 CEK APAKAH IDENTITAS FOTO SUDAH PERNAH DIPAKAI */
-        function isDuplicatePhoto(newHash) {
+        function isDuplicatePhoto(rawHash, compressedHash) {
+            const checkMatch = (item) => {
+                if (!item) return false;
+                if (rawHash && item.rawHash && item.rawHash === rawHash) return true;
+                if (compressedHash && item.hash && item.hash === compressedHash) return true;
+                return false;
+            };
+
             // 1. Cek di Foto Barang yang sedang aktif
-            if (currentFotoBarang.some(item => item.hash === newHash || item.data === newHash)) return true;
+            if (currentFotoBarang.some(checkMatch)) return true;
 
             // 2. Cek di Foto Area yang sedang aktif
-            if (currentFotoArea.some(item => item.hash === newHash || item.data === newHash)) return true;
+            if (currentFotoArea.some(checkMatch)) return true;
 
             // 3. Cek di seluruh barang yang sudah masuk tabel daftar PR (kecuali item yang sedang di-edit)
             for (let i = 0; i < listBarangRequest.length; i++) {
                 if (i === editingIndex) continue;
                 const reqItem = listBarangRequest[i];
                 const allExisting = [...(reqItem.fotoBarang || []), ...(reqItem.fotoArea || [])];
-                if (allExisting.some(foto => foto.hash === newHash)) {
+                if (allExisting.some(checkMatch)) {
                     return true;
                 }
             }
             return false;
         }
 
-        /* 🔧 OPTIMASI KOMPRESI GAMBAR + SERTAKAN HASH IDENTITAS */
-        function compressAndConvertFile(file, maxWidth = 720, quality = 0.5) {
+        /* 🔧 OPTIMASI KOMPRESI GAMBAR + SERTAKAN DUAL HASH IDENTITAS */
+        async function compressAndConvertFile(file, maxWidth = 720, quality = 0.5) {
+            const rawBuffer = await file.arrayBuffer();
+            const rawHash = await generateBufferHash(rawBuffer);
+
             return new Promise((resolve, reject) => {
                 const objectUrl = URL.createObjectURL(file);
                 const img = new Image();
@@ -1005,7 +1021,7 @@
 
                         const dataUrl = canvas.toDataURL('image/jpeg', quality);
                         const base64Clean = dataUrl.split(',')[1];
-                        const photoHash = await generatePhotoHash(base64Clean);
+                        const compressedHash = await generateStringHash(base64Clean);
 
                         URL.revokeObjectURL(objectUrl);
                         canvas.width = 0;
@@ -1015,7 +1031,8 @@
                             name: file.name.replace(/\.[^/.]+$/, ".jpg"),
                             mimeType: 'image/jpeg',
                             data: base64Clean,
-                            hash: photoHash
+                            rawHash: rawHash,
+                            hash: compressedHash
                         });
                     } catch (err) {
                         URL.revokeObjectURL(objectUrl);
@@ -1046,11 +1063,12 @@
                 for (const f of files) {
                     const compressed = await compressAndConvertFile(f);
                     
-                    // Cek duplikat dengan foto yang sudah ada maupun foto lain dalam batch pilihan galeri yang sama
-                    const isDupInBatch = newConverted.some(item => item.hash === compressed.hash);
-                    if (isDuplicatePhoto(compressed.hash) || isDupInBatch) {
+                    const isDupInBatch = newConverted.some(
+                        item => item.rawHash === compressed.rawHash || item.hash === compressed.hash
+                    );
+                    if (isDuplicatePhoto(compressed.rawHash, compressed.hash) || isDupInBatch) {
                         duplicateCount++;
-                        continue; // Lewati foto yang sama
+                        continue;
                     }
 
                     newConverted.push(compressed);
@@ -1079,6 +1097,29 @@
                 showAlert('error', 'Gagal Memproses Foto', 'Ukuran foto terlalu besar atau format tidak didukung.');
             }
         }
+
+        /* 🔧 EVENT LISTENER INPUT KAMERA & GALERI (YANG SEBELUMNYA TERHAPUS) */
+        fotoBarangCam.addEventListener('change', (e) => {
+            triggerVibration(20);
+            handleImageFiles(Array.from(e.target.files), currentFotoBarang, 3, previewFotoBarang, 'Barang');
+            e.target.value = '';
+        });
+        fotoBarangGal.addEventListener('change', (e) => {
+            triggerVibration(20);
+            handleImageFiles(Array.from(e.target.files), currentFotoBarang, 3, previewFotoBarang, 'Barang');
+            e.target.value = '';
+        });
+
+        fotoAreaCam.addEventListener('change', (e) => {
+            triggerVibration(20);
+            handleImageFiles(Array.from(e.target.files), currentFotoArea, 5, previewFotoArea, 'Area');
+            e.target.value = '';
+        });
+        fotoAreaGal.addEventListener('change', (e) => {
+            triggerVibration(20);
+            handleImageFiles(Array.from(e.target.files), currentFotoArea, 5, previewFotoArea, 'Area');
+            e.target.value = '';
+        });
 
         function renderPreviews(base64Arr, container, type) {
             container.innerHTML = '';
@@ -1121,7 +1162,7 @@
             };
         }
 
-        /* 🔧 PERBAIKAN AUTOSAVE (Locking agar tidak tumpang tindih saat simpan ke IndexedDB) */
+        /* 🔧 AUTOSAVE DENGAN LOCKING */
         async function executeDraftWrite() {
             if (isSubmitting) return;
             if (isSavingDraft) {
@@ -1554,7 +1595,7 @@
             }
         });
 
-        /* 🔧 PERBAIKAN PROSES SUBMIT (Timeout 90 detik, batalkan timer draft, & safe JSON parse) */
+        /* 🔧 SUBMIT REQUEST PR */
         submitBtn.addEventListener('click', async function () {
             if (!form.reportValidity()) return;
             if (isSubmitting) return;
@@ -1569,7 +1610,7 @@
                 return;
             }
 
-            clearTimeout(draftSaveTimer); // Hentikan autosave agar tidak bentrok dengan submit
+            clearTimeout(draftSaveTimer);
             triggerVibration(30);
             isSubmitting = true;
             
@@ -1577,15 +1618,22 @@
             submitBtn.innerHTML = '<div class="spinner" style="width: 18px; height: 18px; border-width: 2.5px; border-top-color: #ffffff; display: inline-block;"></div> Mengirim Data...';
             setDraftStatus('saving', 'Mengirim request ke server…');
 
+            // Bersihkan properti hash lokal sebelum dikirim ke Apps Script agar payload tetap ramping
+            const cleanItems = listBarangRequest.map(({ fotoBarang, fotoArea, ...rest }) => ({
+                ...rest,
+                fotoBarang: fotoBarang.map(({ name, mimeType, data }) => ({ name, mimeType, data })),
+                fotoArea: fotoArea.map(({ name, mimeType, data }) => ({ name, mimeType, data }))
+            }));
+
             const payload = {
                 nama: namaInput.value.trim(),
                 grup: grupSelect.value,
                 departemen: deptInput.value,
-                items: listBarangRequest
+                items: cleanItems
             };
 
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 90000); // Timeout 90 detik untuk upload banyak foto
+            const timeoutId = setTimeout(() => controller.abort(), 90000);
 
             try {
                 const response = await fetch(scriptURL, {
