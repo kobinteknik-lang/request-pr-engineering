@@ -579,7 +579,7 @@
 
                     <!-- FOTO BARANG -->
                     <div class="form-group">
-                        <label>📸 Foto Barang (Wajib EXACT 3 Foto)<span class="required-asterisk">*</span></label>
+                        <label>📸 Foto Barang (Wajib EXACT 3 Foto Berbeda)<span class="required-asterisk">*</span></label>
                         <div class="upload-options-group">
                             <div class="btn-upload-option" style="border-color: #2563eb; color: #2563eb; background: #eff6ff;">
                                 📷 Ambil Foto Kamera
@@ -595,7 +595,7 @@
 
                     <!-- FOTO AREA PEMASANGAN -->
                     <div class="form-group">
-                        <label>📍 Foto Area Pemasangan (1 - 5 Foto)<span class="required-asterisk">*</span></label>
+                        <label>📍 Foto Area Pemasangan (1 - 5 Foto, Boleh Sama Antarbarang)<span class="required-asterisk">*</span></label>
                         <div class="upload-options-group">
                             <div class="btn-upload-option" style="border-color: #059669; color: #059669; background: #ecfdf5;">
                                 📷 Ambil Foto Kamera
@@ -967,8 +967,8 @@
             return generateBufferHash(encoder.encode(str).buffer);
         }
 
-        /* 🔧 CEK APAKAH IDENTITAS FOTO SUDAH PERNAH DIPAKAI */
-        function isDuplicatePhoto(rawHash, compressedHash) {
+        /* 🔧 CEK DUPLIKASI FOTO BERDASARKAN TIPE (BARANG WAJIB BEDA, AREA BOLEH SAMA ANTARBARANG) */
+        function isDuplicatePhoto(rawHash, compressedHash, typeName) {
             const checkMatch = (item) => {
                 if (!item) return false;
                 if (rawHash && item.rawHash && item.rawHash === rawHash) return true;
@@ -976,21 +976,26 @@
                 return false;
             };
 
-            // 1. Cek di Foto Barang yang sedang aktif
-            if (currentFotoBarang.some(checkMatch)) return true;
+            if (typeName === 'Barang') {
+                // Foto Barang wajib berbeda dari semua foto yang ada di barang aktif maupun daftar barang lainnya
+                if (currentFotoBarang.some(checkMatch)) return true;
+                if (currentFotoArea.some(checkMatch)) return true;
 
-            // 2. Cek di Foto Area yang sedang aktif
-            if (currentFotoArea.some(checkMatch)) return true;
-
-            // 3. Cek di seluruh barang yang sudah masuk tabel daftar PR (kecuali item yang sedang di-edit)
-            for (let i = 0; i < listBarangRequest.length; i++) {
-                if (i === editingIndex) continue;
-                const reqItem = listBarangRequest[i];
-                const allExisting = [...(reqItem.fotoBarang || []), ...(reqItem.fotoArea || [])];
-                if (allExisting.some(checkMatch)) {
-                    return true;
+                for (let i = 0; i < listBarangRequest.length; i++) {
+                    if (i === editingIndex) continue;
+                    const reqItem = listBarangRequest[i];
+                    const allExisting = [...(reqItem.fotoBarang || []), ...(reqItem.fotoArea || [])];
+                    if (allExisting.some(checkMatch)) {
+                        return true;
+                    }
                 }
+            } else if (typeName === 'Area') {
+                // Foto Area BOLEH sama dengan foto area pada barang lain yang sudah masuk daftar.
+                // Hanya dicegah jika memilih foto yang sama persis di dalam satu input barang yang sedang aktif.
+                if (currentFotoArea.some(checkMatch)) return true;
+                if (currentFotoBarang.some(checkMatch)) return true;
             }
+
             return false;
         }
 
@@ -1047,7 +1052,7 @@
             });
         }
 
-        /* 🔧 VALIDASI FOTO & TOLAK IDENTITAS YANG SAMA */
+        /* 🔧 VALIDASI FOTO & TERAPKAN ATURAN BARANG VS AREA */
         async function handleImageFiles(files, targetArray, maxLimit, previewContainer, typeName) {
             if (files.length === 0) return;
 
@@ -1066,7 +1071,7 @@
                     const isDupInBatch = newConverted.some(
                         item => item.rawHash === compressed.rawHash || item.hash === compressed.hash
                     );
-                    if (isDuplicatePhoto(compressed.rawHash, compressed.hash) || isDupInBatch) {
+                    if (isDuplicatePhoto(compressed.rawHash, compressed.hash, typeName) || isDupInBatch) {
                         duplicateCount++;
                         continue;
                     }
@@ -1086,11 +1091,11 @@
                 }
 
                 if (duplicateCount > 0) {
-                    showAlert(
-                        'warning',
-                        'Foto Duplikat Ditolak',
-                        `${duplicateCount} foto tidak ditambahkan karena memiliki identitas gambar yang sama dengan foto yang sudah dilampirkan sebelumnya. Harap gunakan foto dari sudut/objek yang berbeda.`
-                    );
+                    const reasonMsg = typeName === 'Barang'
+                        ? `${duplicateCount} foto barang ditolak karena foto barang wajib berbeda satu sama lain (baik dalam 1 barang maupun antarbarang di daftar PR).`
+                        : `${duplicateCount} foto area ditolak karena foto tersebut sudah dilampirkan pada barang ini. (Catatan: Foto area yang sama tetap boleh dipakai ulang untuk barang yang berbeda).`;
+
+                    showAlert('warning', 'Foto Duplikat Ditolak', reasonMsg);
                 }
             } catch (err) {
                 console.error("Image compress error:", err);
@@ -1098,7 +1103,7 @@
             }
         }
 
-        /* 🔧 EVENT LISTENER INPUT KAMERA & GALERI (YANG SEBELUMNYA TERHAPUS) */
+        /* 🔧 EVENT LISTENER INPUT KAMERA & GALERI */
         fotoBarangCam.addEventListener('change', (e) => {
             triggerVibration(20);
             handleImageFiles(Array.from(e.target.files), currentFotoBarang, 3, previewFotoBarang, 'Barang');
