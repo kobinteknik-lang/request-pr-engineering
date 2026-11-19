@@ -28,7 +28,6 @@
             min-height: 100vh; 
             padding: 32px 16px; 
             color: #0f172a;
-            /* Background Utama */
             background: linear-gradient(135deg, rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.82)), url('Background-Desktop.jpg') no-repeat center center fixed;
             background-size: cover;
             position: relative;
@@ -731,7 +730,7 @@
         }
     };
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
         const bgMusic = document.getElementById('bgMusic');
         const musicToggleBtn = document.getElementById('musicToggleBtn');
         const musicIcon = document.getElementById('musicIcon');
@@ -779,7 +778,7 @@
 
         const draftStatus = document.createElement('div');
         draftStatus.className = 'draft-status ready';
-        draftStatus.innerHTML = '<span class="dot"></span><span class="label">Draft siap</span>';
+        draftStatus.innerHTML = '<span class="dot"></span><span class="label">Memuat draft...</span>';
         draftStatus.setAttribute('role', 'status');
         draftStatus.setAttribute('aria-live', 'polite');
         document.body.appendChild(draftStatus);
@@ -792,9 +791,15 @@
         let draftSaveTimer = null;
         let isSavingDraft = false;
         let pendingDraftSave = false;
+        let isDraftLoaded = false;
         let isSubmitting = false;
+        let currentRequestId = null;
         const DRAFT_DB = 'pr_engineering_drafts';
         const DRAFT_KEY = 'current_pr_draft';
+
+        function generateRequestId() {
+            return 'REQ-' + Date.now() + '-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
 
         function openDraftDB() {
             return new Promise((resolve, reject) => {
@@ -831,6 +836,9 @@
         }
 
         async function deleteDraftDB() {
+            pendingDraftSave = false;
+            clearTimeout(draftSaveTimer);
+            localStorage.removeItem('pr_form_draft');
             try {
                 const db = await openDraftDB();
                 await new Promise((resolve, reject) => {
@@ -882,7 +890,7 @@
                 .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
-        /* 🔧 MODAL NOTIFIKASI ANTI-FREEZE */
+        /* MODAL NOTIFIKASI ANTI-FREEZE */
         let modalHideTimer = null;
         let activeConfirmCallback = null;
 
@@ -945,7 +953,7 @@
             });
         }
 
-        /* 🔧 GENERATE SIDIK JARI UNIK FOTO (SHA-256 DARI BUFFER / STRING) */
+        /* GENERATE SIDIK JARI UNIK FOTO */
         async function generateBufferHash(arrayBuffer) {
             try {
                 if (window.crypto && window.crypto.subtle) {
@@ -967,7 +975,7 @@
             return generateBufferHash(encoder.encode(str).buffer);
         }
 
-        /* 🔧 CEK DUPLIKASI FOTO BERDASARKAN TIPE (BARANG WAJIB BEDA, AREA BOLEH SAMA ANTARBARANG) */
+        /* CEK DUPLIKASI FOTO */
         function isDuplicatePhoto(rawHash, compressedHash, typeName) {
             const checkMatch = (item) => {
                 if (!item) return false;
@@ -977,7 +985,6 @@
             };
 
             if (typeName === 'Barang') {
-                // Foto Barang wajib berbeda dari semua foto yang ada di barang aktif maupun daftar barang lainnya
                 if (currentFotoBarang.some(checkMatch)) return true;
                 if (currentFotoArea.some(checkMatch)) return true;
 
@@ -990,8 +997,6 @@
                     }
                 }
             } else if (typeName === 'Area') {
-                // Foto Area BOLEH sama dengan foto area pada barang lain yang sudah masuk daftar.
-                // Hanya dicegah jika memilih foto yang sama persis di dalam satu input barang yang sedang aktif.
                 if (currentFotoArea.some(checkMatch)) return true;
                 if (currentFotoBarang.some(checkMatch)) return true;
             }
@@ -999,7 +1004,7 @@
             return false;
         }
 
-        /* 🔧 OPTIMASI KOMPRESI GAMBAR + SERTAKAN DUAL HASH IDENTITAS */
+        /* KOMPRESI GAMBAR */
         async function compressAndConvertFile(file, maxWidth = 720, quality = 0.5) {
             const rawBuffer = await file.arrayBuffer();
             const rawHash = await generateBufferHash(rawBuffer);
@@ -1052,7 +1057,7 @@
             });
         }
 
-        /* 🔧 VALIDASI FOTO & TERAPKAN ATURAN BARANG VS AREA */
+        /* VALIDASI FOTO */
         async function handleImageFiles(files, targetArray, maxLimit, previewContainer, typeName) {
             if (files.length === 0) return;
 
@@ -1103,7 +1108,6 @@
             }
         }
 
-        /* 🔧 EVENT LISTENER INPUT KAMERA & GALERI */
         fotoBarangCam.addEventListener('change', (e) => {
             triggerVibration(20);
             handleImageFiles(Array.from(e.target.files), currentFotoBarang, 3, previewFotoBarang, 'Barang');
@@ -1152,24 +1156,50 @@
             }
         };
 
+        /* SINKRONISASI TAMPILAN MODE EDIT */
+        function syncEditModeUI() {
+            if (editingIndex >= 0 && editingIndex < listBarangRequest.length) {
+                addBarangBtn.textContent = '💾 Simpan Perubahan';
+                addBarangBtn.style.background = '#f59e0b';
+                cancelEditBtn.style.display = 'block';
+                inputAreaTitle.textContent = `✏️ Edit Barang #${editingIndex + 1}:`;
+            } else {
+                editingIndex = -1;
+                addBarangBtn.textContent = '➕ Tambah ke Daftar';
+                addBarangBtn.style.background = 'linear-gradient(135deg, #059669, #047857)';
+                cancelEditBtn.style.display = 'none';
+                inputAreaTitle.textContent = '📍 Input Detail Barang:';
+            }
+        }
+
         function collectDraft() {
+            if (!currentRequestId) currentRequestId = generateRequestId();
             return {
-                version: 2, savedAt: new Date().toISOString(),
-                nama: namaInput.value, grup: grupSelect.value, dept: deptInput.value,
+                version: 3,
+                requestId: currentRequestId,
+                savedAt: new Date().toISOString(),
+                nama: namaInput.value,
+                grup: grupSelect.value,
+                dept: deptInput.value,
                 items: listBarangRequest,
                 current: {
-                    namaBarang: barangInput.value, kodeBarang: kodeInput.value,
-                    jumlah: jumlahInput.value, satuan: satuanSelect.value,
-                    urgensi: urgensiSelect.value, keterangan: keteranganInput.value,
-                    mesin: mesinInput.value, fotoBarang: currentFotoBarang, fotoArea: currentFotoArea,
+                    namaBarang: barangInput.value,
+                    kodeBarang: kodeInput.value,
+                    jumlah: jumlahInput.value,
+                    satuan: satuanSelect.value,
+                    urgensi: urgensiSelect.value,
+                    keterangan: keteranganInput.value,
+                    mesin: mesinInput.value,
+                    fotoBarang: currentFotoBarang,
+                    fotoArea: currentFotoArea,
                     editingIndex
                 }
             };
         }
 
-        /* 🔧 AUTOSAVE DENGAN LOCKING */
+        /* AUTOSAVE DENGAN LOCKING */
         async function executeDraftWrite() {
-            if (isSubmitting) return;
+            if (isSubmitting || !isDraftLoaded) return;
             if (isSavingDraft) {
                 pendingDraftSave = true;
                 return;
@@ -1177,12 +1207,14 @@
             isSavingDraft = true;
             try {
                 await writeDraftDB(collectDraft());
+                localStorage.removeItem('pr_form_draft');
                 if (!isSubmitting) setDraftStatus('saved', 'Draft tersimpan otomatis');
             } catch (e) {
                 try {
                     const d = collectDraft();
                     d.items = d.items.map(item => ({...item, fotoBarang: [], fotoArea: []}));
-                    d.current.fotoBarang = []; d.current.fotoArea = [];
+                    d.current.fotoBarang = [];
+                    d.current.fotoArea = [];
                     localStorage.setItem('pr_form_draft', JSON.stringify(d));
                     if (!isSubmitting) setDraftStatus('saved', 'Draft tersimpan (tanpa foto)');
                 } catch (fallbackError) {
@@ -1190,29 +1222,38 @@
                 }
             } finally {
                 isSavingDraft = false;
-                if (pendingDraftSave) {
+                if (pendingDraftSave && !isSubmitting) {
                     pendingDraftSave = false;
                     executeDraftWrite();
+                } else {
+                    pendingDraftSave = false;
                 }
             }
         }
 
         function saveDraft() {
-            if (isSubmitting) return;
+            if (isSubmitting || !isDraftLoaded) return;
             setDraftStatus('saving', 'Menyimpan draft…');
             clearTimeout(draftSaveTimer);
-            draftSaveTimer = setTimeout(executeDraftWrite, 800);
+            draftSaveTimer = setTimeout(executeDraftWrite, 600);
         }
 
         async function loadDraft() {
+            currentRequestId = generateRequestId();
             let draft = null;
             try { draft = await readDraftDB(); } catch (e) { console.warn('IndexedDB tidak tersedia:', e); }
             if (!draft) {
                 try { const legacy = localStorage.getItem('pr_form_draft'); draft = legacy ? JSON.parse(legacy) : null; }
                 catch (e) { localStorage.removeItem('pr_form_draft'); }
             }
-            if (!draft) return;
+            if (!draft) {
+                renderTable();
+                isDraftLoaded = true;
+                setDraftStatus('ready', 'Draft siap');
+                return;
+            }
             try {
+                if (draft.requestId) currentRequestId = draft.requestId;
                 if (draft.nama) namaInput.value = draft.nama;
                 if (draft.grup) grupSelect.value = draft.grup;
                 if (draft.dept) deptInput.value = draft.dept;
@@ -1238,13 +1279,20 @@
                     mesinInput.value = c.mesin || '';
                     currentFotoBarang = Array.isArray(c.fotoBarang) ? c.fotoBarang : [];
                     currentFotoArea = Array.isArray(c.fotoArea) ? c.fotoArea : [];
-                    editingIndex = Number.isInteger(c.editingIndex) && c.editingIndex < listBarangRequest.length ? c.editingIndex : -1;
+                    editingIndex = Number.isInteger(c.editingIndex) && c.editingIndex >= 0 && c.editingIndex < listBarangRequest.length ? c.editingIndex : -1;
+                    
                     renderPreviews(currentFotoBarang, previewFotoBarang, 'barang');
                     renderPreviews(currentFotoArea, previewFotoArea, 'area');
+                    syncEditModeUI();
                 }
-                renderTable();
                 setDraftStatus('saved', 'Draft dipulihkan');
-            } catch (e) { console.warn('Draft tidak dapat dipulihkan:', e); }
+            } catch (e) {
+                console.warn('Draft tidak dapat dipulihkan:', e);
+                setDraftStatus('ready', 'Draft siap');
+            } finally {
+                renderTable();
+                isDraftLoaded = true;
+            }
         }
 
         [namaInput, grupSelect, deptInput, barangInput, kodeInput, jumlahInput, satuanSelect, urgensiSelect, keteranganInput, mesinInput].forEach(el => {
@@ -1353,8 +1401,8 @@
             }
         }
 
+        await loadDraft();
         loadBarang();
-        loadDraft();
 
         function searchBarang(keyword) {
             const terms = keyword.toLowerCase().trim().split(/\s+/);
@@ -1399,6 +1447,7 @@
                         kodeInput.value = item.kode;
                         kodeInput.readOnly = true;
                         suggestionsBox.style.display = 'none';
+                        saveDraft();
                         jumlahInput.focus();
                     });
                     suggestionsBox.appendChild(div);
@@ -1420,6 +1469,7 @@
                 kodeInput.readOnly = false;
                 kodeInput.focus();
                 suggestionsBox.style.display = 'none';
+                saveDraft();
             });
 
             suggestionsBox.appendChild(newBarangDiv);
@@ -1448,10 +1498,7 @@
             currentFotoArea = [];
             
             editingIndex = -1;
-            addBarangBtn.textContent = '➕ Tambah ke Daftar';
-            addBarangBtn.style.background = 'linear-gradient(135deg, #059669, #047857)';
-            cancelEditBtn.style.display = 'none';
-            inputAreaTitle.textContent = '📍 Input Detail Barang:';
+            syncEditModeUI();
         }
 
         addBarangBtn.addEventListener('click', () => {
@@ -1512,6 +1559,7 @@
         cancelEditBtn.addEventListener('click', () => {
             triggerVibration(15);
             resetItemForm();
+            saveDraft();
         });
 
         function renderTable() {
@@ -1564,10 +1612,8 @@
             renderPreviews(currentFotoArea, previewFotoArea, 'area');
 
             editingIndex = index;
-            addBarangBtn.textContent = '💾 Simpan Perubahan';
-            addBarangBtn.style.background = '#f59e0b';
-            cancelEditBtn.style.display = 'block';
-            inputAreaTitle.textContent = `✏️ Edit Barang #${index + 1}:`;
+            syncEditModeUI();
+            saveDraft();
             barangInput.focus();
         };
 
@@ -1583,7 +1629,12 @@
                 true,
                 'Batal',
                 () => {
-                    if (editingIndex === index) resetItemForm();
+                    if (editingIndex === index) {
+                        resetItemForm();
+                    } else if (editingIndex > index) {
+                        editingIndex--;
+                        syncEditModeUI();
+                    }
                     listBarangRequest.splice(index, 1);
                     renderTable();
                     saveDraft();
@@ -1600,13 +1651,27 @@
             }
         });
 
-        /* 🔧 SUBMIT REQUEST PR */
+        /* CEK APAKAH AREA INPUT BARANG SEDANG TERISI SEBAGIAN */
+        function hasPendingItemInput() {
+            return (
+                barangInput.value.trim() !== '' ||
+                jumlahInput.value.trim() !== '' ||
+                mesinInput.value.trim() !== '' ||
+                keteranganInput.value.trim() !== '' ||
+                currentFotoBarang.length > 0 ||
+                currentFotoArea.length > 0
+            );
+        }
+
+        /* SUBMIT REQUEST PR */
         submitBtn.addEventListener('click', async function () {
             if (!form.reportValidity()) return;
             if (isSubmitting) return;
 
-            if (barangInput.value.trim() !== '') {
-                showAlert('warning', 'Barang Belum Ditambahkan', 'Anda sedang mengetik detail barang. Silakan klik tombol "➕ Tambah ke Daftar" terlebih dahulu sebelum mengirim request!');
+            if (hasPendingItemInput()) {
+                const title = editingIndex >= 0 ? 'Perubahan Barang Belum Disimpan' : 'Barang Belum Ditambahkan';
+                const btnLabel = editingIndex >= 0 ? '💾 Simpan Perubahan' : '➕ Tambah ke Daftar';
+                showAlert('warning', title, `Ada detail/foto barang yang sedang diisi di form atas. Silakan klik tombol <strong>"${btnLabel}"</strong> terlebih dahulu sebelum mengirim request!`);
                 return;
             }
 
@@ -1623,7 +1688,8 @@
             submitBtn.innerHTML = '<div class="spinner" style="width: 18px; height: 18px; border-width: 2.5px; border-top-color: #ffffff; display: inline-block;"></div> Mengirim Data...';
             setDraftStatus('saving', 'Mengirim request ke server…');
 
-            // Bersihkan properti hash lokal sebelum dikirim ke Apps Script agar payload tetap ramping
+            if (!currentRequestId) currentRequestId = generateRequestId();
+
             const cleanItems = listBarangRequest.map(({ fotoBarang, fotoArea, ...rest }) => ({
                 ...rest,
                 fotoBarang: fotoBarang.map(({ name, mimeType, data }) => ({ name, mimeType, data })),
@@ -1631,6 +1697,7 @@
             }));
 
             const payload = {
+                requestId: currentRequestId,
                 nama: namaInput.value.trim(),
                 grup: grupSelect.value,
                 departemen: deptInput.value,
@@ -1638,7 +1705,7 @@
             };
 
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 90000);
+            const timeoutId = setTimeout(() => controller.abort(), 150000);
 
             try {
                 const response = await fetch(scriptURL, {
@@ -1668,10 +1735,16 @@
                     throw new Error(result.message || "Server gagal menyimpan data.");
                 }
 
+                const savedNama = namaInput.value;
+                const savedGrup = grupSelect.value;
+
                 listBarangRequest = [];
-                localStorage.removeItem('pr_form_draft');
+                currentRequestId = generateRequestId();
                 await deleteDraftDB();
+
                 form.reset();
+                namaInput.value = savedNama;
+                grupSelect.value = savedGrup;
                 deptInput.value = "Engineering"; 
                 renderTable();
                 resetItemForm();
@@ -1682,7 +1755,7 @@
                 clearTimeout(timeoutId);
                 console.error("SUBMIT ERROR:", error);
                 const msg = error.name === 'AbortError' 
-                    ? 'Waktu koneksi habis (lebih dari 90 detik). Ukuran total foto terlalu besar atau sinyal lambat. Cek tab Riwayat Request sebelum mencoba lagi.'
+                    ? 'Waktu koneksi habis (lebih dari 2,5 menit). Cek tab <strong>Riwayat Request</strong> terlebih dahulu untuk memastikan data belum masuk sebelum mencoba mengirim ulang.'
                     : (error.message || 'Terjadi masalah teknis saat mengirim data.');
                 showAlert('error', 'Gagal Mengirim', msg);
             } finally {
